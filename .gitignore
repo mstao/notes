@@ -1,0 +1,15 @@
+-总结
+blog/
+.git
+Work-Notes
+.DS_Store
+interview2
+career
+*.iml
+../other/book
+bigdata/homework
+*.pdf
+bigdata/docs
+devops
+fe
+mindmap

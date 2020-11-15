@@ -1,0 +1,1045 @@
+[TOC]  
+
+# *Hive 
+
+## 基础说明
+
+> **将 SQL 转换成 MapReduce 任务的工具**   
+>
+> 基于 Hadoop 的数据仓库工具，存储和处理海量结构化的数据，可将结构化的数据映射成一张表
+
+**说明**
+
+处理 HDFS 中的海量数据  
+
+通过 SQL 完成计算
+
+基于Hadoop的数据仓库工具，可以将结构化的数据文件映射为一张表，并提供类SQL查询功能.
+
+最适合数据仓库程序   
+
+
+
+缺点：
+
+HQL 表达能力有限： 无法表示迭代计算，数据挖掘方面不擅长
+
+效率低： 自动生成的 MR 效率，调优较困难
+
+
+
+ 
+
+Pig: Hive 的替代品，apache 顶级项目  
+一种数据流语言，不是查询语言  
+常用语 ETL 中的一部分  
+
+
+HBase: 已经可以结合 Hive 使用  
+
+
+Thrift:  
+提供了可远程访问其他进程的功能，提供了使用 JDBC, ODBC 访问 Hive 的功能  
+
+HWI: 简单的网页界面  
+
+HQL： 
+
+
+
+**Hive 与 RDBMS 的比较**  
+
+- 查询语言类型：
+
+- 执行引擎： Hive 可为 MR/Tez/Spark/Flink，RDBMS 使用自己的执行引擎  
+
+- 数据存储： RDBMS 使用本地文件系统， Hive 使用 HDFS  
+
+- 执行速度： 
+
+- 扩展型： Hive 支持水平扩展，RDBMS 支持垂直扩展，对水平扩展不友好  
+
+- 数据更新： Hive 对数据更新不友好  
+
+
+
+
+
+Hive:  
+
+- 解释器: AST 抽象语法树
+- 编译器
+- 优化器
+- 执行期
+- MetaStore
+
+Hive 的元数据默认存储在自带的 derby 数据库中  
+derby: java 开发、但进程、单用户
+
+
+
+### 架构原理
+
+// TODO
+
+Client： Hive、Beeline、Hue
+
+
+
+元数据库： 存放元数据的地方，数据库、表、分区、列的名称和属性，数据所在位置等信息
+
+
+
+Meta store 元数据服务： 提供统一的服务接口，Client 通过 metastore 访问元数据。三种模式，内嵌、本地、远程模式。
+
+
+
+。。。
+
+
+
+Hive Driver： 解释器、编译器、优化器、执行器
+
+
+
+HSQL 转化为 MapReduce 的过程
+
+HiveSQL 
+
+--> AST 抽象语法树
+
+--> QB 查询块
+
+--> OperatorTree 操作树
+
+--> 优化后的 OperatorTree
+
+--> MapReduce 树
+
+--> 优化后的 MapReduce 任务树
+
+
+
+
+
+Q: Hive 关联表对应 MapReduce 如何实现？
+
+
+
+
+
+HiveQL 于 SQL 的比较：
+
+| 比较项        | SQL                        | HiveQL                                  |
+| ------------- | -------------------------- | --------------------------------------- |
+| ANSI SQL 更新 | 支持  UPDATEVINSERT\DELETE | 不完全支持  insert OVERWRITEVINTO TABLE |
+| 事务          | 支持                       | 可支持(分桶、ORCFile 文件格式)          |
+| 模式          | 写模式                     | 读模式                                  |
+| 数据保存      | 块设备、本地文件系统       | HDFS                                    |
+| 延时          | 低                         | 高                                      |
+| 多表播入      | 不支持                     | 支持                                    |
+| 子查询        | 完全支持                   | 只能用在From子旬中                      |
+| 视图          | Updatable                  | Read-only                               |
+| 可扩展性      | 低                         | 高                                      |
+| 数据规模      | 小                         | 大                                      |
+|               | 0EE000                     | 0080E0                                  |
+
+
+
+
+
+### 数据类型
+
+基本数据类型
+
+Integer  、TINYINT、SMALINT、、INT、BIGINT
+
+FLOAT、DOUBLE:  
+
+DECIMAL: 17byte  
+
+STRING: 任意长度
+
+VARCHAR: 1-65535  
+
+
+
+类型转换
+
+String 可隐式转换  
+cast 进行强制类型转换，失败返回空  
+
+
+
+四种集合类型  
+array: 有序的相同类型集合
+map:  key 为基本类型
+struct:  不同类型字段的集合
+union: 不同类型元素存储在统一字段的不同行中  
+
+
+
+默认分隔符：
+
+\n:
+
+^A:
+
+^B:
+
+^C
+
+
+
+
+
+
+
+原始的 JSON 数据
+
+```sql
+{
+    "name": "songsong",
+    "friends": ["bingbing" , "lili"] ,       //列表Array,
+    "children": {                      //键值Map,
+        "xiao song": 18 ,
+        "xiaoxiao song": 19
+    }
+    "address": {                      //结构Struct,
+        "street": "hui long guan" ,
+        "city": "beijing"
+    }
+}
+```
+
+格式好的行数据
+
+```
+songsong,bingbing_lili,xiao song:18_xiaoxiao song:19,hui long guan_beijing
+yangyang,caicai_susu,xiao yang:18_xiaoxiao yang:19,chao yang_beijing
+```
+
+```sql
+-- 表创建
+create table test(
+name string,
+friends array<string>,
+children map<string, int>,
+address struct<street:string, city:string>
+)
+row format delimited fields terminated by ','
+collection items terminated by '_'
+map keys terminated by ':'
+lines terminated by '\n';
+```
+
+```sql
+-- 测试结构查询
+SELECT friends[1], children['xiao song'], address.city 
+FROM test WHERE name = 'songsong';
+```
+
+
+
+
+
+### 表类型
+外部表： 指定 external 关键字，删除表定义，数据不会删除
+内部表： 数据会删除
+分桶表： 实现 DML 事务时必须
+分区表： 
+
+
+
+Q: 为何分区？
+
+可避免全表扫描，提高查询效率，通常根据事件、地区等信息进行分区
+
+
+
+Q: 为何分桶？
+
+分区或表数据量过大，分桶降数据划分成更细粒度。
+
+通过 分桶字段.hashCode % 分桶个数。
+
+不能使用 load data local inpath 方式加载数据
+
+
+
+### 文本文件编码
+支持自定义文件存储格式  
+
+ ctrl+v + ctrl+c  
+
+行与行 \n  
+字段之间 ^A  
+元素之间 ^B
+k-v 之间： ^C  
+
+
+
+### 读时模式  
+写时模式 -> 写数据检查 -> RDBMS  
+读时模式 -> 读时检查 -> Hive   
+
+
+
+
+
+
+
+
+## 命令操作
+hive  
+--service name 指定服务名称  
+hive --help --service cli  
+
+
+
+
+
+### 变量和属性
+set -v
+
+```
+-- 打印当前数据库  
+hive.cli.print.current.db=true
+```
+
+执行文件  ，一般为 h/hql 结尾  
+hive -f xxx.hql
+
+-i: 指定文件名  
+启动时，首先执行这个文件，默认为 .hiverc  
+
+.hivehistory: 记录hive 的历史命令
+
+集成  Shell 使用  
+集成 HDFS 使用  
+
+
+
+### *DQL
+
+排序字句：
+
+order by: 全局有序
+
+sort by： 每个 MR 内部有序
+
+distribute by: 分区排序，将数据按照 distribute by 字段分区
+
+Cluster by： distrubute by 于 sort by 同一个字段时使用
+
+
+
+
+
+### *函数
+
+*日期函数
+
+
+
+
+
+**条件函数**
+
+if
+
+Case when: 使用较多
+
+Coalesce:
+
+Is null / isnotnull:
+
+nvl
+
+nulif:
+
+Explode: 配合 lateral view 于 explode 联用，解决 uDTF 不能添加额外列的问题
+
+```sql
+
+```
+
+
+
+
+
+***窗口函数：**
+
+聚集函数：
+
+序列函数：
+
+排名函数：
+
+
+
+
+
+**自定义函数**
+
+
+
+
+
+### DML
+
+事务
+
+
+
+事务的限制：
+
+行级别
+
+不支持 begin, commit, rollback, 自动提交
+
+必须 ORC 文件格式，表必须是分桶表，表必须是 内部表
+
+默认事务关闭
+
+  
+
+
+## 元数据管理
+通常是独立的 RDBMS  
+
+
+## Thrift 服务
+开启 hiveserver2，搭配 groovy / maven 使用      
+默认情况下，管理表在 `/usr/hive/warehouse` 目录下
+
+hive.start.cleanup.scratchdir  默认为 false  
+每次重启 Hiveserver 时清理掉历史目录  
+
+
+
+### HiveServer2
+
+### beeline
+beeline 可以连接 Hive， MySQL...  
+
+
+### HCatalog
+Hive 的元数据服务  
+统一的元数据服务  
+
+可不启动 MR 任务执行  
+主要是 DDL 对元数据的操作  
+
+
+hcat -e "create database tt2";
+
+hcat -f xxx.hql
+
+
+## 数据存储格式 
+TEXTFILE（默认格式） 、
+SEQUENCEFILE、
+RCFILE、
+ORCFILE、
+PARQUET。
+
+TEXTFILE、SEQUENCEFILE 的存储格式是基于行存储的；  
+ORC和PARQUET 是基于列式存储的。
+
+
+TEXTFILE  
+
+
+通常先导入到 textfile，之后执行 insert ... select 到其他格式的表中  
+
+
+
+**行和列的存储**   
+行存储：  
+insert 与 update 比较容易  
+select 需要查询大多无用的数据  
+
+
+textfile,sequencefile 行  
+rcrile, orc, parout   列存储  
+
+
+
+sequencefile:  
+可分割  
+可压缩  
+record, none, block 压缩  ...
+
+
+
+
+RCFile:  
+烈士记录文件，结合列和行存储的优势  
+
+先按水平划分，后让垂直划分  
+
+
+
+### ORCFile  
+组成  
+文件脚注(file footer)：  
+postscript：  
+stripe: 条带  ，默认 250M  
+- Index Data:  1W行一个, 条带统计信息, 数据在条带中的位置  
+- Row data:  水平 --> 垂直, 列为单位存储数据  
+- Stripe Footer: stripe 元数据信息  
+
+
+三个级别的索引：  
+文件级别、条带级、行组级  
+
+无需指定分割符，自动处理  
+
+
+
+
+### Parquet  
+apache 顶级项目 
+通用型强  
+**与语言和平台无关**  
+二进制存储的  
+
+文件中包含数据和元数据  
+
+Row group:  文件有多个行组组成，写入数据最大的缓存单元，50M ~ 1GB 之间    
+
+Column Chunk: 存储当前行组内的某一行数据  
+最小的 I/O 并发单元  
+
+Page: 压缩读取数据的最小单元  
+8K ~ 1M 之间，越大压缩率越高  
+
+
+Footer: 数据的 schema 信息    
+每个行组的元数据信息：  
+每个 column chunk 的元数据信息：  
+
+
+
+### 比较
+压缩比  
+ORC > Parquet > text  
+
+
+执行查询 
+ORC 与 Parquet  相当  
+
+
+
+- TextFile文件更多的是作为跳板来使用(即方便将数据转为其他格式)  
+- 有update、delete和事务性操作的需求，通常选择ORCFile  
+- 没有事务性要求，希望支持Impala、Spark，多种计算框架/查询引擎，建议选择Parquet
+
+
+## Hive 调优
+### 架构优化
+**执行引擎选择**
+
+hive.execution.engine 控制  
+
+MapReduce, Tez, Spark, Flink  
+
+DAG 有向五环图  
+Hontonworks 开源  
+
+
+
+
+
+优化器的使用  
+矢量化查询执行  
+使用矢量化查询执行，必须用ORC格式存储数据  
+
+```
+-- 默认 false 
+set hive.vectorized.execution.enabled = true;
+
+-- 默认 false
+set hive.vectorized.execution.reduce.enabled = true;
+```
+
+
+
+
+
+文件格式
+
+
+
+
+
+数据压缩
+
+
+
+
+
+分区、分桶表
+
+
+
+
+
+### 参数优化
+
+#### 配置参数
+
+<p align="center"><strong>常用配置</strong></p>
+
+| 变量                                 | 含义                     | 参数类型 | 取值作用                                                 |
+| ------------------------------------ | ------------------------ | -------- | -------------------------------------------------------- |
+| hive.execution.engine                | 配置执行引擎             | 架构     |                                                          |
+|                                      |                          |          |                                                          |
+| hive.fetch.task.conversion           | Fetch 抓取               |          | more 在全局查找、字段查找、limit查找等都不走mapreduce    |
+| hive.exec.mode.local.auto            | 本地模式                 |          | 在输入数据量小的情况下，在单台机器上处理所有任务。       |
+| hive.map.aggr                        | Map 端聚合               |          | True，默认                                               |
+| hive.groupby.mapaggr.checkinterval   | Map 端聚合条目数目       |          | 100000，默认                                             |
+| hive.groupby.skewindata              | 数据倾斜时负载均衡       |          | 默认 false                                               |
+|                                      |                          |          |                                                          |
+| hive.input.format                    | InpuFormat               |          | org.apache.hadoop.hive.ql.io.CombineHiveInputFormat 默认 |
+| hive.exec.reducers.bytes.per.reducer | 每个 Reduce 处理的数据量 |          | 默认 256MB                                               |
+| hive.exec.reducers.max               | 任务最大的 reduce 数     |          | 默认 1009                                                |
+|                                      |                          |          |                                                          |
+| hive.exec.parallel                   | 并行执行（多阶段）       |          |                                                          |
+| hive.cli.print.current.db            | 打印当前数据库           | 显示     |                                                          |
+|                                      |                          |          |                                                          |
+| hive.metastore.uris                  | 元数据地址               |          | 如果为空，则为本地模式                                   |
+
+
+
+
+
+本地模式   
+
+
+
+严格模式  
+
+
+
+JVM重用   
+
+
+
+并行执行   
+
+Hive 将查询转换成一个或多个阶段，MapReduce 阶段、抽样阶段、合并阶段、Limit 阶段.. 
+
+默认情况下一次只执行一个阶段，对于特定 Job 有多个阶段，阶段间非完全相互依赖，并行执行，可以缩短 job 的执行时间。
+
+并行执行集群利用了对应增加。
+
+
+
+
+
+推测执行   
+
+
+
+合并小文件   
+
+
+
+Fetch模式
+
+
+
+
+
+
+
+### SQL 优化
+**列裁剪和分区裁剪**  
+sort by 代替 order by   
+
+
+
+**group by 代替 count(distinct)**  
+
+去重计算数据量大时不好处理，一般COUNT DISTINCT使用先GROUP BY再COUNT的方式替换。
+
+
+
+**group by 配置调整**  
+
+
+
+**join 基础优化**  
+
+map join
+
+分桶 join
+
+
+
+
+
+**处理空值或无意义值**  
+
+大表 Join 大表时，key 有大量的异常数据，结果 Join 的时候耗时长，可通过 SQL 对其进行过滤
+
+空 Key 转化，ke y 非异常数据，为空 key 设置随机值，防止 ...
+
+
+
+**单独处理倾斜key**  
+
+
+
+
+
+**调整 Map 数**  
+
+Q:  是不是map数越多越好？
+  答案是否定的。如果一个任务有很多小文件（远远小于块大小128m），则每个小文件也会被当做一个块，用一个map任务来完成，而一个map任务启动和初始化的时间远远大于逻辑处理的时间，就会造成很大的资源浪费。而且，同时可执行的map数是受限的。
+
+Q:  是不是保证每个map处理接近128m的文件块，就高枕无忧了？
+  答案也是不一定。比如有一个127m的文件，正常会用一个map去完成，但这个文件只有一个或者两个小字段，却有几千万的记录，如果map处理的逻辑比较复杂，用一个map任务去做，肯定也比较耗时。
+
+增加 Map 的方法：
+
+调整 maxSize 最大值，使 maxSize 小于 blockSize 增加 map 个数
+
+// TODO maxSize 对应的配置参数...
+
+```java
+computeSliteSize(Math.max(minSize,Math.min(maxSize,blocksize)))=blocksize=128M
+```
+
+
+
+
+
+
+
+**调整 Reduce 数**  
+
+
+
+
+
+
+
+## HQL 编写
+
+连续值问题
+
+
+
+
+
+
+
+
+
+
+
+# Impala
+
+![image-20201102200733355](assets/image-20201102200733355.png)
+
+交互式查询工具    
+支持 parquet 存储  
+
+按照阶段划分⼀个⼤数据开发任务，会有：  
+数据采集(⽇志⽂件，关系型数据库中)，  
+数据清洗 (数据格式整理，脏数据过滤等)，  
+数据预处理(为了后续分析所做的⼯作)，  
+数据分析：离线处理(T+1分 析)，  
+实时处理(数据到来即分析)，  
+数据可视化，  
+机器学习，  
+深度学习等  
+
+
+
+
+
+Hive 对交互式查询的场景⽆能为⼒  
+
+抛弃了MapReduce 使⽤了类似于传统的 **MPP数据库技术**  
+
+Impala：在执⾏程序之间使⽤流的⽅式传输中间结果，避免数据落盘。尽可能使⽤内存避免磁盘 开销  
+
+处理数据量在PB级别最佳  
+
+
+Impala 使用 Java、C++ 编写  
+
+在 PB 级别，比 Hive 快 3-90 倍  
+
+Join 优化  
+
+Cloudera 提供的，参考 Google 新
+
+
+
+
+
+使用的元数据为 Hive 的 ...  
+
+
+
+**移动数据不如移动计算**
+
+
+
+
+
+MR
+
+### *MPP
+每个节点独享磁盘和内存  
+
+MR 慢的原因：  
+
+- Shuffer 开销大，读写磁盘的 I/O 开销大  
+- Shuffle 默认对 key 进行分区排序, 即使不需要  
+
+
+
+MPP: 
+
+- 提前启动好， MR 每次启动时候进行启动  
+
+- 中间结果： Hive 需要落盘，Impala 使用流的方式传输中间结果  
+
+- 排序： 可不对数据进行排序
+
+
+
+缺点：  
+
+- 只能是百节点级  
+
+- 并发查询达到 20，处于系统的满负载  
+- 资源不能通过 Yarn 进行资源调度  
+
+
+
+Impala 需要引用 Hive 依赖包，需要 Hadoop 支持 C 的调用接口...   
+
+rpm 安装需要管理包的依赖关系  
+
+
+
+### 短路读取
+数据节点与 xx 在同一个节点上  
+直接访问本地的数据  
+
+短路读取本地中转站  
+好的方式配置 DN 与 HDFS 客户气通信  
+快之间元数据。。   
+
+
+
+### 安装
+22000： 可用的 catalog 进程端口  
+
+25000： 管理界面  。。。  
+
+
+
+### 与 Hive 比较
+
+Impala 与 Hive 的元数据关系？
+
+Hive 对元数据的跟新操作不能被 Impala 感知。
+
+Impa la 对元数据的更新操作可悲 Hive 感知
+
+
+
+`inviolate metadata` 手动同步 Hive 元数据命令
+
+
+
+### Imapala 架构原理
+
+与 Hive 类似的数据分析工具，非数据库
+
+
+
+
+
+Impalad
+
+- Query Planner: 生成查询计划
+
+- Query Cordinator: 查询协调器，协调多个节点上的执行
+
+- Query Executor:
+
+对节点获取健康情况
+
+
+
+
+
+Catalog:
+
+某个 impala d 更新元数据后，将此次更新同步给其他 impala d 
+
+集群启动时，拉取元数据信息同步到 impala d 进程，后续只有执行 ·inviolate metadata`  后拉取元数据
+
+
+
+
+
+#### *Impala 查询
+
+一般不会问，有助于理解。
+
+
+
+
+
+Query Planner 生成单机执行计划、分布式执行计划
+
+
+
+分布式并行执行计划：
+
+
+
+
+
+Hash Join
+
+
+
+Impala 发现为小表时，采用 broadcast join，将数据复制到所有节点上
+
+
+
+局部聚合完成后，按照分组字段分发数据，保证分组字段相同的数据去往相同节点进行全局汇总
+
+
+
+### 执行计划生成
+....   
+
+
+## Impala 交互式查询  
+集成了 Hive 的 sql 语法  
+重点在于查询，事务性、更新操作不适合  
+一般数据存储在 HDFS  
+
+### Impala shell  
+外部命令  
+-r: 元数据的刷新  
+-f: 指定查询文件  
+-i: 连接到哪个 impala ， `-i linux122`  
+-o: 将执行结果保存到文件   
+
+
+
+展示 Impala 默认内置汉书需要进入 Impala 默认系统数据库中，其他数据库中无法查看   
+
+
+
+更新指定的表, 非更新所有的元数据, 建议使用  
+```
+refresh default.t1
+```
+
+连接到其他机器
+```shell
+connect linux122
+```
+
+
+explain  
+查看执行计划  
+显示读取文件大小、个数、表、分区的信息    
+```shell script
+set explain_level=3
+```
+
+
+profile  
+任务执行后调用  
+更详细，物理层面的资源消耗信息...  
+```shell script
+# Planner TImeline  
+# Query Timeline  
+# 
+```
+
+
+
+### Impala SQL  
+
+text 格式存储时，不支持 array 数据类型  
+对于 paxxx 支持  
+
+
+
+
+view 支持  
+```sql
+create view if not exist  u2_view as select * from u2 where name = 'd'
+```
+
+
+
+order by 排序  
+NULL FIRST , NULL LAST
+
+
+
+limit offset  
+```shell script
+select * from employee order by salary limit 2 offset 0;
+```
+
+
+### 数据导入与 JDBC 查询  
+
+load data 方式不建议在 impala 中使用  
+先使用 load dagta 导入到 hive，之后插入到 impala 表中  
+
+
+
+
+
+
+
+
+
+
+## Impala 进阶
+### Impala 负载均衡
+对 Impalad 节点进行负载均衡  
+DNS 负载均衡最简单，性能一般  
+
+生产中选择一个非 impala 节点安装 HAProxy   
+
+
+
+### Impala 优化
+文件格式：大数据量下最佳为 Parquet    
+避免小文件   
+合理分区力度： 分区数量在 3W 以下造成元数据管理性能下降  
+
+分区列数据类型最好是证书类型：  
+
+获取表的统计指标，追求性能 / 大数据查询时，获取统计指标 compute stats   
+
+减少客户端数据量：  
+
+使用 explanin 查看执行计划...  
+
+
+
+
+
+
+
