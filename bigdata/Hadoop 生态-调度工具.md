@@ -42,10 +42,6 @@ Oozie⽀持参数和EL表达式，例如${fs:dirSize(myInputDir)}
 
 
 
-
-
-
-
 ### 整体架构  
 
 ![image-20201101201711196](assets/image-20201101201711196.png)
@@ -60,13 +56,7 @@ Oozie⽀持参数和EL表达式，例如${fs:dirSize(myInputDir)}
 
 - AzkabanExecutorServer:负责具体的⼯作流的提交、执⾏。  可有多个并行执行。
 
-
-
 azkaban默认需要3G的内存，剩余内存不⾜则会报异常  
-
-
-
-
 
 
 
@@ -75,20 +65,6 @@ azkaban默认需要3G的内存，剩余内存不⾜则会报异常
 AirFlow、Oozie、Azkaban 工作流调度系统。
 
 相对 AirFlow 使用更多。。。
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

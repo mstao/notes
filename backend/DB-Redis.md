@@ -1,18 +1,17 @@
 # 概述
 
-> 远程字典服务器，是用C语言开发的一个开源的高性能键值对（ key-value ）内存数据库。
+> 远程字典服务器，是用 C 语言开发的一个开源的高性能键值对（ key-value ）内存数据库。
 >
+> Redis 读的速度是110000次/s, 写的速度是81000次/s 。
 
 **特性-存取速度快 | 简单**
 
 （1） 速度快的原因
 
-- 完全存放在**内存**
-- C 语言编写(50000 line)
+- 数据完全存放在内存
+- 底层使用 C 语言编写(50000 line)
 - 单线程, 避免不必要的上下文切换和竞争条件，无锁的开销，同时采用 IO 多路复用，非阻塞IO
 - 数据结构简单，对数据操作也简单，Redis 中的数据结构是专门设计的；
-
-Redis 读的速度是110000次/s, 写的速度是81000次/s 
 
 （2）多路 I/O 复用模型
 
@@ -24,23 +23,15 @@ Redis 读的速度是110000次/s, 写的速度是81000次/s
 
 **功能丰富**
 
-- 发布订阅
+- 支持发布订阅模式
 - pipeline: 提高客户端的并发效率
-- 事务： 不支持回滚??
-- Lua 脚本  自定义功能
+- 事务： 不支持回滚
+- 脚本扩展支持(Lua)： 方便实现自定义功能
 
 
 
-**主从复制**
-
-
-
-**高可用，分布式**
+**高可用、分布式支持**
 高可用  ⇒ Redis-Sentinel(v2.8) 支持高可用
-
-分布式  ⇒  
-
-
 
 
 
@@ -48,35 +39,25 @@ Redis 读的速度是110000次/s, 写的速度是81000次/s
 
 （1） 优点
 
-性能高，速度快
+性能高，速度快；
 
-丰富的数据类型；
+支持丰富的数据类型；
 
 原子操作；
 
-丰富的特性，包括 pipeline、订阅发布模型
+丰富的特性，包括 pipeline、订阅发布模型；
 
 （2） 缺点
 
-是数据库容量受到物理内存的限制, 不能用作海量数据的高性能读写, 因此Redis适合的场景主要<font color="green">局限在较小数据量的高性能操作和运算上</font>。
+是数据库容量受到物理内存的限制, 不能用作海量数据的高性能读写, 因此 Redis 适合的场景主要<font color="green">局限在较小数据量的高性能操作和运算上</font>。
 
 
-
-
-
-**二八定律**：
-
-百分之八十的请求都是访问百分之二十的数据
-
-![1554022751048](assets/1554022751048.png)
-
-横轴是连接数，纵轴是QPS。此时，这张图反映了一个数量级。
 
 
 
 相关问题：
 
-@Q: **为什么Redis是单线程的**
+Q: **为什么Redis是单线程的**
 
 因为 Redis 是基于内存的操作，CPU 不是 Redis 的瓶颈，Redis 的瓶颈最有可能是机器内存的大小或者网络带宽。既然单线程容易实现，而且CPU不会成为瓶颈，那就顺理成章地采用单线程的方案了。
 
@@ -100,13 +81,11 @@ Redis 读的速度是110000次/s, 写的速度是81000次/s
 
 ## Redis 线程模型
 
-redis 内部使⽤⽂件事件处理器 file event handler ，这个⽂件事件处理器是单线程的，所以 redis 才叫做单线程的模型。它采⽤ IO 多路复⽤机制同时监听多个 socket，根据 socket 上的事件 来选择对应的事件处理器进⾏处理。
+redis 内部使⽤⽂件事件处理器 `file event handler` ，这个⽂件事件处理器是单线程的，所以 redis 才叫做单线程的模型。它采⽤ IO 多路复⽤机制同时监听多个 socket，根据 socket 上的事件 来选择对应的事件处理器进⾏处理。
 
 
 
-
-
-## *数据结构
+## *数据类型
 
 （1） 底层结构
 
@@ -119,37 +98,20 @@ redis 内部使⽤⽂件事件处理器 file event handler ，这个⽂件事件
 ```c
 typedef struct redisObject {
     unsigned type:4;
-    unsigned encoding:4;
-
+    unsigned encoding:4;、
     unsigned lru:LRU_BITS; /* lru time (relative to server.lruclock) */
     int refcount;
     void *ptr;
 } robj;
 ```
 
-<img src="assets/1552957729759.png" alt="1552957729759" style="zoom:50%;" />
+<img src="assets/1552957729759.png" alt="1552957729759" style="zoom: 67%;" />
 
 （2） 特性
 
 ① 多态特性，可根据实际场景来进行自动切换
 
 ② "单线程"：
-
-
-
-
-
-通用命令：
-
-expire | ttl | p：
-
-keys*
-
-type
-
-config get [pattern]
-
-
 
 （）scan
 ```
@@ -213,8 +175,6 @@ hget hash1 name
 存放用户的信息；
 
 视频的信息；
-
-
 
 
 
@@ -533,8 +493,6 @@ typedef struct dictEntry {
 
 ```
 
-
-
 rehash 情况： 映射到辅助表对应的桶中
 
 ```java
@@ -611,13 +569,74 @@ rehash 特殊
 
 
 
+### *QuickList
+
+> 快速列表，在Redis3.2以后结合adlist和ziplist的优势Redis设 计出了quicklist。
+
+```c
+typedef struct quicklist {
+    quicklistNode *head;
+    quicklistNode *tail;
+    unsigned long count;        /* total count of all entries in all ziplists */
+    unsigned long len;          /* number of quicklistNodes */
+    int fill : 16;              /* fill factor for individual nodes */
+    unsigned int compress : 16; /* depth of end nodes not to compress;0=off */
+} quicklist;
+```
+
+```c
+typedef struct quicklistNode {
+    struct quicklistNode *prev;
+    struct quicklistNode *next;
+    unsigned char *zl;
+    unsigned int sz;             /* ziplist size in bytes */
+    unsigned int count : 16;     /* count of items in ziplist */
+    unsigned int encoding : 2;   /* RAW==1 or LZF==2 */
+    unsigned int container : 2;  /* NONE==1 or ZIPLIST==2 */
+    unsigned int recompress : 1; /* was this node previous compressed? */
+    unsigned int attempted_compress : 1; /* node can't compress; too small */
+    unsigned int extra : 10; /* more bits to steal for future usage */
+} quicklistNode;
+```
+
+```c
+typedef struct quicklistLZF {
+    unsigned int sz; /* LZF size in bytes*/
+    char compressed[];
+} quicklistLZF;
+```
+
+
+
+Redis 采用的压缩算法是LZF。
+
+其基本思想是：数据与前面重复的记录重复位置及长度，不重复的记录原始数据。
+
+
+
+### stream
+
+> stream主要由：消息、生产者、消费者和消费组构成。
+>
+> Redis Stream的底层主要使用了listpack（紧凑列表）和Rax树（基数树）。
+
+**listpack**
+
+表示一个字符串列表的序列化，listpack可用于存储字符串或整数。用于存储stream的消息内 容。
+
+
+
+**Rax 树**
+
+Rax 是一个有序字典树 (基数树 Radix Tree)，按照 key 的字典序排列，支持快速地定位、插入和删除操 作。
+
+
+
 ## 持久化
 
 （1） 适用的场景
 
 对于一些  <u>需要进行大量计算而得到的数据，放置在Redis服务器</u>  ，我们就有必要对其进行数据的持久化，如果需要对数据进行恢复的时候，我们就不需进行重新的计算，只需要简单的将这台机器上的数据复制到另一台需要恢复的Redis服务器就可以了。
-
-
 
 （2） 持久化策略
 
@@ -886,7 +905,7 @@ bgsave 做镜像的全量持久化， aof 做增量持久化；
 
 
 
-## 缓存淘汰 | 过期
+## 缓存淘汰 
 
 ### *过期键删除策略
 
@@ -952,8 +971,6 @@ typedef struct redisObject {
 } robj;
 ```
 
-
-
 （2） 函数调用
 
 
@@ -1015,23 +1032,7 @@ Memcached适合于缓存SQL语句、数据集、用户临时性数据、延迟�
 - 超时剔除：  expire
 - 主动更新： 开发控制生命周期, -1 ⇒  -2
 
-
-
 （2） 三种策略比较
-
-
-
-// todo 
-
-缓存的受益与成本 
-缓存更新策略 
-缓存粒度控制 
-缓存穿透优化 
-无底洞问题优化 
-缓存雪崩优化 
-热点key重建优化
-
-
 
 
 
@@ -1044,14 +1045,10 @@ CPU L1/L2/L3 Cache、Linux page Cache 加速磁盘读写、浏览器缓存、Ehc
 2.降低后端存储负载 
 缓存降低负载，后端Mysql负载
 
-
-
 **（2） 成本：** 
 数据不一致：cache 和 storage 不一致 ⇦ 更新策略 
 代码维护成本： cache logic 
 运维成本： Redis CLuster
-
-
 
 **（3） 使用场景：** 
 排行榜等复杂的SQL
@@ -1113,8 +1110,6 @@ URL 缓存；
 
 
 
-
-
 **一些问题**
 
 （） 大量的 Key 同时过期
@@ -1129,7 +1124,7 @@ URL 缓存；
 
 ## 客户端
 
-### 连接 | 池
+### 连接池
 
 **连接方式**
 
@@ -1192,17 +1187,25 @@ testOnBorrow 高并发下不应该使用
 参考数据：
 
 1，业务希望Redis并发量
+
 2，客户端执行命令时间
+
 3，Redis资源：例如nodes（例如应用个数）*maxTotal是不能超过redis的最大连接数。(config get maxclients)
+
 4，资源开销：例如虽然希望控制空闲连接，但是不希望因为连接池的频繁释放创建连接造成不必靠开销。
 
 
 
 **4. 选取合适的 maxIdle, minIdle**
+
 高并发下的预热
+
 建议maxldle=maxTotal
+
 减少创建新连接的开销
+
 建议预热 minIdle
+
 减少第一次启动后的新连接开销。
 
 
@@ -1211,9 +1214,13 @@ testOnBorrow 高并发下不应该使用
 
 Timeout wait for idle object
 Pool Exhausted
+
 1，慢查询阻塞：池子连接都被hang住。
+
 2，资源池参数不合理：例如QPS高、池子小。
+
 3，连接泄露（没有close()）·此类问题比较难定位，例如clientlist、netstat等，最重要的是代码。
+
 4, DNS异常
 
 分别用集群版的JedisClientCluster和单机版的JedisClientPool去实现，并重写方法，各自用自己的方式实现功能；
@@ -1270,15 +1277,11 @@ boolean follow(int userId, int entityType, int entityId) {
 
 可以通过 watch + incr 实现乐观锁
 
-
-
-通过维护一个 hash 来实现，
-
+通过维护一个 hash 来实现
 
 
 
 
-<String, List<
 
 
 
@@ -1366,12 +1369,6 @@ pipeline 命令与 `m....` 命令区别：
 
 
 
-**使用范例**
-
-```java
-
-```
-
 
 
 ## 发布订阅
@@ -1444,7 +1441,6 @@ eval 解释执行 Lua 脚本
 
 ```
 EVAL ""
-
 script load ""
 ```
 
@@ -1470,22 +1466,28 @@ script load ""
 
 主从同步原理：  分为全量同步，之后进行增量同步。
 
-
-
 （1） 全量同步过程
+
 ① Salve发送sync命令到Master
+
 ② Master启动一个后台进程，将Redis中的数据快照保存到文件中
+
 ③ Master将保存数据快照期间的收到的写命令写入到缓存
+
 ④ Master完成操作②之后，将该文件发送给Salve 
+
 ⑤ Salve收到文件后保存到磁盘，并从文件中恢复快照，即使用新文件替换旧文件
+
 ⑥ Master将快照生成期间的增量数据发送给salve端
 
-
-
 （2） 增量同步过程
+
 ① Master接收到用户的操作指令后，判断是否需要传播到Salve
+
 ② 将操作记录追加到AOF文件
+
 ③ 将操作传播到其他salve：1、对齐主从库；2、往响应缓存写入指令
+
 ④ 将缓存中的数据发送给其他salve
 
 
@@ -1525,10 +1527,6 @@ Sentinel（哨兵）可以监听集群中的服务器，并在主服务器进入
 ④ 分布式，可起多个节点，通过流言协议 Gossip 通讯
 ​	  
 
-
-
-
-
 一种特殊的 Redis Server：
 
 支持的命令： PING, PONG, INFO, 
@@ -1565,7 +1563,7 @@ Sentinel（哨兵）可以监听集群中的服务器，并在主服务器进入
 >
 > 去中心化方式，包括 sharding(分区)、replication(复制)、falivor()
 
-![image-20201115144106872](assets/image-20201115144106872.png)
+<img src="assets/image-20201115144106872.png" alt="image-20201115144106872" style="zoom:33%;" />
 
 通信关系
 
@@ -1597,10 +1595,6 @@ Sentinel（哨兵）可以监听集群中的服务器，并在主服务器进入
 > 将物理节点分配到 0 - 166383 个槽上。
 
 平均分 slot、且连续
-
-
-
-
 
 Hash 槽算法
 
@@ -1817,15 +1811,13 @@ AP: 高可用模型
 >
 > Redisson在基于NIO的Netty框架上，生产环境使用分布式锁。
 
-![image-20201115154158813](assets/image-20201115154158813.png)
+<img src="assets/image-20201115154158813.png" alt="image-20201115154158813" style="zoom: 33%;" />
 
 通过 Lua 脚本加锁
 
 通过 watch dog 进行续租，每隔10秒查看，如果有锁，则继续...
 
 Lua: 保证复杂业务逻辑执行的原子性。
-
-
 
 
 
@@ -1840,8 +1832,6 @@ Lua: 保证复杂业务逻辑执行的原子性。
 **可重入机制**
 
 自己加一
-
-
 
 
 
@@ -1879,8 +1869,6 @@ Redis 通过 lua 的原子性， redission 判断是不是加锁的
 
 (1) 数据并发竞争
 
-
-
 (2) 防止库存超卖
 
 
@@ -1891,17 +1879,7 @@ Redis 通过 lua 的原子性， redission 判断是不是加锁的
 
 # 其他
 
-## Redis 监控平台
-
-Grafana、Prometheus、Redis_exporter
-
-
-
-
-
-Ø  缓解数据库频繁交互数据的压力，得到商品查询高可用、负载均衡、性能提升的目的
-
-从海量Key里查询出某一固定前缀的Key？
+Q: 从海量Key里查询出某一固定前缀的Key？
 
 ```shell
 scan cursor [MATCH pattern] [Count count]
@@ -1919,11 +1897,9 @@ scan cursor [MATCH pattern] [Count count]
 
 
 
+Q: 判断redis服务是否正常？
 
-
-判断redis服务是否正常？
-
-ping-pong机制来判断节点是否挂了
+通过 ping-pong机制来判断节点是否挂了
 
 
 

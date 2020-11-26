@@ -2,18 +2,18 @@
 
 [TOC]  
 
-
-
-
-
 ## 端口
 
 组件的安装以及配置  
 
 Hadoop 核心组件安装  
+
 Hive 的安装配置  
+
 Hue 的安装配置  
+
 Sqoop 的安装配置  
+
 Flume 的安装配置、启动  
 
 组件的端口整理
@@ -42,8 +42,6 @@ Flume 的安装配置、启动
 |           | 25000 | impalad                | HTTP | impalad 的管理界⾯                                           |
 |           | 25010 | statestored            | HTTP | statestored 的管理界⾯                                       |
 | Haproxy   | 1080  | #                      |      | HAProxy 统计的 Http 端口                                     |
-|           | 25003 |                        |      |                                                              |
-|           | 25004 |                        |      |                                                              |
 | Zookeeper | 2181  | 提供服务的端口         |      |                                                              |
 |           | 2888  | 服务器之间通信端⼝     |      |                                                              |
 |           | 3888  | 服务器之间投票选举端⼝ |      |                                                              |
@@ -51,9 +49,10 @@ Flume 的安装配置、启动
 | Azkaban   | 8081  | Web                    |      | Azkaban 浏览器 Web 访问                                      |
 | MySQL     | 3306  | #                      |      |                                                              |
 | Redis     | 6379  | #                      |      |                                                              |
+|           | 26379 | #                      |      |                                                              |
 | Kafka     | 9092  | #                      |      |                                                              |
 
-### 
+
 
 
 
@@ -305,122 +304,8 @@ http://archive.apache.org/dist/
 ## 环境搭建
 
 [版本支持](https://cwiki.apache.org/confluence/display/HADOOP/Hadoop+Java+Versions)  
-- Apache Hadoop from 3.0 to 3.2 now supports only Java 8  
-- Apache Hadoop from 2.7.x to 2.x support Java 7 and 8  
-- Apache Hadoop 3.3 and upper supports Java 8 and Java 11 (runtime only)  
 
 
-
-software: 软件安装版
-app: 软件的安装目录  
-data: 使用的数据  
-lib: 开发作业的  
-shell: 脚本  
-maven_resp: maven 仓库  
-
-
-
-
-
-```
-50090: 2NN 节点地址
-10020:  job 
-19888: 历史服务器地址
-
-```
-
-### 单节点安装
-```
-useradd hadoop
-mkdir /home/hadoop/software
-mkdir /home/hadoop/app
-mkdir /home/hadoop/shell
-
-hadoop_file=hadoop-2.9.2.tar.gz
-wget -O /home/hadoop/app/$hadoop_file http://app2.iwms.hd123.cn:8081/ftp/deploy/iwms/tools/$hadoop_file
-
-cd /home/hadoop/app
-tar -zxvf $hadoop_file
-```
-
-
-```
-vi etc/hadoop/core-site.xml
-```
-
-```
-vi etc/hadoop/hadoop-env.sh
-
-export JAVA_HOME=/xxx
-export HADOOP_PREFIX=/usr/local/hadoop
-```
-
-```
-Usage: shellcommand [SHELL_OPTIONS] [COMMAND] [GENERIC_OPTIONS] [COMMAND_OPTIONS]
-```
-
-
-Generic Options  
--D <property>=<value>:   
-
-
-
-### 集群安装
-// TODO
-
-
-
-## 命令
-### 用户命令  
-
-
---glob： 扩展通配符  
-
-
-hadoop conftest [-conffile <path>]...  
-验证 XML 配置文件  
-
-
-hadoop credential <subcommand> [options]  
-证书、密码管理  
-```
-hadoop credential list -provider jceks://file/tmp/test.jceks
-```
-
-hadoop distch [-f urilist_url] [-i] [-log logdir] path:owner:group:permissions  
-属主、权限更改  
-
-
-
-fs:  
-文件系统  与 hdfs、dfs 同义   
-
-  
-
-
-gridmix：  
-基准测试 Hadoop cluster  
-
-
-jar  
-hadoop jar <jar> [mainClass] args...  
-运行jar, 可运行 yarn jar   
-
-
-kdiag:  
-诊断Kerberos问题  
-
-
-key  
-提供程序经常要求提供密码  
-一些建不支持大些命名  
-
-
-trace  
-
-
-CLASSNAME：
-运行指定的类，必须是...  
 
 
 ### 管理命令  
@@ -627,13 +512,7 @@ hdfs dfs -ls /
 hdfs dfs -mkdir /test
 hdfs dfs -mkdir /input
 hdfs dfs -mkdir /out
-
-hdfs 
 ```
-
-
-
-
 
 ```shell
 # Hadoop运行时产生文件的存储目录
@@ -641,63 +520,11 @@ hdfs
 # NN 数据
 /opt/lagou/servers/hadoop-2.9.2/hdfs/namenode
 
-
-
 mv /opt/lagou/servers/hadoop-2.9.2/data/tmp.backup
 mkdir -p /opt/lagou/servers/hadoop-2.9.2/data/tmp
 ```
 
 
-
-
-
-### Zookeeper
-
-
-
-目录
-
-```shell
-
-```
-
-
-
-```
-zk.sh start
-
-
-tail -f -n 500 /opt/lagou/servers/zookeeper-3.4.14/data/logs/version-2/logXX
-
-
-
-# 清除 /hbase
-rmr /hbase
-
-sh /opt/lagou/servers/zookeeper-3.4.14/bin/zkCli.sh
-```
-
-
-
-
-
-### HBase
-
-```
-tail -f -n 500 /opt/lagou/servers/hbase-1.3.1/logs/hbase-root-master-linux121.log
-```
-
-
-
-
-
-## 实际使用
-
-Flume+Kafka对数据进行采集聚合传输
-
-
-
-Spark对实时数据进行处理，传输给相应的数据处理模块
 
 
 

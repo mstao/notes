@@ -22,157 +22,14 @@
 
 
 
-矩阵：
-
-旋转矩阵
-
-旋转图片
-
-最小路径和
-
-单词搜索
-
-
-
-直方图的最大矩形
-
-最大的矩阵
-
-
-
-
-
-最大的乘积数组
-
-主元素
-
-除自身的乘积数组
-
-
-
-
-
-& 1~n 问题
-
-找出重复的数字
-
-找出所有消失的数字
-
-
-
-
-
-
-
-
-
-前序和后续遍历构建二叉树
-
-
-
-CPU 任务调度
-
-
-
-
-
-
-
-base_two_point_binary_search_sort_matrix__major_build_1_n_rotate
-
-
-
-
-
-sub_array_sequency_
-
-
-
-
-
-
-
-
-
-GOOD: 
-
-旋转数组中查找给定数字，可以含有重复的元素
-
-
-
-找出数组汇总重复的数字，数字在 [1, n] 之间  
-
-元素范围在 0-n 之间，求丢失的一个数字
-
-
-
-
-
-重复元素中 3 个数和为给定值的所有三元组
-
-
-
-kth 问题：
-
-在排序矩阵中中出 kth 最小的元素
-
-两个排序链表组成的 Pair 中的 kth 元素
-
-
-
-含重复元素的旋转数组中是否存在某个元素
-
-
-
-
-
-
-
-
-
-找出子数组和最大的子数组
-
-
-
-合并时间间隔
-
-
-
-&& 常见的二维矩阵搜索问题
-
-从左上角到右下角有多少条路径可以到达
-
-从左上角到右下角最小的路径和
-
-二维矩阵中单词的搜索
-
-
-
-
-
-
-
-&& 基础的排列组合问题：
-
-求解下一个排列；
-
-集合的子集；
-
-
-
-
-
-
-
-矩阵遍历问题:
-
-`%`, `/` 操作
-
-**其他数组问题**
-
 **无重复排序数组中元素的范围段**
 
-228.Summary Ranges
+[228.Summary Ranges]((https://leetcode.com/problems/summary-ranges/))
+
+```
+Input:  [0,2,3,4,6,8,9]
+Output: ["0","2->4","6","8->9"]
+```
 
 ```java
 public List<String> summaryRanges(int[] nums) {
@@ -191,7 +48,7 @@ public List<String> summaryRanges(int[] nums) {
             end = nums[i];
         }
     }
-    res.add(geneRange(nums, begin, end));     // handle tail
+    res.add(geneRange(nums, begin, end));    // handle tail
     return res;
 }
 
@@ -211,6 +68,11 @@ private String geneRange(int[] nums, int begin, int end) {
 
 645. Set Mismatch
 
+```
+Input: nums = [1,2,2,4]
+Output: [2,3]
+```
+
 ```java
 public int[] findErrorNums(int[] nums) {
     for (int i = 0; i < nums.length; i ++) {
@@ -225,9 +87,12 @@ public int[] findErrorNums(int[] nums) {
     }
     return null;
 }
+private void swap(int[] a, int i, int j) {
+  int t = a[i];
+  a[i] = a[j];
+  a[j] = t;
+}
 ```
-
-
 
 **排序数组中删除重复的值**
 
@@ -253,8 +118,6 @@ public int removeDuplicates(int[] nums) {
 }
 ```
 
-
-
 **数组中删除给定的值**
 
 [27. Remove Element](https://leetcode.com/problems/remove-element/description/)
@@ -268,8 +131,6 @@ public int removeElement(int[] nums, int val) {
     return k;
 }
 ```
-
-
 
 **排序数组中删除相同的元素，允许相同元素最多出现两次**
 
@@ -337,7 +198,9 @@ Output: [1,2]
 ```
 
 思路： 每次遍历的元素只能够更新 candidate1 | candidate2 的 counter,   
+
 或者对 candidate 进行重新选取  
+
 或者对两者的 counter 进行 -- 操作  
 
 判断两个 candidate 在数组中出现的频次是否符合要求 
@@ -379,11 +242,11 @@ public List<Integer> majorityElement(int[] nums) {
 }
 ```
 
-
-
 **构建乘积数组**
 
 [238. Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self)
+
+不使用除法，时间复杂度 o(n)
 
 ```html
 Input:  [1,2,3,4]
@@ -409,8 +272,6 @@ public int[] productExceptSelf(int[] nums) {
     return product;
 }
 ```
-
-
 
 **把数组中的 0 移到末尾**
 
@@ -894,23 +755,7 @@ public List<Integer> getRow(int rowIndex) {
 
 
 
-
-
-
-
-
-
-
-
-
-
 ### 矩阵问题
-
-单词搜索；
-
-最小路径和；
-
-
 
 **重新构造矩阵**
 
@@ -961,7 +806,6 @@ public int[][] matrixReshape(int[][] nums, int r, int c) {
 ```html
 Input: [[1,3],[2,6],[8,10],[15,18]]
 Output: [[1,6],[8,10],[15,18]]
-Explanation: Since intervals [1,3] and [2,6] overlaps, merge them into [1,6].
 ```
 
 ```java
@@ -974,7 +818,6 @@ public List<Interval> merge(List<Interval> intervals) {
     for (Interval item : intervals) {
         if (item.start <= end) {        
             end = Math.max(end, item.end);
-
         } else {    
             res.add(new Interval(start, end));
             start = item.start;
@@ -1001,7 +844,6 @@ Given input matrix =
   [13, 3, 6, 7],
   [15,14,12,16]
 ],
-
 rotate the input matrix in-place such that it becomes:
 [
   [15,13, 2, 5],

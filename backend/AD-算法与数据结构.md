@@ -29,44 +29,6 @@
 
 
 
-**循环控制**
-
-（1） 循环不变式（loop invariant）
-
-一句断言定义各变量所满足的条件
-
-（2） 循环书写方法
-
-定义循环不变式，并在循环体每次结束后 **保持** 循环不变式
-
-先 **一般**， 后 **特殊**；
-
-每次 **必须** 向前推进循环不变式中涉及的变量值；
-
-每次推进的规模必须为 **1**；
-
-（3） 思路
-
-取中间情况，初始情况多为特殊
-
-（4） 流程
-
-不管 while 的循环条件，直接写对应的逻辑语句，之后根据写的语句确定条件 | 边界；
-
-
-
-循环注意点
-
-进循环之前， loop variable 变量的定义并初始化；
-
-每次循化的开始；
-
-每次循环的结束，保持循环不变式；
-
-
-
-
-
 ## 排序
 > 基本的排序算法，以及变种  
 
@@ -116,6 +78,7 @@ void selectSort(int[] arr) {
     }
 }
 ```
+
 
 
 #### 冒泡排序
@@ -222,14 +185,39 @@ void insertSort(int[] arr) {
 [147. Insertion Sort List(Medium)](https://leetcode.com/problems/insertion-sort-list/)
 
 ```java
+public ListNode insertionSortList(ListNode head) {
+  if (head == null) {
+    return head;
+  }
 
+  ListNode first = new ListNode(0);
+  ListNode cur = head; //the node will be inserted
+  ListNode pre = first; //insert node between pre and pre.next
+  ListNode next = null; //the next node will be inserted
+  while (cur != null) {
+    next = cur.next;
+    //find the right place to insert
+    while (pre.next != null && pre.next.val < cur.val) {
+      pre = pre.next;
+    }
+    //insert between pre and pre.next
+    cur.next = pre.next;
+    pre.next = cur;
+    pre = first;
+    cur = next;
+  }
+
+  return first.next;
+}
 ```
 
 
 
-
-
 #### 希尔排序
+
+<img src="assets/image-20201122224138741.png" alt="image-20201122224138741" style="zoom: 33%;" />
+
+<p align="center">希尔排序可视轨迹</p>
 
 （1） 算法：使用插入排序对间隔 h 的序列进行排序。通过不断减小 h，最后令 h=1，就可以使得整个数组是有序的。 
 
@@ -333,6 +321,10 @@ int partition(int[] arr, int lo, int hi) {
 
 **2、三路快排优化**
 
+<img src="assets/image-20201122224436315.png" alt="image-20201122224436315" style="zoom: 33%;" />
+
+<p align="center">三向切分快排可视轨迹</p>
+
 对重复元素较多的情形优化；
 
 函数返回重复元素第一次和最后一次出现位置；
@@ -433,6 +425,10 @@ void quickSort(int[] arr, int lo, int hi) {
 
 **1、基础归并排序**
 
+<img src="assets/image-20201122224009106.png" alt="image-20201122224009106" style="zoom: 33%;" />
+
+<p align="center">自顶向下归并排序可视轨迹</p>
+
 ① 对排序的两个子数组 [lo,mid], [mid+1, hi]，在 [mid] >= [mid+1] 数组整体有序情况下跳过合并；
 
 ② 分配当前两个数组对应的数组空间作为辅助；
@@ -467,6 +463,10 @@ void merge(int[] arr, int lo, int mid, int hi) {
 ```
 
 **2、 自底向上的归并排序**
+
+<img src="assets/image-20201122223815424.png" alt="image-20201122223815424" style="zoom:33%;" />
+
+<p align="center">自底向上的归并排序可视轨迹</p>
 
 考虑处理两种情况：
 
@@ -558,6 +558,10 @@ public ListNode sortList(ListNode head) {
 
 
 ### 堆排序
+
+<img src="assets/image-20201122225020506.png" alt="image-20201122225020506" style="zoom:33%;" />
+
+<p align="center">堆排序可视轨迹</p>
 
 （1） 算法
 
@@ -1069,8 +1073,6 @@ sink 向下调整
 
 基于 AC 自动机实现；
 
-
-
 （2） 关键字提示功能
 
 
@@ -1109,8 +1111,6 @@ public interface Merger<E> {
     E merge(E a, E b);
 }
 ```
-
-
 
 
 
@@ -1730,7 +1730,7 @@ Node： 包含多个向前指向，一个向后指向，存放数据的指针
 
 
 
-**&& 装载因子 | 扩容**
+**装载因子 | 扩容**
 
 （） 负载因子的大小
 
@@ -1740,7 +1740,7 @@ Node： 包含多个向前指向，一个向后指向，存放数据的指针
 
 
 
-**&& 散列表 与 链表**
+**散列表 与 链表**
 
 （1） LRU 缓存淘汰算法，将找到访问节点的复杂度降低为 O(1)；
 
@@ -1754,7 +1754,7 @@ Node： 包含多个向前指向，一个向后指向，存放数据的指针
 
 
 
-**&& 应用**
+**应用**
 
 @Q: word 文档中的单词拼写检查；
 
@@ -1928,7 +1928,7 @@ E:000
 
 解码也是使用上面的哈夫曼树来，从根节点开始，遇到0就往左走，遇到1就往右走，走到叶子节点就是该字符了，完成一个字符解码，下一个字符解码又从根节点开始走。
 
-![img](assets/5184817_1506229417770_81A46849FABAB44F4CD2A83B1AB1FA7F.png)
+<img src="assets/5184817_1506229417770_81A46849FABAB44F4CD2A83B1AB1FA7F.png" alt="img" style="zoom: 50%;" />
 
 
 

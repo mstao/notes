@@ -86,22 +86,6 @@ Region：表的分区。
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ### 整体架构  
 
 <img src="assets/image-20201028233637286.png" alt="image-20201028233637286" style="zoom: 50%;" />
@@ -173,8 +157,6 @@ scan 'lagou', {FILTER=>"PrefixFilter('rk')"}
 
 ## Hbase 原理
 
-
-
 ### *读流程
 
 ![image-20201029082348655](assets/image-20201029082348655.png)
@@ -188,8 +170,6 @@ MemStore： 每个 Store 持有一个。
 读取数据的过程中 HMaster 未参与。 
 
 HBase 表中的 RowKey 按照字典许排序，切分 Region 按照 RowKey 来划分。
-
-
 
 
 
@@ -269,10 +249,6 @@ regioncount ^3 * 128M * 2
 
 (5) DelimitedKeyPrefixRegionSPlitPolicy
 
-
-
-
-
 (6) DisabledRegionSplitPolicy
 
 不启用切分。
@@ -285,19 +261,9 @@ regioncount ^3 * 128M * 2
 
 (1) 全局指定
 
-
-
 (2) 通过 Java API 指定策略
 
-
-
-
-
 (3) 通过 Hbase SHell 指定策略
-
-```shell
-
-```
 
 
 
@@ -310,8 +276,6 @@ regioncount ^3 * 128M * 2
 不需要启动 HBase 集群。
 
 对 RowKey 进行合并。
-
-
 
 
 
@@ -344,13 +308,7 @@ Bala na ce，防止数组倾斜
 
 
 
-
-
 在未自动分区前控制
-
-
-
-
 
 
 
@@ -370,10 +328,6 @@ Bala na ce，防止数组倾斜
 
 - Endpoint Coprocessor 类似粗糙才能过程，在 RegionServer 上直接存储的数据计算。
 
-
-
-
-
 (1) OBSERVER
 
 与触发器类似
@@ -384,21 +338,13 @@ Bala na ce，防止数组倾斜
 
 Note: HBase 的一种二级索引通过此种方式实现。
 
-
-
 (2) Endpoint
 
 类似存储过程，在 RegionServer 中执行代码
 
-
-
 常见用途： 聚合操作。普通操作为全表扫描。
 
 Endpoint Coprocessor 借助 phoenix 框架容易实现。针对 HBase 数据集进行聚合运算直接使用 SQL 语句。
-
-
-
-
 
 初始化表
 
@@ -438,12 +384,6 @@ enable 't2'
 
 
 
-
-
-
-
-
-
 ### *RowKey 设计
 
 字典序排序。
@@ -462,13 +402,7 @@ enable 't2'
 
 (3) 唯一原则： 
 
-
-
-
-
 实现的HBase 中快速的读写
-
-
 
 
 
@@ -504,15 +438,11 @@ HBase 底层中使用，判断某个元素是否存在。
 
 ### 配置
 
-|                                               |                                                              |      |
-| --------------------------------------------- | ------------------------------------------------------------ | ---- |
-| hbase.hregion.memstore.flush.size             | 134217728 默认，128M，MemStore 大小超过这个值<br>Flush 到磁盘 |      |
-| hbase.regionserver.optionalcacheflushinterval | 当memstore中的数据时间超过1⼩时，会ﬂush到磁盘                |      |
-| hbase.regionserver.global.memstore.size       | HregionServer的全局memstore的⼤⼩，超过该⼤⼩会触发ﬂush到磁盘的操作,默认是堆⼤⼩的40% |      |
-
-
-
-
+| 配置                                          | 用途                                                         |
+| --------------------------------------------- | ------------------------------------------------------------ |
+| hbase.hregion.memstore.flush.size             | 134217728 默认，128M，MemStore 大小超过这个值<br>Flush 到磁盘 |
+| hbase.regionserver.optionalcacheflushinterval | 当memstore中的数据时间超过1⼩时，会ﬂush到磁盘                |
+| hbase.regionserver.global.memstore.size       | HregionServer的全局memstore的⼤⼩，超过该⼤⼩会触发ﬂush到磁盘的操作,默认是堆⼤⼩的40% |
 
 ```
 调优以下分配管理器参数，以匹配Region的数量，从而加快分配速度：
@@ -523,10 +453,6 @@ hbase.master.wait.on.regionservers.mintostart：向HMaster汇报的RegionServer�
 hbase.bulk.assignment.threshold.regions：Region数量超过阈值（默认值7），使用bulk assign
 hbase.bulk.assignment.threshold.servers ：Server数量超过阈值（默认值3），使用bulk assign
 ```
-
-
-
-
 
 
 
@@ -558,8 +484,6 @@ put 'lagou2', 'rk1', 'extra_info:address', 'shanghai'
 ```
 create 'lagou', {NAME => 'base_info', VERSIONS => '3'},{NAME => 'extra_info',VERSIONS => '3'}
 ```
-
-
 
 ```
 # query data

@@ -440,7 +440,7 @@ GROUP BY student_id;       --
 
 
 
-![1551857013614](.\..\assets\1551857013614.png)
+![1551857013614](.\assets\1551857013614.png)
 
 
 
@@ -495,8 +495,6 @@ HAVING COUNT(*) <
 
 
 
-
-
 **ORDER BY 的排序**
 
 相同列时的特殊处理情况
@@ -519,17 +517,7 @@ ORDER BY  f1 DESC, f2 DESC
 
 子查询作为 SELECT 字段
 
-```SQL
-
-```
-
 子查询结果作为 WHERE 过滤条件
-
-```SQL
-
-```
-
-
 
 
 
@@ -576,10 +564,6 @@ NATURAL JOIN tableb  AS B
 
 
 
-
-
-
-
 ## 模糊分页查询
 
 模糊查询
@@ -617,8 +601,6 @@ FROM mytable
 
 
 
-
-
 限制个数
 
 LIMIT offset count
@@ -636,10 +618,6 @@ ORDER BY col DESC
 LIMIT 1 1;
 ```
 
-
-
-
-
 （2） 找出前5 个
 
 ORDER BY col ASC
@@ -653,23 +631,11 @@ ORDER BY col
 LIMIT 5
 ```
 
-
-
-
-
 // TODO 对于分页的优化
 
 不需要具体的页数，只有下一页
 
 缓存前几页的数据
-
-
-
-
-
-
-
-
 
 
 
@@ -726,12 +692,17 @@ FROM mytable;
 流程控制函数
 
  case 有两种一种等值 一种值比较
+
  case 值 when 比较值 then 值 .... else 值 end
+
  值比较利用比较运算符
+
  case when 比较过程 then 值 .... else 值 end  
 
  if(func,a,b) 等价于三目运算 func 为真 返回a 为假返回 b
+
  ifnull(a,b) 判断a是否为null 是返回b不是返回a
+
  nullif(a,b) 判断a，b是否相等 是就null 不是就a
 
  
@@ -760,10 +731,6 @@ SELECT IFNULL(1/0, 10);     -- 10
 SELECT IFNULL(1/0, yes);   -- yes
 ```
 
-
-
-
-
 返回最新插入的 ID
 
 ```java
@@ -784,8 +751,6 @@ long insertOrderInfo(OrderInfo orderInfo);
 ② LOWER() | UPPER()
 
 ③ LENGTH() | LEFT() | RIGHT()： 
-
-
 
 
 
@@ -929,13 +894,12 @@ WHERE col5=val;
 
 ## *窗口函数
 
-> MySQL8.0 支持，Hive 支持。
+> MySQL8.0+ 支持，Hive、Oracle 默认支持。
 
 大多数商业数据库都支持，部分开源数据库支持的
 
 
 主要用于统计分析使用
-
 
 分类：
 按照行进行统计
