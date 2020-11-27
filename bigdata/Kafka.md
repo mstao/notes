@@ -50,11 +50,7 @@ Connector API:
 
 > 一个分布式、分区的、多副本的、多生产者、多订阅者，基 于zookeeper协调的分布式日志系统, 常见可以用于web/nginx日志、访问日 志，消息服务等。
 
-![image-20201121171728810](assets/image-20201121171728810.png)
-
 支持**<font color="green">点对点传递模式、发布-订阅模式</font>**的消息传递模式。
-
-
 
 每个记录由一个键，一个值和一个时间戳组成。
 
@@ -62,27 +58,17 @@ Connector API:
 
 分批发送： 批次为一组消息，消息属于同一个主题和分区。可对批次进行压缩。吞吐量大。
 
+测试 Kafka 处理数据 200G/h。
 
+两个反常识：
 
-模式： 进行序列化和反序列化，azvo。
+消息磁盘存储，非内存
 
-消费组： 保证被多个消费者消费的时候避免重复消费。
-
-Broker 与集群： 单个 Brokder 可处理多个分区和每秒百万级的消息量。
-
-集群管理器 Brokder： 监控 brokder
-
+分区副本保持数据一致性(高可用保证)，非过半机制，随机选择一个 ISR，依据配置可选一个 USR。
 
 
 
-
-Avro提供了一种紧凑的序列化格式，模式和消息体 分开。当模式发生变化时，不需要重新生成代码，它还支持强类型和模式进化，其版本既向前兼容，也 向后兼容。
-
-
-
-单个broker可以轻松处理数千个分区以及每秒百万级的消息量。
-
-### 核心概念
+<img src="assets/image-20201121171728810.png" alt="image-20201121171728810" style="zoom: 50%;" />
 
 Producer:
 
@@ -104,6 +90,14 @@ Broker:
 
 
 
+Broker 与集群： 单个 Brokder 可处理多个分区和每秒百万级的消息量。
+
+
+
+集群管理器 Brokder： 监控 brokder
+
+
+
 Topic:
 
 类似 DB 的表，分库分表的<font color="green">逻辑表</font>。
@@ -114,15 +108,11 @@ Partiton:
 
 主题实际存储的分片, 无法保证主题范围内消息的顺序，通过分区实现数据冗余与伸缩。
 
-生产端通过轮训、哈希(基于Key)、指定放到特定分区(基于分区号)。
-
-
+生产端通过轮询、哈希(基于Key)、指定放到特定分区(基于分区号)。
 
 Replicas：
 
 首领副本、追随者副本。主题分区的，不让相同分区的副本在同一台机器上。
-
-
 
 Offset：
 
@@ -160,23 +150,16 @@ Consumer Group:
 
 
 
-两个反常识：
-
-消息磁盘存储，非内存
-
-分区副本保持数据一致性(高可用保证)，非过半机制，随机选择一个 ISR，依据配置可选一个 USR。
-
-
-
-测试 Kafka 200G/h
-
 
 
 ## 安装
 
-**使用**
+### 命令
+
+**主题操作**
 
 ```shell
+# 查看主题
 kafka-topic.sh --zookeeper loclhost:2181/myKafka --list
 
 # broker count ====> replication-factor
@@ -188,7 +171,7 @@ kafka-topic.sh --zookeeper localhost:2181/myKafka \
 kafka-topic.sh --zookeeper localhost:2181/myKafka \
   --describe --topic topic_1
 ```
-
+**消费者操作**
 ```shell
 kafka-console-consumer.sh --bootstrap-server localhost:9092 \
   --topic topic_1
@@ -198,26 +181,20 @@ kafka-console-consumer.sh --bootstrap-server localhost:9092 \
   --topic topic_1 \
   --from-beginning
 ```
-
+**生产者操作**
 ```shell
 kafka-console-producer.sh --brokder-list localhost:9092 \
   --topic topic_1
 ```
+**服务的启停**
 
-
-
-
-
-```
+```shell
 # 前台启动
 kafka-server-start.sh -daemon $KAFKA_HOME/config/server.properties
 kafka-server-stop.sh
 
-# 后台启动a
-
-
+# 后台启动
 curl linux123/log -d "message send to kafka ..0000000088888"
-
 
 vi $KAFKA_HOME/config/server.properties
 bootstrap.servers=linux121:9092,linux122:9092,linux123:9092
@@ -225,21 +202,11 @@ bootstrap.servers=linux121:9092,linux122:9092,linux123:9092
 
 
 
-
-
-
-
-
-
 <img src="assets/image-20201116213957800.png" alt="image-20201116213957800" style="zoom: 67%;" />
-
-
 
 acks: 副本分区进行...， 保证可靠性，    同步确认/异步确认
 
 Retries: 重试的次数..
-
-
 
 
 
@@ -259,12 +226,6 @@ advertised.listeners
 
 配置监听器名称与安全协议的映射关系, 内外部的监听器。
 
-```
-
-```
-
-
-
 
 
 Broader.id: 建议与主机相关
@@ -283,51 +244,43 @@ Log.dirs: 持久化的数据目录, 可指定多个
 
 # 高级特性
 
+## 生产
+
 <img src="assets/image-20201116223818141.png" alt="image-20201116223818141" style="zoom: 50%;" />
 
-
-
-
-
-
-
-## 生产
+<p align="center">生产者发送过程</p>
 
 ### 序列化器
 
-自定义序列化器需要实现org.apache.kafka.common.serialization.Serializer<T>接口，并实现其 中的 serialize 方法。
+自定义序列化器需要实现 `org.apache.kafka.common.serialization.Serializer<T>` 接口，并实现其 中的 serialize 方法。
+
+Avro 提供了一种紧凑的序列化格式，模式和消息体分开。当模式发生变化时，不需要重新生成代码，它还支持强类型和模式进化，其版本既向前兼容，也向后兼容。
 
 
 
 ### 分区器
 
-生产端控制消息发送到哪个分区，有轮询、哈希、指定分区号...方式
-
-
-
-
+生产端控制消息发送到哪个分区，有轮询、哈希、指定分区号等方式。
 
 
 
 ### 拦截器
 
-Interceptor可能被运行在多个线程中，在具体**<font color="green">需要自行保证线程安全性</font>**
-
-
-
-
+Interceptor 可能被运行在多个线程中，在具体实现中**<font color="green">需要自行保证线程安全性</font>**
 
 
 
 ### 原理分析
 
-<img src="assets/image-20201117215502433.png" alt="image-20201117215502433" style="zoom: 67%;" />
+<img src="assets/image-20201117215502433.png" alt="image-20201117215502433" style="zoom: 60%;" />
 
-主线程：负责消息创建，拦截器，序列化器，分区器等操作，并将消息追加到消息收集器 RecoderAccumulator中
+<p align="center">生产者执行原理</p>
 
-Sender 线程：
+两个线程：
 
+① 主线程：负责消息创建，拦截器，序列化器，分区器等操作，并将消息追加到消息收集器 RecoderAccumulator中
 
+② Sender 线程：
 
 
 
@@ -339,15 +292,19 @@ Sender 线程：
 org.apache.kafka.clients.producer.ProducerConfig
 ```
 
-
-
 Bootstrap.servers:
 
 Key.serializer:
 
 Value.serializer:
 
-Acks: 默认为 all, 0 -> 不等待 brokder 消息的去人, acks->1, 消息写到主分区即可，不用等待 fOLLOER 的确认。
+Acks: 默认为 
+
+  all, 
+
+  0 -> 不等待 brokder 消息的去人, 
+
+  acks ->1, 消息写到主分区即可，不用等待 fOLLOER 的确认。
 
 Retries:
 
@@ -375,10 +332,6 @@ max.block.ms
 
 
 
-
-
-
-
 ## 消费
 
 消费消息的偏移量保存在Kafka的名字是 __consumer_offsets 的 主题中。
@@ -397,13 +350,9 @@ max.block.ms
 
 
 
-
-
 消费者进行横向扩展
 
 <font color="green">分区不能被多个消费者消费</font>, Topic 的分区越多，越有利于消费组的扩展。
-
-
 
 
 
@@ -415,15 +364,7 @@ Kafka 的心跳是 Kafka Consumer 和 Broker 之间的健康检查，只有当 B
 
 
 
-
-
-
-
-
-
 consumer 采用 pull 模式从 brokder 中读取数据，<font color="green">可自主控制消费消息的速率, 可控制消费方式.. </font>
-
-
 
 推送, 保证及时性, RabbitMq 保证 um, 小而美。
 
@@ -431,11 +372,9 @@ consumer 采用 pull 模式从 brokder 中读取数据，<font color="green">可
 
 
 
-
-
 ### **反序列化**
 
-org.apache.kafka.common.serialization.Deserializer<T> 接口。
+自定义需要实现 `org.apache.kafka.common.serialization.Deserializer<T>` 接口。
 
 ```
 ByteBuffer.wrap(data);
@@ -451,11 +390,7 @@ ByteBuffer.wrap(data);
 
 于将第三方组件引入 消费者应用程序，用于定制的监控、日志处理等。
 
-ConsumerInterceptor方法抛出的异常会被捕获、记录，但是不会向下传播。如果用户配置 了错误的key或value类型参数，消费者不会抛出异常，而仅仅是记录下来。
-
-
-
-
+ConsumerInterceptor 方法抛出的异常会被捕获、记录，但是不会向下传播。如果用户配置 了错误的key或value类型参数，消费者不会抛出异常，而仅仅是记录下来。
 
 
 
@@ -499,8 +434,6 @@ try {
 }
 ```
 
-
-
 ```SHELL
 for i in `seq 60`; do echo "hello lagou $i" >> nm.txt; done
 kafka-topics.sh --zookeeper linux121:2181/myKafka \
@@ -508,8 +441,6 @@ kafka-topics.sh --zookeeper linux121:2181/myKafka \
   --partitions 3 --replication-factor 1
 kafka-console-producer.sh --broker-list linux121:9092 --topic tp_demo_01 < nm.txt
 ```
-
-
 
 ```shell
 # 查看偏移量信息
@@ -519,8 +450,6 @@ kafka-console-consumer.sh --topic __consumer_offsets \
   --consumer.config $KAFKA_HOME/config/consumer.properties \
   --from-beginning | head
 ```
-
-
 
 ```SHELL
 # 查看有那些 group ID 正在进行消费
@@ -544,30 +473,6 @@ kafka-consumer-groups.sh --bootstrap-server linux121:9092 \
   --reset-offsets --group user_consumer \
   --shift-by -10 --topic tp_demo_02:1
 ```
-
-
-
-
-
-
-
-### **再平衡**
-
-再平衡的时候无法进行消费，导致消费能力下降。
-
-三个参数
-
-session.timout.ms: 控制心跳的超时时间, 6s 
-
-heartbeat.interval.ms: 心跳的频率, 2s, 一般为上面值的三分之一
-
-max.poll.interval.ms: poll 的间隔, 1分钟
-
-
-
-
-
-
 
  
 
@@ -966,6 +871,9 @@ kafka-reassign-partitions.sh --zookeeper linux121:2181/myKafka \
 
 ### +分区与消费者的再分配
 
+> 再平衡的时候无法进行消费，导致消费能力下降。
+>
+
 **触发条件：**
 
 ① 消费者组内成员发生变更： 增减消费者
@@ -1025,6 +933,16 @@ kafka-reassign-partitions.sh --zookeeper linux121:2181/myKafka \
 <font color="green">分区的分配尽量的均衡，每一次重分配的结果尽量与上一次分配结果保持一致,</font>和 HashMap 的 rehash 对低位的不变相同思想。
 
 4、自定义分配策略
+
+
+
+可控制再平衡的三个参数
+
+session.timout.ms: 控制心跳的超时时间, 6s 
+
+heartbeat.interval.ms: 心跳的频率, 2s, 一般为上面值的三分之一
+
+max.poll.interval.ms: poll 的间隔, 1分钟
 
 
 
@@ -1092,15 +1010,7 @@ all
 
 
 
-
-
-
-
 **文件的切分**
-
-
-
-
 
 
 
@@ -1110,13 +1020,7 @@ all
 
 
 
-
-
 offset 实际长度 64位，默认日志文件使用 20位
-
-
-
-
 
 ```shell
 # 常见测试主题
@@ -1130,8 +1034,6 @@ kafka-console-producer.sh --broker-list linux121:9092 --topic tp_demo_05 <nmm.tx
 
 kafka-run-class.sh kafka.tools.DumpLogSegments --files 00000000000000000000.log --print-data-log | head
 ```
-
-
 
 
 
@@ -1150,13 +1052,9 @@ offset 与 position 没有直接关系，因为会删除数据和清理日志。
 
 
 
-
-
 Q:  如何查看偏移量为23的消息？
 
 Kafka 中存在一个 ConcurrentSkipListMap 来保存在每个日志分段，通过跳跃表方式，定位到在 00000000000000000000.index ，通过二分法在偏移量索引文件中找到不大于 23 的最大索引项，即 offset 20 那栏，然后从日志分段文件中的物理位置为320 开始顺序查找偏移量为 23 的消息。
-
-
 
 
 
@@ -1167,10 +1065,6 @@ Kafka 中存在一个 ConcurrentSkipListMap 来保存在每个日志分段，通
 Q: 查找时间戳为 1557554753430 开始的消息？
 
 <font color="green">timestamp文件中的 offset 与 index 文件中的 relativeOffset 不是一一对应的。因为数据的 写入是各自追加。</font>
-
-
-
-
 
 
 
@@ -1274,19 +1168,11 @@ producer epoch 保证只有一个 TransactionId 进行消费。
 
 
 
-
-
-
-
 **事务组**
 
 
 
-
-
 **生产者 ID 与 事务组状态**
-
-
 
 
 
@@ -1414,8 +1300,6 @@ private void maybeWaitForPid() {
 
 
 
-
-
 ### 集群控制器
 
 > 为一个 Broker，负责 Leader 分区的选举。
@@ -1424,11 +1308,7 @@ private void maybeWaitForPid() {
 
 ==> 通过 Zookeeper 的分布式锁实现，进行选举控制器，监听 ids 。
 
-
-
 控制器使用 <font color="green">epoch 来避免 "脑裂"</font>
-
-
 
 <font color="green">控制器需要那个 Broder 宕机了，宕机的 Broder 上负责的哪些 分区的 Leader 副本分区。</font>
 
@@ -1453,8 +1333,6 @@ get /myKafka/brokers/ids/
 ISR: 
 
 USR：
-
-
 
 `replica.lag.time.ms`: 默认 10000ms，落后改时间，Follower 没有向 Leader 发送 fetch 请求。
 
@@ -1547,7 +1425,7 @@ epoch 未 Leader 的版本好，Leader 变更一次， + 1。
 
 ### 生产阶段重复
 
-![image-20201120230200106](assets/image-20201120230200106.png)
+<img src="assets/image-20201120230200106.png" alt="image-20201120230200106" style="zoom:80%;" />
 
 Max.in.flight.requests.per.connnection 默认 5，单个连接上发送的未确认请求的最大数量。
 
@@ -1556,8 +1434,6 @@ Max.in.flight.requests.per.connnection 默认 5，单个连接上发送的未确
 #### 消费阶段重复
 
 消费者没有及时的提交 offset
-
-
 
 
 
@@ -1574,8 +1450,6 @@ kafka-consumer-groups.sh --bootstrap-server linux121:9092 \
 # 指定格式化查看
 kafka-console-consumer.sh --topic __consumer_offsets -bootstrap-server linux121:9092 --formatter "kafka.coordinator.group.GroupMetadataManager\$OffsetsMessageFormatter" -consumer.config config/consumer.properties --from-beginning
 ```
-
-
 
 
 
@@ -1638,22 +1512,20 @@ Request.timeout.ms 默认30s，进行消息确认。
 
 
 
-
-
 主题的分片
 
 
 
 
 
+## 其他
 
+MQ 之间的对比
 
 
 
 RabbitMQ 遵循 AMQP 协议
 
 RocketMQ 根据 Tag 进行消息过滤
-
-
 
 Kafka 吞吐量高，实时性不如 RabbitMQ 好。
