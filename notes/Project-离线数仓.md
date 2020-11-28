@@ -1,26 +1,6 @@
 [parent](README.md)  
 [TOC]  
 
-
-电商的  
-架构设计，技术选型、数仓开发  
-
-
-## 准备
-需求分析  
-架构设计  
-环境搭建  
-数据准备  
-数仓开发  
-
-
-## 开发与部署
-数仓开发  
-数据可视化  
-项目部署  
-
-
-
 核心交易
 
 任务调度
@@ -29,69 +9,7 @@
 
 数据质量监控
 
-即系查询
-
-
-
-
-
-
-
-
-
-
-
-数据的
-
-数据质量
-
-数据规范
-
-数据开发工具
-
-
-
-
-
-### 会员活跃度分析
-
-计算指标
-
-新增会员： 
-
-活跃会员：每日、周、月的活跃会员数
-
-会员留存： 1日、2日、3日会员留存数，留存率
-
-
-
-
-
-指标口径业务逻辑：
-
-会员： 根据设备标准，Android, IOS, Ipad...
-
-活跃会员： 打开应用，浏览xx秒，一个设备每天打开，每周打开都作为一个；按照自然周、自然月；
-
-会员活跃率：会员数与活跃会员比例。
-
-新增会员：第一次使用的为新会员，卸载安装的不算，自然周、自然月。
-
-留存会员与留存率： 某段时间的新增会员，经过一段时间后忍让继续使用的，这部分会员赞当时新增会员的比例。
-
-
-
-已知条件：
-
-输入: 启动日志
-
-输出：新增会员、活跃会员、留存会员
-
-日志文件： ODS、DWD、DWS, ADS
-
-
-
-
+即席查询
 
 
 
@@ -99,15 +17,17 @@
 
 # 数仓
 
+> 数据仓库(DataWarehouse)是一个面向主题的(Subject Oriented)、集成的(Integrated)、相对
+>
+> 稳定的(Non-Volatile)、反映历史变化的(Time Variant)数据集合，用于支持管理决策(Decision-Making Support)。
+
 数据仓库理论
 
-数据连线仓库设计
+数据离线仓库设计
 
 会员活跃度分析
 
 广告分析： 广告的效果
-
-
 
 
 
@@ -117,25 +37,19 @@
 
 **数据仓库特征**
 
-① 面向主题的：
+① 面向主题的：在逻辑意义上，它是对应企业中某一宏观分析领域所涉及的分析对象
 
-
-
-② 集成的： 各种来源，内部、外部；
+② 集成的： 从原有的分散的多个数据库、数据文件、用户日志中抽取来的，数据来源可能既有内部数据又有外部数据
 
 从各种业务系统中集成数据
 
-
-
-③ 稳定：
-
-不会修改数据
-
-
+③ 稳定：数据经加工和集成进入数据仓库后是极少更新的，通常只需要定期的加载和更新。
 
 ④ 反应历史变化
 
 业务系统不保存大量数据，数仓需要...
+
+数据仓库中的数据是历史数据, 的数据是按照时间顺序追加的，都带有时间属性
 
 
 
@@ -199,7 +113,7 @@ OLAP: 联机分析处理 ==> 数据仓库
 >
 > 反应各个主题的局部性数据组织。又称为部门数据仓库。
 
-
+遵循不同的标准和建设原则, 可能导致众多的数据孤岛。
 
 ### 数据建模
 
@@ -253,7 +167,9 @@ OLAP: 联机分析处理 ==> 数据仓库
 
 Operate Data Store
 
-<font color="green">原封不动的存储一份</font>
+数据仓库源头系统的数据<font color="green">原封不动的存储一份</font>
+
+
 
 **2、数据仓库层(DW Data Warehouse)**
 
@@ -353,7 +269,7 @@ Operate Data Store
 
 
 
-### 元数据
+## 元数据
 
 包含的内容
 
@@ -415,17 +331,51 @@ Operate Data Store
 
 
 
+计算指标
+
+新增会员： 
+
+活跃会员：每日、周、月的活跃会员数
+
+会员留存： 1日、2日、3日会员留存数，留存率
+
+
+
+
+
+指标口径业务逻辑：
+
+会员： 根据设备标准，Android, IOS, Ipad...
+
+活跃会员： 打开应用，浏览xx秒，一个设备每天打开，每周打开都作为一个；按照自然周、自然月；
+
+会员活跃率：会员数与活跃会员比例。
+
+新增会员：第一次使用的为新会员，卸载安装的不算，自然周、自然月。
+
+留存会员与留存率： 某段时间的新增会员，经过一段时间后忍让继续使用的，这部分会员赞当时新增会员的比例。
+
+
+
+已知条件：
+
+输入: 启动日志
+
+输出：新增会员、活跃会员、留存会员
+
+日志文件： ODS、DWD、DWS, ADS
+
 
 
 ### 数据埋点
 
 > <font color="green">将用户的浏览、点击事件采集上报的一套数据采集的方法。</font>
 
-一般不保存到数据库中，保存到日志文件中
+一般不保存到数据库中，保存到日志文件中。
 
+包括访问数、访客数、停留时长、浏览数、跳出率。
 
-
-页面统计、统计操作
+页面统计、统计操作。
 
 
 
@@ -556,10 +506,6 @@ Fusion Insight: 华为 hadoop2.7.2 ，主要是国企、大型项目使用
 
 
 
-
-
-
-
 **软件选型**
 
 数据采集: **Flume**, Sqoop, Logstash, **DataX**, Kafka(实时)
@@ -578,9 +524,7 @@ Fusion Insight: 华为 hadoop2.7.2 ，主要是国企、大型项目使用
 
 其他： **MySQL**
 
-
-
-<p align="center">产品版本</p>
+<p align="center">产品版本选择</p>
 
 | 产品    | 版本                  |
 | ------- | --------------------- |
@@ -632,8 +576,6 @@ Fusion Insight: 华为 hadoop2.7.2 ，主要是国企、大型项目使用
 
 其他未考虑： 数据压缩、业务数据
 
-
-
 开发测试环境、生产环境，也需要一定数量的机器。
 
 
@@ -641,6 +583,10 @@ Fusion Insight: 华为 hadoop2.7.2 ，主要是国企、大型项目使用
 ### 系统逻辑架构
 
 ![image-20201128102452229](assets/image-20201128102452229.png)
+
+
+
+### 开发规范
 
 **数据库命名规范**
 
@@ -680,8 +626,6 @@ Flume
 
 
 
-
-
 日志数据采集：
 
 - 使用taildir source 监控指定的多个目录，可以给不同目录的日志加上不同 header 
@@ -693,13 +637,15 @@ Flume
 
 
 
-
-
 ### ODS 层建表和数据加载
 
 > HDFS ==> ODS ==> OWD
 
 ODS 层的数据与源数据的格式基本相同。
+
+定义按照 dt 进行分区。
+
+每天添加分区的方式将已经采集到 HDFS 中的数据加载到 Hive 表中操作。
 
 ```sql
 use ODS;
@@ -716,8 +662,6 @@ location '/user/data/logs/start';
 alter table ods.ods_start_log add partition(dt='2020-08-02');
 drop table ods.ods_start_log;
 ```
-
-
 
 ```shell
 #!/bin/bash
@@ -738,8 +682,6 @@ hive -e "$sql"
 
 
 
-
-
 ### json 数据处理
 
 Hive 处理 json 数据的方式
@@ -750,9 +692,7 @@ Hive 处理 json 数据的方式
 
 
 
-
-
-**内建的函数处理**
+**方式一: 内建的函数处理**
 
 `get_json_object(string json_string, string path)`: 解析json字符串json_string，返回path指定的内容；
 
@@ -796,7 +736,7 @@ from jsont1;
 select json_tuple(json, 'id', 'ids', 'total_number') from jsont1;
 ```
 
-不能直接展开，使用 explod 展开
+含其他字段时，不能直接展开，需要使用 explod 展开
 
 ```sql
 select username, age, sex, id, ids, num 
@@ -811,24 +751,24 @@ from tmp
 lateral view explode(split(regexp_replace(ids, "\\[|\\]", ""), ",")) t1 as ids1;
 ```
 
-
-
-**使用 UDF 处理**
+**方式二: 使用 UDF 处理**
 
 ```sql
+-- 创建临时函数
 add jar /data/lagoudw/jars/cn.lagou.dw-1.0-SNAPSHOT-jar-withdependencies.jar;
+create temporary function json_json_array as "cn.lagou.dw.hive.udf.ParseJsonArray";
 
-create temporary function lagou_json_array as "cn.lagou.dw.hive.udf.ParseJsonArray";
+select username, age, sex, parse_json_array(json, "ids") ids 
+from jsont1;
 
-select username, age, sex, parse_json_array(json, "ids") ids from jsont1;
-
-select username, age, sex, ids1 from jsont1 
+select username, age, sex, ids1 
+from jsont1 
 lateral view explode(parse_json_array(json, "ids")) t1 as ids1;
 
 select username, age, sex, id, num 
 from jsont1 
 lateral view json_tuple(json, 'id', 'total_number') t1 as id, num;
-
+-- 合并
 select username, age, sex, ids1, id, num 
 from jsont1 
 lateral view explode(parse_json_array(json, "ids")) t1 as ids1 
@@ -837,11 +777,11 @@ lateral view json_tuple(json, 'id', 'total_number') t1 as id, num;
 
 
 
-**使用SerDe处理**
+**方式三: 使用SerDe处理**
 
 对象的序列化用途：
 
-- 对象的持久化，即把对象转换成字节序列后保存到文件中
+- 把对象转换成字节序列后保存到文件中
 
 - 对象数据的网络传送
 
@@ -859,13 +799,12 @@ Write : Row object => Seriallizer => <key, value> => OutputFileFormat => HDFS fi
 
 ```sql
 create table jsont2(
-id int,
-ids array<string>,
-total_number int
+  id int,
+  ids array<string>,
+  total_number int
 )
 ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe';
-load data local inpath '/data/lagoudw/data/json2.dat' into table
-jsont2;
+load data local inpath '/data/lagoudw/data/json2.dat' into table jsont2;
 ```
 
 
@@ -882,9 +821,13 @@ jsont2;
 
 ### DWD 层建表和数据加载
 
-表的格式：parquet、分区表
+>  表的格式：parquet、分区表
+>
+> `inserter override` 避免相同的插入多次..
+>
+> 将 json 串提取出来轻度成表
 
-`inserter override` 避免相同的插入多次..
+加载时指定分区字段 dt。
 
 ```sql
 use DWD;
@@ -910,6 +853,7 @@ STORED AS parquet;
 ```shell
 #！/bin/bash
 source /etc/profile
+
 # 可以输入日期；如果未输入日期取昨天的时间
 if [ -n "$1" ]
 then
@@ -917,6 +861,7 @@ then
 else
 	do_date=`date -d "-1 day" +%F`
 fi
+
 # 定义要执行的SQL
 sql="
 with tmp as(
@@ -986,7 +931,11 @@ daycnt weekcnt monthcnt dt
 
 创建 DWS 层表
 
-```shell
+剔除无用的字段
+
+周、月增加相应的 week、month 字段
+
+```sql
 use dws;
 drop table if exists dws.dws_member_start_day;
 create table dws.dws_member_start_day(
@@ -1052,6 +1001,7 @@ then
 else
 	do_date=`date -d "-1 day" +%F`
 fi
+
 # 定义要执行的SQL
 # 汇总得到每日活跃会员信息；每日数据汇总得到每周、每月数据
 sql="
@@ -1139,17 +1089,17 @@ fi
 sql="
 with tmp as(
 select 'day' datelabel, count(*) cnt, dt
-  from dws.dws_member_start_day
+    from dws.dws_member_start_day
   where dt='$do_date'
   group by dt
   union all
   select 'week' datelabel, count(*) cnt, dt
-  from dws.dws_member_start_week
+    from dws.dws_member_start_week
   where dt='$do_date'
   group by dt
   union all
   select 'month' datelabel, count(*) cnt, dt
-  from dws.dws_member_start_month
+    from dws.dws_member_start_month
   where dt='$do_date'
   group by dt
 )
@@ -1214,10 +1164,6 @@ ads_load_member_active.sh
 留存会员： 某段时间内新增的会员，经过一定时间后，仍继续使用应用的；
 
 新增会员： 安装后卸载再次安装的不算做新增
-
-
-
-
 
 DWD: 会员每日启动(95-110)； 所有会员的信息(1-100)；
 
@@ -1302,10 +1248,6 @@ where t1.dt="2020-08-03"
 -- 检查结果
 select * from t2;
 ```
-
-
-
-
 
 
 
@@ -1397,18 +1339,6 @@ where dt = '$do_date'
 "
 hive -e "$sql"
 ```
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
