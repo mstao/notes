@@ -735,6 +735,12 @@ computeSliteSize(Math.max(minSize,Math.min(maxSize,blocksize)))=blocksize=128M
 
 
 
+Hive 自带的序列化与反序列化
+
+https://cwiki.apache.org/confluence/display/Hive/DeveloperGuide#DeveloperGuide-HiveSerDe
+
+
+
 
 
 

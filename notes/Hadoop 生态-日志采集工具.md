@@ -14,7 +14,20 @@
 
 输入的速率大于写入目的存储的速率，会被缓存，减少 HDFS 压力
 
-事务基于 channel，两个十五模型（sender + receiver），保证消息被可靠发送
+事务基于 channel，两个十五模型（sender + receiver），保证消息被可靠发送\
+
+
+
+Flume 1.6
+
+提供的 spolling directory source, exec source 不满足实时收集的需求
+
+
+
+Flume 1.8+
+
+- 提供 Taildir Source
+- 使用该 source， 可监控多个目录，对目录中心加入的数据进行实时采集
 
 
 
@@ -263,6 +276,159 @@ Channel 与 Sink 之间
 source、sink 的可靠不可控，随着具体使用 Source、Channel、Sink 的类型。  
 
 生成常用 taildir source + sink
+
+
+
+
+
+
+
+
+
+## taildir source
+
+特点：
+
+- 支持正则表达式匹配目录中的文件名
+- 监控日志文件，有文件写入
+- 高可靠，不会数据丢失
+- 不会对跟踪文件有任何处理，不会重命名、删除
+- 不支持 Windows, 不能读取二进制文件，支持按照行读取文本文件。
+
+
+
+**配置**
+
+```properties
+a1.sources.r1.type = TAILDIR 
+a1.sources.r1.positionFile = /data/lagoudw/conf/startlog_position.json 
+a1.sources.r1.filegroups = f1 
+a1.sources.r1.filegroups.f1 = /data/lagoudw/logs/start/.*log
+```
+
+
+
+**HDFS sink 配置**
+
+滚动方式：
+
+基于时间
+
+基于文件daxiao基于 EVENT 数量
+
+基于文件空闲时间
+
+```properties
+a1.sinks.k1.type = hdfs 
+a1.sinks.k1.hdfs.path = /user/data/logs/start/%Y-%m-%d/ 
+a1.sinks.k1.hdfs.filePrefix = startlog.
+
+# 配置文件滚动方式（文件大小32M）, 默认 1024b, 生产中 >>
+a1.sinks.k1.hdfs.rollSize = 33554432 
+# 基于时间的数量，默认10
+a1.sinks.k1.hdfs.rollCount = 0 
+# 基于时间的滚动，默认30s
+a1.sinks.k1.hdfs.rollInterval = 0 
+# 基于文件空闲时间
+a1.sinks.k1.hdfs.idleTimeout = 0 
+# 默认值与 hdfs 副本数一致, 设为1是为了让 Flume 感知不到hdfs的块复制
+a1.sinks.k1.hdfs.minBlockReplicas = 1
+
+# 向hdfs上刷新的event的个数, 默认100 
+a1.sinks.k1.hdfs.batchSize = 100
+
+# 使用本地时间 
+a1.sinks.k1.hdfs.useLocalTimeStamp = true
+```
+
+
+
+**agent 配置**
+
+```properties
+a1.sources=r1
+a1.sinks = k1
+a1.channels = c1
+# taildir source
+a1.sources.r1.type = TAILDIR
+a1.sources.r1.positionFile = /data/lagoudw/conf/startlog_position.json
+a1.sources.r1.filegroups = f1
+a1.sources.r1.filegroups.f1 = /data/lagoudw/logs/start/.*log
+# memorychannel
+a1.channels.c1.type = memory
+a1.channels.c1.capacity = 100000
+a1.channels.c1.transactionCapacity = 2000
+# hdfs sink
+a1.sinks.k1.type = hdfs
+a1.sinks.k1.hdfs.path = /user/data/logs/start/%Y-%m-%d/
+a1.sinks.k1.hdfs.filePrefix = startlog.
+# 配置文件滚动方式（文件大小32M）
+a1.sinks.k1.hdfs.rollSize = 33554432
+a1.sinks.k1.hdfs.rollCount = 0
+a1.sinks.k1.hdfs.rollInterval = 0
+a1.sinks.k1.hdfs.idleTimeout = 0
+a1.sinks.k1.hdfs.minBlockReplicas = 1
+# 向hdfs上刷新的event的个数
+a1.sinks.k1.hdfs.batchSize = 1000
+# 使用本地时间
+a1.sinks.k1.hdfs.useLocalTimeStamp = true
+# Bind the source and sink to the channel
+a1.sources.r1.channels = c1
+a1.sinks.k1.channel = c1
+```
+
+
+
+使用自定义拦截器
+
+```
+
+```
+
+
+
+
+
+
+
+### Flume 命令操作
+
+```SHELL
+$FLUME_HOME/bin/flume-ng agent --name a1 \
+  --conf-file $FLUME_HOME/conf/flume-netcat-logger.conf \
+  -Dflume.root.logger=INFO,console
+```
+
+```shell
+export JAVA_OPTS="-Xms4000m -Xmx4000m -Dcom.sun.management.jmxremote"
+flume-ng agent --conf /opt/apps/flume-1.9/conf \
+  --conf-file /data/lagoudw/conf/flume-log2hdfs1.conf \
+  -name a1 -Dflume.roog.logger=INFO,console
+```
+
+```shell
+flume-ng agent --conf /opt/apps/flume-1.9/conf \
+  --conf-file conf/flume-log2hdfs1.conf \
+  -name a1 -Dflume.root.logger=INFO,console
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

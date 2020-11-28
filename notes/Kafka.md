@@ -60,11 +60,21 @@ Connector API:
 
 测试 Kafka 处理数据 200G/h。
 
+
+
 两个反常识：
 
 消息磁盘存储，非内存
 
 分区副本保持数据一致性(高可用保证)，非过半机制，随机选择一个 ISR，依据配置可选一个 USR。
+
+
+
+可对生产者、消费者、 Brokder、主题的分区进行横向扩展。
+
+consumer 采用 pull 模式从 brokder 中读取数据，<font color="green">可自主控制消费消息的速率, 可控制消费方式.. </font>
+
+推送, 保证及时性, RabbitMq 保证 um, 小而美。
 
 
 
@@ -150,11 +160,23 @@ Consumer Group:
 
 
 
-
-
 ## 安装
 
 ### 命令
+
+**服务的启停**
+
+```shell
+# 前台启动
+kafka-server-start.sh -daemon $KAFKA_HOME/config/server.properties
+kafka-server-stop.sh
+
+# 后台启动
+curl linux123/log -d "message send to kafka ..0000000088888"
+
+vi $KAFKA_HOME/config/server.properties
+bootstrap.servers=linux121:9092,linux122:9092,linux123:9092
+```
 
 **主题操作**
 
@@ -170,6 +192,7 @@ kafka-topic.sh --zookeeper localhost:2181/myKafka \
   
 kafka-topic.sh --zookeeper localhost:2181/myKafka \
   --describe --topic topic_1
+# 调高主题的分区数
 ```
 **消费者操作**
 ```shell
@@ -186,20 +209,6 @@ kafka-console-consumer.sh --bootstrap-server localhost:9092 \
 kafka-console-producer.sh --brokder-list localhost:9092 \
   --topic topic_1
 ```
-**服务的启停**
-
-```shell
-# 前台启动
-kafka-server-start.sh -daemon $KAFKA_HOME/config/server.properties
-kafka-server-stop.sh
-
-# 后台启动
-curl linux123/log -d "message send to kafka ..0000000088888"
-
-vi $KAFKA_HOME/config/server.properties
-bootstrap.servers=linux121:9092,linux122:9092,linux123:9092
-```
-
 
 
 <img src="assets/image-20201116213957800.png" alt="image-20201116213957800" style="zoom: 67%;" />
@@ -284,6 +293,18 @@ Interceptor 可能被运行在多个线程中，在具体实现中**<font color=
 
 
 
+### +消息确认
+
+Request.required.acks
+
+0 
+
+1
+
+-1
+
+all
+
 
 
 ### **配置参数**
@@ -341,34 +362,6 @@ max.block.ms
 **消费组**
 
 设置 gorup.id ，保证在一个消费族的时候
-
-
-
-**再平衡**
-
-某个消费者挂掉
-
-
-
-消费者进行横向扩展
-
-<font color="green">分区不能被多个消费者消费</font>, Topic 的分区越多，越有利于消费组的扩展。
-
-
-
-**心跳机制**
-
-Kafka 的心跳是 Kafka Consumer 和 Broker 之间的健康检查，只有当 Broker Coordinator 正常 时，Consumer 才会发送心跳。
-
-控制Topic 的分区与消费组中的消费者对应关系
-
-
-
-consumer 采用 pull 模式从 brokder 中读取数据，<font color="green">可自主控制消费消息的速率, 可控制消费方式.. </font>
-
-推送, 保证及时性, RabbitMq 保证 um, 小而美。
-
-
 
 
 
@@ -669,7 +662,7 @@ kafka-topics.sh --zookeeper localhost:2181/myKafka \
   --alter --delete-config max.message.bytes \
   --topic topic_test_01
   
-# 删除 Topic   ,  先标记 后删除
+# 删除 Topic,  先标记 后删除
 kafka-topics.sh --zookeeper localhost:2181/myKafka --delete --topic topic_x
 ```
 
@@ -721,11 +714,11 @@ Follower 分区和普通 Kafka 消费者一样，消费 Leader 分区消息，�
 
 
 
-**分区副本(LJ)**
+**分区副本在 Broker 上的存放(LJ)**
 
 副本因子
 
-不考虑机架的分配方案：
+(1) 不考虑机架的分配方案：
 
 第一轮顺序放
 
@@ -733,39 +726,21 @@ Follower 分区和普通 Kafka 消费者一样，消费 Leader 分区消息，�
 
 第三轮, Partiton1 -->  Brokder, Partition2 --> Brokder3, Partiton3 --> Brokder4
 
-
-
-考虑机架的分配情况
+(2) 考虑机架的分配情况
 
 按照基本规则分配，达到特定情况区分于基本规则配置，防止某几个 Broker 总是出现问题。
 
 
 
-
-
-#### Leader 选举
-
-副本分区中的选举
-
-
-
-ISR: 保存一致的
-
-OSR： 无法保存一致的
+**出现问题时选取 Partition**
 
 由集群控制器控制。
 
+① 有 ISR 存在，随机找一个 ISR 进行恢复
 
+② 所有的 ISR 都宕机，等一个 ISR 恢复
 
-
-
-出现问题
-
-有 ISR 存在，随机找一个 ISR 进行恢复
-
-所有的 ISR 都宕机，等一个 ISR 恢复
-
-所有的 ISR 都宕机，选一个 OSR 
+③ 所有的 ISR 都宕机，在配置可以选择 OSR 作为 Leader 时选一个 OSR 
 
 
 
@@ -827,11 +802,9 @@ kafka-preferred-replica-election.sh --zookeeper linux121:2181/myKafka \
   --path-to-json-file preferred-replica.json
 ```
 
-
-
 **修改副本因子**
 
-```
+```json
 {
 	"version": 1,
 	"partitions": [
@@ -865,10 +838,6 @@ kafka-reassign-partitions.sh --zookeeper linux121:2181/myKafka \
 
 
 
-
-
-
-
 ### +分区与消费者的再分配
 
 > 再平衡的时候无法进行消费，导致消费能力下降。
@@ -881,6 +850,24 @@ kafka-reassign-partitions.sh --zookeeper linux121:2181/myKafka \
 ② 主题的分区数发生变更： 增加主题的分区
 
 ③ 订阅的主题发生变化： 消费组通过正则订阅主题, 消费组订阅的 Topic 数量变更
+
+
+
+**再平衡**
+
+某个消费者挂掉
+
+消费者进行横向扩展
+
+<font color="green">分区不能被多个消费者消费</font>, Topic 的分区越多，越有利于消费组的扩展。
+
+
+
+**心跳机制**
+
+Kafka 的心跳是 Kafka Consumer 和 Broker 之间的健康检查，只有当 Broker Coordinator 正常 时，Consumer 才会发送心跳。
+
+控制Topic 的分区与消费组中的消费者对应关系
 
 
 
@@ -936,7 +923,7 @@ kafka-reassign-partitions.sh --zookeeper linux121:2181/myKafka \
 
 
 
-可控制再平衡的三个参数
+**可控制再平衡的三个参数**
 
 session.timout.ms: 控制心跳的超时时间, 6s 
 
@@ -962,21 +949,11 @@ max.poll.interval.ms: poll 的间隔, 1分钟
 
 消费者的消费状态
 
+```
+brokders/ids
+```
 
 
-
-
-### 消息确认
-
-Request.required.acks
-
-0 
-
-1
-
--1
-
-all
 
 
 
@@ -1017,8 +994,6 @@ all
 **索引文件切分**
 
 预分配大小，实际切分的时候进行实际的大小，<font color="green">降低代码逻辑的复杂性。</font>
-
-
 
 offset 实际长度 64位，默认日志文件使用 20位
 
@@ -1068,21 +1043,15 @@ Q: 查找时间戳为 1557554753430 开始的消息？
 
 
 
-
-
 **日志清理**
 
 删除、压缩
 
 Log.cleanup.policy: 默认 delete, 可选择 compact，业务数据一般不删除。
 
-
-
 基于时间删除
 
 log.retention.hours/log.retention.minutes/log.retention.ms，默认 7 days。
-
-
 
 
 
@@ -1092,8 +1061,7 @@ log.retention.hours/log.retention.minutes/log.retention.ms，默认 7 days。
 
 ```
 内核缓冲区 ==> 用户缓冲区(JVM 堆内存) ==> 内核缓冲区 ==> 网卡...
-
-内核缓冲区
+内核缓冲区 ==> 网卡
 ```
 
 
@@ -1102,9 +1070,7 @@ log.retention.hours/log.retention.minutes/log.retention.ms，默认 7 days。
 
 操作系统级别的特性，实现的磁盘缓存。
 
-<font color="green">Mmap 不可靠</font>
-
-NIO 提供 MappedByteBuffer 实现映射。
+<font color="green">Mmap 不可靠</font>， NIO 提供 MappedByteBuffer 实现映射。
 
 mmap 的文件映射，在 Full GC 时才会进行释放， close 时需要手动清理内存映像文件。
 
@@ -1114,21 +1080,19 @@ mmap 的文件映射，在 Full GC 时才会进行释放， close 时需要手�
 
 
 
-
-
 **顺序写入机制**
 
 多个文件相同的大小与一个文件进行传输，一个文件更快，读取的时候效率更高。
 
-. RocketMQ 在消费消息时，使用了 mmap。kafka 使用了 sendFile。
+RocketMQ 在消费消息时，使用了 mmap。kafka 使用了 sendFile。
 
 
 
-Kafka速度快是因为：
+**Kafka 使用磁盘存储速度快的原因**
 
-1. partition顺序读写，充分利用磁盘特性，这是基础；
+1. partition 顺序读写，充分利用磁盘特性；
 2. Producer生产的数据持久化到broker，采用mmap文件映射，实现顺序的快速写入；
-3. Customer从broker读取数据，采用sendfile，将磁盘文件读到OS内核缓冲区后，直接转到 socket buffer进行网络发送。
+3. Customer从broker读取数据，采用 <font color="green">sendfile</font>，将磁盘文件读到OS内核缓冲区后，直接转到 socket buffer进行网络发送。
 
 
 
@@ -1141,8 +1105,6 @@ log.index.interval.bytes: 4096(4K) 网络中的索引项达到此大小，写 .i
 Log.roll.hours: 168(7天)
 
 Log.index.size.max.bytes: 10485760(10MB) 限制索引文件的大小...
-
-
 
 
 
@@ -1254,7 +1216,7 @@ f(f(x)) = f(x)
 
 最多一次: 
 
-最少一次: 失败重发(重试)
+最少一次: 失败重发(重试队列)
 
 仅一次
 
@@ -1308,23 +1270,21 @@ private void maybeWaitForPid() {
 
 ==> 通过 Zookeeper 的分布式锁实现，进行选举控制器，监听 ids 。
 
-控制器使用 <font color="green">epoch 来避免 "脑裂"</font>
+控制器使用 <font color="green">epoch 来避免 "脑裂"</font>。
 
-<font color="green">控制器需要那个 Broder 宕机了，宕机的 Broder 上负责的哪些 分区的 Leader 副本分区。</font>
+<font color="green">控制器需要那个 Broder 宕机了，宕机的 Broder 上负责的哪些分区的 Leader 副本分区。</font>
 
-变动的 临时节点 xx/broders/ids。
+变动的临时节点 xx/broders/ids。
 
 监听 ids 的节点，监听到哪些节点宕机。
 
-xx/broders/topic: 非临时节点
+xx/broders/topic: 非临时节点。
 
 xx/broders/seqid: 
 
 ```
 get /myKafka/brokers/ids/
 ```
-
-
 
 
 
@@ -1340,15 +1300,11 @@ USR：
 
 
 
-
-
 **失效副本**
 
 可通过编程方式获取
 
 Follower 副本进程卡住，同步太慢...
-
-
 
 
 
@@ -1367,19 +1323,9 @@ HW: HW 不会大于 LEO 值
 
 Leader 收到消息更新自己的 LEO，在 Follower 执行 FETCH 请求的时候更新 Leader 中的 Follower 中的 LEO。
 
-
-
-
-
 如果Follower的LEO大于Leader的HW，Follower HW值不会大于Leader的HW值。
 
-
-
 Kafka 通过 HW 
-
-
-
-
 
 数据丢失
 
@@ -1391,10 +1337,6 @@ Min.insync.replicas=1
 
 Follow 与 Leader 的 中的数据顺序不一致。
 
-
-
-
-
 <font color="green">延迟一轮 FETCH RPC 更新HW值的设计使follower HW值是异步延迟更新</font>
 
 
@@ -1403,27 +1345,23 @@ Follow 与 Leader 的 中的数据顺序不一致。
 
 HW 的值是异步延迟的..
 
-
-
 实际上是一堆值 `<epoch, offset>`
 
 epoch 未 Leader 的版本好，Leader 变更一次， + 1。
 
 
 
-依靠Leader epoch的信息可以有效地规避数据不一致的问题。
+依靠 Leader epoch 的信息可以有效地规避数据不一致的问题。
 
-对于使用 unclean.leader.election.enable = true 设置的群集，该方案不能保证消息的一致性。
-
-
+对于使用 `unclean.leader.election.enable = true` 设置的群集，该方案不能保证消息的一致性。
 
 <font color="green">Kafka 通过  ISR 保证一致性， Zookeeper 通过过半机制保证数据一致性。</font>
 
 
 
+### 重复消费
 
-
-### 生产阶段重复
+**生产阶段重复**
 
 <img src="assets/image-20201120230200106.png" alt="image-20201120230200106" style="zoom:80%;" />
 
@@ -1431,7 +1369,7 @@ Max.in.flight.requests.per.connnection 默认 5，单个连接上发送的未确
 
 
 
-#### 消费阶段重复
+**消费阶段重复**
 
 消费者没有及时的提交 offset
 
@@ -1439,7 +1377,7 @@ Max.in.flight.requests.per.connnection 默认 5，单个连接上发送的未确
 
 ### __consumer_offsets
 
-> 默认 50 个 partition。
+> 默认 50 个 partition， Kafka 的集群控制器管理。
 
 ```
 kafka-consumer-groups.sh --bootstrap-server linux121:9092 \
@@ -1450,8 +1388,6 @@ kafka-consumer-groups.sh --bootstrap-server linux121:9092 \
 # 指定格式化查看
 kafka-console-consumer.sh --topic __consumer_offsets -bootstrap-server linux121:9092 --formatter "kafka.coordinator.group.GroupMetadataManager\$OffsetsMessageFormatter" -consumer.config config/consumer.properties --from-beginning
 ```
-
-
 
 指定 consumer group 的位移信息。
 
@@ -1484,11 +1420,9 @@ Request.timeout.ms 默认30s，进行消息确认。
 
 
 
-
-
 ## 重试队列
 
-> kafka没有重试机制不支持消息重试，也没有死信队列，因此使用kafka做消息队列时，需要自己实 现消息重试的功能。
+> kafka没有重试机制不支持消息重试，也没有死信队列，因此使用kafka做消息队列时，需要自己实现消息重试的功能。
 >
 > RabbitMQ 中自带重试队列，Kafka 中需要自定义实现重试队列。
 
@@ -1510,19 +1444,9 @@ Request.timeout.ms 默认30s，进行消息确认。
 
 
 
-
-
-主题的分片
-
-
-
-
-
 ## 其他
 
 MQ 之间的对比
-
-
 
 RabbitMQ 遵循 AMQP 协议
 

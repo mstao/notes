@@ -16,7 +16,7 @@ Dubbo： 分布式。。。
 
 ### 架构
 
-<img src="assets/image-20201028221932970.png" alt="image-20201028221932970" style="zoom:50%;" />
+<img src="assets/image-20201028221932970.png" alt="image-20201028221932970" style="zoom: 43%;" />
 
 Leader: 核心组件，事务请求唯一处理者。非手动指定，需要选举。
 
@@ -24,15 +24,9 @@ Follower： 处理读请求，转发食物到 Leader
 
 Observer:  不参与选举，增加 ZK 集群的读的..
 
- 
-
-
-
 每个 Server 保存相同的数据副本，数据一致。
 
 只要有半数以上节点存活， ZK 集群就能正常提供服务。
-
-
 
 **<font color="green">Zookeeper 本质上是一个分布式的小文件存储系统</font>**
 
