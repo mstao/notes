@@ -2,8 +2,105 @@
 
 [TOC]  
 
-[配置与启动](../../bigdata/conf/hadoop)  
-[HDFS Shell 操作](../../bigdata/shell/hadoop)
+# Hadoop
+
+**大数据特征**
+
+```
+1TB = 1024 GB
+1PB = 1024 TB
+1EB = 1024 PB
+1ZB = 1024 EB
+1YB = 1024 ZB
+1BB = 1024 YB
+1NB = 1024 BB
+1DB = 1024 NB
+```
+
+![image-20201201082140039](assets/image-20201201082140039.png)
+
+
+
+**大数据的应用场景**
+
+仓储物流、电商零售、汽车、电信、生物医学、人工智能、智慧城市等等领域
+
+
+
+**大数据的发展路线**
+
+从事岗位: ETL工程师， 数据仓库工程师，实时流处理工程师，用户画像工程师，数据挖掘，算法工程师，推荐系统工程。
+
+
+
+**起源**
+
+```
+Nutch —> Google论文（GFS、MapReduce）
+—> Hadoop产生
+—> 成为Apache顶级项目
+—> Cloudera公司成立
+```
+
+
+
+**Hadoop 的特点**
+
+![image-20201201084326281](assets/image-20201201084326281.png)
+
+Hadoop的缺点
+
+- 不适用于低延迟数据访问。
+
+- 不能高效存储大量小文件。
+
+- 不支持多用户写入并任意修改文件。
+
+
+
+**版本**
+
+http://hadoop.apache.org/
+
+https://www.cloudera.com/
+
+https://hortonworks.com/
+
+
+
+**组成**
+
+HDFS
+
+MapReduce
+
+Yarn
+
+Hadoop Common：支持其他模块的工具模块（Configuration、RPC、序列化机制、日志操作）
+
+
+
+## 安装
+
+```shell
+hadoop-env.sh
+
+
+# 指定NameNode节点以及数据存储目录
+core-site.xm
+# 指定SecondaryNameNode节点
+hdfs-site.xml
+
+mapred-env.sh
+
+mapred-site.xml
+
+yarn-env.sh
+# 指定ResourceManager老大节点所在计算机节点
+yarn-site.xml
+# 指定DataNode从节点, 指定NodeManager节点
+slaves
+```
 
 
 
@@ -11,13 +108,31 @@
 
 # HDFS
 
+> HDFS：（Hadoop Distribute File System ）一个高可靠、高吞吐量的分布式文件系统。
+>
+> 数据切割、制作副本、分散储存。
+
+
+
+NameNode（nn）：存储文件的元数据，比如文件名、文件目录结构、文件属性（生成时间、副
+
+本数、文件权限），以及每个文件的块列表和块所在的DataNode等。
+
+SecondaryNameNode（2nn）：辅助NameNode更好的工作，用来监控HDFS状态的辅助后台
+
+程序，每隔一段时间获取HDFS元数据快照。
+
+DataNode（dn）：在本地文件系统存储文件块数据，以及块数据的校验
+
+
+
 ## 存储扩展
 put： 1file => 1..n block  到不同的节点不同的块上 
 get:    去  NN 上查找 file 对应元数据信息  
 
 通过统一的命名空间目录树来定位文件；
 
-<img src="assets/image-20200913081633164.png" alt="image-20200913081633164" style="zoom:67%;" />
+<img src="assets/image-20200913081633164.png" alt="image-20200913081633164" style="zoom: 50%;" />
 
 HDFS集群往往是一个NameNode（HA架构会有两个NameNode,联邦机制）+ 多个DataNode组 成；
 
@@ -318,12 +433,78 @@ Mem + Dist，NameNode 内存 + FsImage 的磁盘文件
 
 ## 配置参数
 
-> [doc]()
+> [core-site.xml](https://hadoop.apache.org/docs/r2.9.2/hadoop-project-dist/hadoop-common/core-default.xml)
+>
+> [hdfs-site.xml](https://hadoop.apache.org/docs/r2.9.2/hadoop-project-dist/hadoop-hdfs/hdfs-default.xml)
+
+<p align="center">core-default.xml 配置内容</p>
+
+| name                                                 | Value                                                        | description                                                  |
+| ---------------------------------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| **hadoop.tmp.dir**                                   | /tmp/hadoop-${user.name}                                     |                                                              |
+| hadoop.service.shutdown.timeout                      | 30s                                                          |                                                              |
+| io.file.buffer.size                                  | 4096                                                         |                                                              |
+| io.compression.codecs                                |                                                              |                                                              |
+| io.serializations                                    | org.apache.hadoop.io.serializer.WritableSerialization, org.apache.hadoop.io.serializer.avro.AvroSpecificSerialization, org.apache.hadoop.io.serializer.avro.AvroReflectSerialization |                                                              |
+| io.map.index.interval                                | 128                                                          |                                                              |
+| **fs.defaultFS**                                     | file:///                                                     |                                                              |
+| fs.default.name                                      | file:///                                                     |                                                              |
+| io.mapfile.bloom.size                                | 1048576                                                      |                                                              |
+| io.mapfile.bloom.error.rate                          | 0.005                                                        | 布隆过滤器错误比率                                           |
+| hadoop.socks.server                                  |                                                              |                                                              |
+| file.stream-buffer-size                              | 4096                                                         |                                                              |
+| file.client-write-packet-size                        | 65536                                                        | 客户端写的 PACKET 大小                                       |
+| file.blocksize                                       | 67108864                                                     |                                                              |
+| **file.replication**                                 | 1                                                            | 副本数量                                                     |
+| hadoop.http.cross-origin.enabled                     | false                                                        | 是否开启 CORS 过滤器                                         |
+| hadoop.http.cross-origin.allowed-origins             | *                                                            |                                                              |
+| hadoop.http.cross-origin.allowed-methods             | GET,POST,HEAD                                                |                                                              |
+| hadoop.http.cross-origin.allowed-headers             | X-Requested-With,Content-Type,Accept,Origin                  |                                                              |
+| hadoop.http.cross-origin.max-age                     | 1800                                                         |                                                              |
+| ha.zookeeper.quorum                                  |                                                              | ZooKeeper服务器地址列表，以逗号分隔，将由ZKFailoverController在自动故障转移中使用。 |
+| ha.zookeeper.session-timeout.ms                      | 10000                                                        | ZKFC连接到ZooKeeper时使用的会话超时                          |
+| ha.zookeeper.parent-znode                            | /hadoop-ha                                                   |                                                              |
+| ha.zookeeper.acl                                     | world:anyone:rwcda                                           |                                                              |
+| ha.zookeeper.auth                                    |                                                              |                                                              |
+| ha.health-monitor.connect-retry-interval.ms          | 1000                                                         |                                                              |
+| ha.failover-controller.graceful-fence.rpc-timeout.ms | 5000                                                         |                                                              |
+| hadoop.registry.zk.root                              | /registry                                                    |                                                              |
+| hadoop.registry.zk.session.timeout.ms                | 60000                                                        |                                                              |
+| hadoop.registry.zk.retry.times                       | 5                                                            |                                                              |
+| hadoop.registry.zk.retry.interval.ms                 | 1000                                                         |                                                              |
+| hadoop.registry.zk.quorum                            | localhost:2181                                               |                                                              |
+| hadoop.shell.safely.delete.limit.num.files           | 100                                                          | 由hadoop fs shell -rm命令的-safely选项使用，以避免意外删除大目录。 |
+| hadoop.http.logs.enabled                             | true                                                         | 在所有Hadoop守护程序上启用“ / logs” endpoint                 |
+
+<p align="center">hdfs-default.xml 配置内容</p>
+
+| Name                                    | Value                                      | Desctirption                                   |
+| --------------------------------------- | ------------------------------------------ | ---------------------------------------------- |
+| **dfs.namenode.secondary.http-address** | 0.0.0.0:50090                              | 2NN 的地址                                     |
+| dfs.datanode.address                    | 0.0.0.0:50010                              |                                                |
+| dfs.namenode.http-address               | 0.0.0.0:50070                              |                                                |
+| dfs.namenode.backup.address             | 0.0.0.0:50100                              | NN 备份地址                                    |
+| dfs.namenode.backup.http-address        | 0.0.0.0:50105                              |                                                |
+| dfs.namenode.name.dir                   | file://${hadoop.tmp.dir}/dfs/name          |                                                |
+| dfs.namenode.edits.dir                  | ${dfs.namenode.name.dir}                   |                                                |
+| **dfs.permissions.enabled**             | true                                       | fs 的权限                                      |
+| dfs.datanode.data.dir                   | file://${hadoop.tmp.dir}/dfs/data          | DN 数据地址                                    |
+| **dfs.replication**                     | 3                                          |                                                |
+| dfs.blocksize                           | 134217728                                  |                                                |
+| dfs.heartbeat.interval                  | 3                                          | 数据节点心跳间隔（以秒为单位）。               |
+| dfs.namenode.safemode.extension         | 30000                                      | 确定达到阈值级别后以毫秒为单位的安全模式扩展。 |
+| dfs.namenode.checkpoint.dir             | file://${hadoop.tmp.dir}/dfs/namesecondary |                                                |
+| dfs.image.compression.codec             | org.apache.hadoop.io.compress.DefaultCodec |                                                |
+|                                         |                                            |                                                |
 
 
 
 # MapReduce
->  基于 Google 论文2004年12月
+>  基于 Google 论文2004年12月。
+>
+>  一个分布式的离线并行计算框架
+>
+>  拆解任务、分散处理、汇整结果
 
 Map、Shuffle、Reduce    
 
@@ -386,15 +567,33 @@ org.apache.hadoop.mapreduce.lib.input.FileInputFormat#computeSplitSize
 
 ### 配置参数
 
-> [doc]()
+> [mapred-site.xmo](https://hadoop.apache.org/docs/r2.9.2/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml)
 
 <p align="center">MapReduce 运行的参数配置</p>
 
-| 参数                   | 默认值   | 含义                    |
-| ---------------------- | -------- | ----------------------- |
-| mapreduce.job.reduces  |          | 每个 job 的 reduce 个数 |
-| mapped.child.java.opts | -Xmx200m |                         |
-| mapred.max.split.size  |          | 256000000               |
+| 参数                                            | 默认值                           | 含义                                                         |
+| ----------------------------------------------- | -------------------------------- | ------------------------------------------------------------ |
+| mapreduce.job.reduces                           |                                  | 每个 job 的 reduce 个数                                      |
+| **mapreduce.framework.name**                    | local                            | local, classic or yarn.                                      |
+| mapred.max.split.size                           |                                  | 256000000                                                    |
+| mapreduce.framework.name                        |                                  |                                                              |
+| mapreduce.task.io.sort.mb                       | 100                              | 排序文件时要使用的缓冲内存总量                               |
+| mapreduce.map.sort.spill.percent                | 0.80                             | 序列化缓冲区中的软限制                                       |
+| mapreduce.job.maps                              | 2                                | 每个作业的默认地图任务数。当mapreduce.framework.name为“本地”时被忽略。 |
+| mapreduce.job.reduces                           | 1                                |                                                              |
+| mapreduce.shuffle.listen.queue.size             | 128                              |                                                              |
+| mapreduce.task.timeout                          | 600000                           |                                                              |
+| mapreduce.map.memory.mb                         | 1024                             |                                                              |
+| **mapred.child.java.opts**                      | -Xmx200m                         | Java选择任务流程。<br>大数据量时需要调大。                   |
+| mapreduce.map.log.level                         | INFO                             |                                                              |
+| mapreduce.reduce.log.level                      | INFO                             |                                                              |
+| mapreduce.output.fileoutputformat.compress      | false                            | 作业输出是否应该压缩                                         |
+| mapreduce.output.fileoutputformat.compress.type | RECORD                           |                                                              |
+| mapreduce.map.output.compress                   | false                            |                                                              |
+| map.sort.class                                  | org.apache.hadoop.util.QuickSort |                                                              |
+| yarn.app.mapreduce.am.command-opts              | -Xmx1024m                        |                                                              |
+| mapreduce.jobhistory.address                    | 0.0.0.0:10020                    | 历史服务器地址 PC host:port                                  |
+| ßmapreduce.jobhistory.webapp.address            | 0.0.0.0:19888                    | Web UI host:port                                             |
 
 
 
@@ -759,11 +958,19 @@ SequenceFileOutputFormat
 
 # Yarn  
 
+> 作业调度与集群资源管理的框架。
+
 <img src="assets/image-20201121163919879.png" alt="image-20201121163919879" style="zoom: 50%;" />
 
-架构    
+- ResourceManager：处理客户端请求、启动/监控ApplicationMaster、监控NodeManager、资源分配与调度；
 
-已经封装到底层中
+- NodeManager：单个节点上的资源管理、处理来自ResourceManager的命令、处理来 ApplicationMaster的命令；
+
+- ApplicationMaster：数据切分、为应用程序申请资源，并分配给内部任务、任务监控与容错。
+
+- Container：对任务运行环境的抽象，封装了CPU、内存等多维资源以及环境变量、启动命令等任务运行相关的信息。
+
+
 
 
 
