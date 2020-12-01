@@ -26,11 +26,11 @@ Flume 的安装配置、启动
 |           | 8088  | Yarn-ResourceManager   | HTTP | ResourceManager 的 Web 管理端口                              |
 |           | 9000  | HDFS-NameNode          |      | HDFS 管理端口，Java Client 连接 HDFS 的端口                  |
 |           | 10020 | 历史服务器             | HTTP | Job 历史服务器端口                                           |
-|           | 50070 | HDFS-DataNode          |      | DataNode 的 http 地址, 可查看 HDFS 的目录内容<br>            |
+|           | 19888 | 历史服务器             | HTTP | Yarn Job 历史管理端口                                        |
+|           | 50010 | HDFS                   |      | 文件上传相关的?                                              |
+|           | 50070 | HDFS-DataNode          | HTTP | DataNode 的 http 地址, 可查看 HDFS 的目录内容<br>            |
 |           | 50075 | Datanode-webhdfs       |      | 访问文件内容或者进行打开、上传、修改、下载等操作<br>不区分端口，直接使用namenode的IP和端口进行所有的webhdfs操作<br>需要在所有的datanode上都设置hdfs-site.xml中的 <br> `dfs.webhdfs.enabled` 为true |
 |           | 50090 | HDFS-2NN               | HTTP | 2NN 的 http 端口                                             |
-|           | 19888 | Yarn-Job               |      | Yarn Job 历史管理端口                                        |
-|           | 50010 | HDFS                   |      | 文件上传相关的?                                              |
 | Hive      | 9083  | Metastore              | TCP  | Hive 中 thrift 的 metastore 服务                             |
 |           | 10000 | HiveServer2            | TCP  | Hive 连接的端口                                              |
 |           | 10002 | HiveServer2            | HTTP | hiveserver2 浏览器端口                                       |

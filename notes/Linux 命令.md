@@ -786,30 +786,65 @@ find，高级查找
 - find . -size 0 | xargs rm -f &，删除当前目录下文件大小为0的文件  
 - du -hm --max-depth=2 | sort -nr | head -12，找出系统中占用容量最大的前 12 个目录  
 
-
 ### grep  
-`-i`: 忽略大小写
-`-n`: 打印行号
--H, --with-filename: 打印文件名
-`-r`: 递归处理  
--d, --directories=ACTION: 目录处理策略, `read`,`recurse`,`skip`
-`-c`: --count 打印匹配的数量
 
-查看某一字符串在文件中出现的次数
+`-v`: 过滤掉
+
+`-i`: 忽略大小写
+
+`-n`: 打印行号
+
+`-H, --with-filename`: 打印文件名
+
+`-r`: 递归处理  
+
+`-d, --directories=ACTION`: 目录处理策略, `read`,`recurse`,`skip`
+
+`-c`/`--count`: 打印匹配的数量
+
+`-w`: 匹配整个词
+
+`-x`: 整行
+
+查看指定进程并过滤掉 grep 自身
 
 ```shell
-# 打印匹配行的前后5行 
+ps -ef | grep namenode | grep -v grep
+```
+
+正则匹配
+
+```shell
+grep "python|PYTHON" file
+grep -E "python|PYTHON" file
+grep -F "py.*" file
+```
+
+打印匹配行的前后5行 
+
+```shell
 grep -5 'parttern' INPUT_FILE 
 ```
 
 ```shell
-grep Full /usr/iwms/report/logs/gclogs/fanruan.gc.log.2020-07-26
-grep -n Full /usr/iwms/report/logs/gclogs/fanruan.gc.log.2020-07-26
-2020-07-26T03:04:18.061+0800: 891906.038: [Full GC (System.gc()) [PSYoungGen: 1278K->0K(5924352K)] [ParOldGen: 1153137K->684714K(10786816K)] 1154415K->684714K(16711168K), [Metaspace: 151316K->150728K(155392K)], 1.621 secs] [Times: real=1.621 secs] [pid: 8] [timestamp: 1595703858061] [node: ]
-2020-07-26T04:23:45.718+0800: 896673.695: [Full GC (System.gc()) [PSYoungGen: 2238K->0K(5926912K)] [ParOldGen: 684714K->639626K(10786816K)] 686953K->639626K(16713728K), [Metaspace: 150917K->150917K(155392K)], 1.075 secs] [Times: real=1.075 secs] [pid: 8] [timestamp: 1595708625718] [node: ]
+grep Full gclogs/fanruan.gc.log.2020-07-26
+grep -n Full gclogs/fanruan.gc.log.2020-07-26
+```
+
+搜索指定字符，并显示匹配到的行号
+
+```shell
+grep -n man /etc/man_db.conf
+```
+
+```
+3:# This file is used by the man-db package to configure the man and cat paths.
+4:# It is also used to provide a manpath for those without one by examining
+5:# their PATH environment variable. For details see the manpath(5) man page.
 ```
 
 查看单个/多个文件某字符出现的次数
+
 ```shell
 grep Full gclogs/* | wc -l
 # count
@@ -817,19 +852,10 @@ grep -c processor /proc/cpuinfo
 # Show filename:count
 grep -c Full gclogs/*
 gclogs/fanruan.gc.log:1
-gclogs/fanruan.gc.log.2020-07-15:0
-gclogs/fanruan.gc.log.2020-07-16:0
 gclogs/fanruan.gc.log.2020-07-17:434
 gclogs/fanruan.gc.log.2020-07-18:1
 gclogs/fanruan.gc.log.2020-07-19:3
-gclogs/fanruan.gc.log.2020-07-20:2
-gclogs/fanruan.gc.log.2020-07-21:2
-gclogs/fanruan.gc.log.2020-07-22:2
-gclogs/fanruan.gc.log.2020-07-23:3
-gclogs/fanruan.gc.log.2020-07-24:4
-gclogs/fanruan.gc.log.2020-07-25:2
-gclogs/fanruan.gc.log.2020-07-26:2
-gclogs/fanruan.gc.log.2020-07-27:1
+...
 ```
 
 
@@ -887,7 +913,6 @@ ifconfig eth0 |grep 'inet' |sed 's/^.*inet//g' |sed 's/netmask.*$//g' |sed -n '1
 
 
 ```shell
-
 有一个文件：/opt/log4j2.properties
 status = error                                                                                                                                      
 
@@ -1013,8 +1038,6 @@ userdel -r ⽤户名
 visudo
 %vagrant ALL=(ALL)   ALL
 ```
-
-
 
 /etc/sudoers
 

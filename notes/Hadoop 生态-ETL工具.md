@@ -1,5 +1,3 @@
-
-
 # Sqoop ETL 工具
 
 > 数据清洗工具，在 RDBMS 和 HDFS 之间导入导出
@@ -82,3 +80,56 @@ ERROR Could not register mbeans java.security.AccessControlException: access den
 找到java.policy文件，添加一句
 permission javax.management.MBeanTrustPermission "register";
 到grant{}里边在执行  
+
+
+
+# DataX
+
+> 阿里巴巴集团内被广泛使用的离线数据同步工具/平台。
+>
+> 包括 MySQL、Oracle、SqlServer、Postgre、HDFS、Hive、ADS、HBase、TableStore(OTS)、MaxCompute(ODPS)、DRDS 等各种异构数据源之间高效的数据同步功能。
+
+![image-20201129113942274](assets/image-20201129113942274.png)
+
+
+
+支持单机多线程模式完成同步作业运行，Task 为最小的调度单元。
+
+![image-20201129114053385](assets/image-20201129114053385.png)
+
+<p align="center">DataX 作业生命周期时序图</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1340,9 +1340,317 @@ where dt = '$do_date'
 hive -e "$sql"
 ```
 
+```
+
+```
 
 
 
+### 留存会员
+
+10W 新会员： dws_member_add_day(dt=08-01) 明细
+
+3W: 1号位新会员，在2号启动 dws_member_start_day
+
+
+
+可进一步分析留存会员所在的区域、使用的手机系统。
+
+| 30   | 31   | 1         | 2    |           |
+| ---- | ---- | --------- | ---- | --------- |
+|      |      | 10W新会员 | 3W   | 1日留存数 |
+|      | 20W  |           | 5W   | 2日留存数 |
+| 30W  |      |           | 4W   | 3日留存数 |
+
+```sql
+-- 会员留存明细
+drop table if exists dws.dws_member_retention_day;
+create table dws.dws_member_retention_day (
+  `device_id` string,
+  `uid` string,
+  `app_v` string,
+  `os_type` string,
+  `language` string,
+  `channel` string,
+  `area` string,
+  `brand` string,
+  `add_date` string comment '会员新增时间',
+  `retention_date` int comment '留存天数'
+)COMMENT '每日会员留存明细'
+PARTITIONED BY (`dt` string)
+stored as parquet;
+```
+
+加载 DWS 层数据
+
+Hive 出现内部错误，改写 SQL 语句
+
+```shell
+#!/bin/bash
+source /etc/profile
+if [ -n "$1" ] ;then
+	do_date=$1
+else
+	do_date=`date -d "-1 day" +%F`
+fi
+sql="
+insert overwrite table dws.dws_member_retention_day
+partition(dt='$do_date')
+(
+select t2.device_id,
+	t2.uid,
+	t2.app_v,
+	t2.os_type,
+	t2.language,
+	t2.channel,
+	t2.area,
+	t2.brand,
+	t2.dt add_date,
+	1
+from dws.dws_member_start_day t1 join dws.dws_member_add_day t2
+on t1.device_id=t2.device_id
+where t2.dt=date_add('$do_date', -1)
+	and t1.dt='$do_date'
+union all
+select t2.device_id,
+  t2.uid,
+  t2.app_v,
+  t2.os_type,
+  t2.language,
+  t2.channel,
+  t2.area,
+  t2.brand,
+  t2.dt add_date,
+  2
+from dws.dws_member_start_day t1 join dws.dws_member_add_day t2
+on t1.device_id=t2.device_id
+where t2.dt=date_add('$do_date', -2)
+	and t1.dt='$do_date'
+union all
+select t2.device_id,
+  t2.uid,
+  t2.app_v,
+  t2.os_type,
+  t2.language,
+  t2.channel,
+  t2.area,
+  t2.brand,
+  t2.dt add_date,
+  3
+from dws.dws_member_start_day t1 join dws.dws_member_add_day t2
+on t1.device_id=t2.device_id
+where t2.dt=date_add('$do_date', -3)
+	and t1.dt='$do_date'
+);
+"
+hive -e "$sql"
+```
+
+改写的 SQL
+
+```shell
+#!/bin/bash
+source /etc/profile
+if [ -n "$1" ] ;then
+	do_date=$1
+else
+	do_date=`date -d "-1 day" +%F`
+fi
+sql="
+drop table if exists tmp.tmp_member_retention;
+create table tmp.tmp_member_retention as
+(
+  select t2.device_id,
+  t2.uid,
+  t2.app_v,
+  t2.os_type,
+  t2.language,
+  t2.channel,
+  t2.area,
+  t2.brand,
+  t2.dt add_date,
+  1
+from dws.dws_member_start_day t1 join dws.dws_member_add_day t2
+on t1.device_id=t2.device_id
+where t2.dt=date_add('$do_date', -1)
+and t1.dt='$do_date'
+union all
+select t2.device_id,
+  t2.uid,
+  t2.app_v,
+  t2.os_type,
+  t2.language,
+  t2.channel,
+  t2.area,
+  t2.brand,
+  t2.dt add_date,
+  2
+from dws.dws_member_start_day t1 join dws.dws_member_add_day t2
+on t1.device_id=t2.device_id
+where t2.dt=date_add('$do_date', -2)
+and t1.dt='$do_date'
+union all
+select t2.device_id,
+  t2.uid,
+  t2.app_v,
+  t2.os_type,
+  t2.language,
+  t2.channel,
+  t2.area,
+  t2.brand,
+  t2.dt add_date,
+  3
+from dws.dws_member_start_day t1 join dws.dws_member_add_day t2
+on t1.device_id=t2.device_id
+where t2.dt=date_add('$do_date', -3)
+and t1.dt='$do_date'
+);
+insert overwrite table dws.dws_member_retention_day
+partition(dt='$do_date')
+select * from tmp.tmp_member_retention;
+"
+hive -e "$sql"
+```
+
+
+
+创建 ADS 表
+
+使用 textfile 存储，方便导出。
+
+```sql
+-- 会员留存数
+drop table if exists ads.ads_member_retention_count;
+create table ads.ads_member_retention_count
+(
+  `add_date` string comment '新增日期',
+  `retention_day` int comment '截止当前日期留存天数',
+  `retention_count` bigint comment '留存数'
+) COMMENT '会员留存数'
+partitioned by(dt string)
+row format delimited fields terminated by ',';
+-- 会员留存率
+drop table if exists ads.ads_member_retention_rate;
+create table ads.ads_member_retention_rate
+(
+  `add_date` string comment '新增日期',
+  `retention_day` int comment '截止当前日期留存天数',
+  `retention_count` bigint comment '留存数',
+  `new_mid_count` bigint comment '当日会员新增数',
+  `retention_ratio` decimal(10,2) comment '留存率'
+) COMMENT '会员留存率'
+partitioned by(dt string)
+row format delimited fields terminated by ',';
+```
+
+
+
+加载ADS层数据
+
+script/member_active/ads_load_member_retention.sh
+
+最后一条SQL的连接条件应为：t1.add_date=t2.dt
+
+```shell
+#!/bin/bash
+source /etc/profile
+if [ -n "$1" ] ;then
+	do_date=$1
+else
+	do_date=`date -d "-1 day" +%F`
+fi
+sql="
+insert overwrite table ads.ads_member_retention_count
+partition (dt='$do_date')
+select add_date, retention_date,
+	count(*) retention_count
+from dws.dws_member_retention_day
+where dt='$do_date'
+group by add_date, retention_date;
+
+insert overwrite table ads.ads_member_retention_rate
+partition (dt='$do_date')
+select t1.add_date,
+    	  t1.retention_day,
+    		t1.retention_count,
+  	   	t2.cnt,
+  	    t1.retention_count/t2.cnt*100
+from ads.ads_member_retention_count t1 join
+ads.ads_new_member_cnt t2 on t1.dt=t2.dt
+where t1.dt='$do_date';
+"
+hive -e "$sql"
+```
+
+
+
+
+
+### 数据导出
+
+配置 HDFS ==> MySQL。
+
+测试
+
+配置参数化。
+
+```sql
+-- MySQL 建表
+-- 活跃会员数
+create database dwads;
+drop table if exists dwads.ads_member_active_count;
+create table dwads.ads_member_active_count(
+`dt` varchar(10) COMMENT '统计日期',
+`day_count` int COMMENT '当日会员数量',
+`week_count` int COMMENT '当周会员数量',
+`month_count` int COMMENT '当月会员数量',
+primary key (dt)
+);
+-- 新增会员数
+drop table if exists dwads.ads_new_member_cnt;
+create table dwads.ads_new_member_cnt
+(
+`dt` varchar(10) COMMENT '统计日期',
+`cnt` string,
+primary key (dt)
+);
+-- 会员留存数
+drop table if exists dwads.ads_member_retention_count;
+create table dwads.ads_member_retention_count
+(
+`dt` varchar(10) COMMENT '统计日期',
+`add_date` string comment '新增日期',
+`retention_day` int comment '截止当前日期留存天数',
+`retention_count` bigint comment '留存数',
+primary key (dt)
+) COMMENT '会员留存情况';
+-- 会员留存率
+drop table if exists dwads.ads_member_retention_rate;
+create table dwads.ads_member_retention_rate
+(
+`dt` varchar(10) COMMENT '统计日期',
+`add_date` string comment '新增日期',
+`retention_day` int comment '截止当前日期留存天数',
+`retention_count` bigint comment '留存数',
+`new_mid_count` bigint comment '当日会员新增数',
+`retention_ratio` decimal(10,2) comment '留存率',
+primary key (dt)
+) COMMENT '会员留存率';
+```
+
+导出
+
+```shell
+#!/bin/bash
+JSON=/data/lagoudw/script/member_active
+source /etc/profile
+if [ -n "$1" ] ;then
+	do_date=$1
+else
+	do_date=`date -d "-1 day" +%F`
+fi
+python $DATAX_HOME/bin/datax.py -p "-Ddo_date=$do_date" $JSON/export_member_active_count.json 2020-08-02
+```
 
 
 

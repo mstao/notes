@@ -588,31 +588,6 @@ set hive.vectorized.execution.reduce.enabled = true;
 
 ### 参数优化
 
-#### 配置参数
-
-<p align="center"><strong>常用配置</strong></p>
-
-| 变量                                 | 含义                     | 参数类型 | 取值作用                                                 |
-| ------------------------------------ | ------------------------ | -------- | -------------------------------------------------------- |
-| hive.execution.engine                | 配置执行引擎             | 架构     |                                                          |
-|                                      |                          |          |                                                          |
-| hive.fetch.task.conversion           | Fetch 抓取               |          | more 在全局查找、字段查找、limit查找等都不走mapreduce    |
-| hive.exec.mode.local.auto            | 本地模式                 |          | 在输入数据量小的情况下，在单台机器上处理所有任务。       |
-| hive.map.aggr                        | Map 端聚合               |          | True，默认                                               |
-| hive.groupby.mapaggr.checkinterval   | Map 端聚合条目数目       |          | 100000，默认                                             |
-| hive.groupby.skewindata              | 数据倾斜时负载均衡       |          | 默认 false                                               |
-|                                      |                          |          |                                                          |
-| hive.input.format                    | InpuFormat               |          | org.apache.hadoop.hive.ql.io.CombineHiveInputFormat 默认 |
-| hive.exec.reducers.bytes.per.reducer | 每个 Reduce 处理的数据量 |          | 默认 256MB                                               |
-| hive.exec.reducers.max               | 任务最大的 reduce 数     |          | 默认 1009                                                |
-|                                      |                          |          |                                                          |
-| hive.exec.parallel                   | 并行执行（多阶段）       |          |                                                          |
-| hive.cli.print.current.db            | 打印当前数据库           | 显示     |                                                          |
-|                                      |                          |          |                                                          |
-| hive.metastore.uris                  | 元数据地址               |          | 如果为空，则为本地模式                                   |
-
-
-
 
 
 本地模式   
@@ -740,6 +715,42 @@ Hive 自带的序列化与反序列化
 https://cwiki.apache.org/confluence/display/Hive/DeveloperGuide#DeveloperGuide-HiveSerDe
 
 
+
+
+
+## 配置参数
+
+```shell
+hive \
+  -hiveconf mapred.max.split.size=128000000 \
+  -hiveconf  hive.exec.reducers.bytes.per.reducer=128000000 \
+  -e  "$sql"
+```
+
+
+
+<p align="center"><strong>常用配置</strong></p>
+
+| 变量                                 | 含义                     | 参数类型 | 取值作用                                                 |
+| ------------------------------------ | ------------------------ | -------- | -------------------------------------------------------- |
+| hive.execution.engine                | 配置执行引擎             | 架构     | mr, tez                                                  |
+| hive.fetch.task.conversion           | Fetch 抓取               |          | more 在全局查找、字段查找、limit查找等都不走mapreduce    |
+| hive.exec.mode.local.auto            | 本地模式                 |          | 在输入数据量小的情况下，在单台机器上处理所有任务。       |
+| hive.map.aggr                        | Map 端聚合               |          | True，默认                                               |
+| hive.groupby.mapaggr.checkinterval   | Map 端聚合条目数目       |          | 100000，默认                                             |
+| hive.groupby.skewindata              | 数据倾斜时负载均衡       |          | 默认 false                                               |
+|                                      |                          |          |                                                          |
+| hive.input.format                    | InpuFormat               |          | org.apache.hadoop.hive.ql.io.CombineHiveInputFormat 默认 |
+| hive.exec.reducers.bytes.per.reducer | 每个 Reduce 处理的数据量 |          | 默认 256MB                                               |
+| hive.exec.reducers.max               | 任务最大的 reduce 数     |          | 默认 1009                                                |
+|                                      |                          |          |                                                          |
+| hive.exec.parallel                   | 并行执行（多阶段）       |          |                                                          |
+| hive.cli.print.current.db            | 打印当前数据库           | 显示     |                                                          |
+|                                      |                          |          |                                                          |
+| hive.metastore.uris                  | 元数据地址               |          | 如果为空，则为本地模式                                   |
+| mapred.max.split.size=256000000      |                          |          |                                                          |
+| hive.exec.reducers.bytes.per.reducer | 256000000                |          |                                                          |
+| hive.exec.reducers.max               | 调整reduce个数：         |          |                                                          |
 
 
 

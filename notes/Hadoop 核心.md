@@ -17,7 +17,7 @@ get:    去  NN 上查找 file 对应元数据信息
 
 通过统一的命名空间目录树来定位文件；
 
-![image-20200913081633164](assets/image-20200913081633164.png)
+<img src="assets/image-20200913081633164.png" alt="image-20200913081633164" style="zoom:67%;" />
 
 HDFS集群往往是一个NameNode（HA架构会有两个NameNode,联邦机制）+ 多个DataNode组 成；
 
@@ -69,7 +69,7 @@ Java Api 执行
 ## *读写流程
 
 **读取流程**  
-![image-20201121142318261](assets/image-20201121142318261.png)
+<img src="assets/image-20201121142318261.png" alt="image-20201121142318261" style="zoom:67%;" />
 
 1. 客户端通过 Distributed FileSystem 向 NN 请求下载文件，NN 通过查询元数据， 返回文件块所在的 DN 地址。
 2. 挑选一台 DN（就近原则，然后随机）服务器，请求读取数据。
@@ -79,7 +79,7 @@ Java Api 执行
 
 
 **写入流程**  
-![image-20201121142459379](assets/image-20201121142459379.png)
+<img src="assets/image-20201121142459379.png" alt="image-20201121142459379" style="zoom:67%;" />
 
 1. 客户端通过 Distributed FileSystem 模块向 NN 请求上传文件，NN 检查目标文件是否已存在，父目录是否存在。
 2. NameNode返回是否可以上传。
@@ -175,7 +175,7 @@ NN 机器进行升级，如软件、硬件升级，此时集群无法使用；
 
 **ZK 实现 HA 故障转移过程**
 
-![image-20201121143425742](assets/image-20201121143425742.png)
+<img src="assets/image-20201121143425742.png" alt="image-20201121143425742" style="zoom: 50%;" />
 
 1、NN(NN1) 假死
 
@@ -316,6 +316,12 @@ Mem + Dist，NameNode 内存 + FsImage 的磁盘文件
 
 
 
+## 配置参数
+
+> [doc]()
+
+
+
 # MapReduce
 >  基于 Google 论文2004年12月
 
@@ -380,9 +386,15 @@ org.apache.hadoop.mapreduce.lib.input.FileInputFormat#computeSplitSize
 
 ### 配置参数
 
-| 参数                  | 含义                    |
-| --------------------- | ----------------------- |
-| mapreduce.job.reduces | 每个 job 的 reduce 个数 |
+> [doc]()
+
+<p align="center">MapReduce 运行的参数配置</p>
+
+| 参数                   | 默认值   | 含义                    |
+| ---------------------- | -------- | ----------------------- |
+| mapreduce.job.reduces  |          | 每个 job 的 reduce 个数 |
+| mapped.child.java.opts | -Xmx200m |                         |
+| mapred.max.split.size  |          | 256000000               |
 
 
 
@@ -397,10 +409,6 @@ Key 相同去往同个分区
 ```
 org.apache.hadoop.mapreduce.task.JobContextImpl#getPartitionerClass
 ```
-
-
-
-
 
 NumReduceTasks: 决定分区的结果，最好与 xx 数量一致;
 
@@ -751,7 +759,7 @@ SequenceFileOutputFormat
 
 # Yarn  
 
-![image-20201121163919879](assets/image-20201121163919879.png)
+<img src="assets/image-20201121163919879.png" alt="image-20201121163919879" style="zoom: 50%;" />
 
 架构    
 
@@ -856,9 +864,15 @@ B队列设置占用资源30%主要运行临时任务，
 
 
 
+## 配置
+
+> [doc]()
 
 
-# 总结
+
+
+
+**总结**
 
 Hadoop 集群中需要启动哪些进程，作用分别是什么？
 

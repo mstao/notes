@@ -22,8 +22,10 @@ ${变量%%匹配规则}: 删除  ←  最长
 # 替换
 ${变量/旧字符串/新字符串}:   替换  第一个
 ${变量//旧字符串/新字符串}: 替换  全部
+
 # 字符索引位置
 expr index "$string" substr
+
 # 字符长度
 ${#string}
 expr length "$string" # 字符中存在空格，必须使用 ""
@@ -41,13 +43,8 @@ expr substr $string $position $length
 
 > 通过特定取值获取到特定的值，表达式为 Linux 命令
 >
-> 常用为 
+> 常用为 XX_DIR=\`pwd\`、TIME=、COMMIT_ID=
 >
-> XX_DIR=\`pwd\`
->
-> TIME=
->
-> COMMIT_ID=
 
 ```shell
 # 命令替换
@@ -59,10 +56,10 @@ $(()): 整数运算
 # 获取系统所有用户并输出
 #   -d: 分隔符
 #   -f: 属性列表
-man cut
 cat /etc/passwd | cut -d ":" -f 1
 num1=20;num2=30
 ((num++))
+
 # 遍历
 #!/bin/bash index=1
 for user in `cat /etc/passwd | cut-d ":"-f 1`
@@ -70,6 +67,7 @@ do
   echo "This is $index user:$user"
   index=$(($index +1))
 done
+
 # 日期格式截取
 man date
 echo "$(date +%Y)"
@@ -77,6 +75,7 @@ echo "$(($(date +%Y) + 1))"
 echo "$(date +%j) day"
 echo "$(($(date +%j)/7)) weeks"
 echo "$(((365 - $(date +%j))/7) weeks"
+
 # 统计个数， -l: 行的个数
 ps -ef | grep nginx | grep -v grep
 ps -ef | grep nginx | grep -v grep | wc -l
@@ -154,6 +153,8 @@ do
   continue
 done
 ```
+
+
 
 浮点数运算
 
@@ -307,8 +308,6 @@ add 12 34
 sub 33 21
 ```
 
-
-
 ```shell
 # switch
 case $choice
@@ -454,45 +453,6 @@ locate my.conf
 updatedb
 whereis mysql
 which mysql
-```
-
-
-
-**grep**
-
-> 方式一： grep [option] [pattern] [file1,file2,...]    查找文件内容
->
-> 方式二： command | grep [option] [pattern]
-
-```shell
-# -v: no...
-# -i: ignore case
-# -n: show line
-# -r: recursive
-# -E: 扩展正则表达式
-# -F: 按字符字面匹配
-#   -c: 匹配行数量，非具体信息
-#   -w: 匹配整词
-#   -x: 整行
-grep -v python file
-grep -n man /etc/man_db.conf
-# 扩展正则表达式    |
-grep "python|PYTHON" file
-grep -E "python|PYTHON" file
-grep -F "py.*" file
-
-grep -c python file
-grep -c man /ect/man_db.conf
-```
-
-
-
-**egrep**
-
-> 支持扩展正则表达式
-
-```shell
-egrep 
 ```
 
 
