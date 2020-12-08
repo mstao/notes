@@ -114,15 +114,15 @@ slaves
 
 
 
-NameNode（nn）：存储文件的元数据，比如文件名、文件目录结构、文件属性（生成时间、副
+- NameNode（nn）：存储文件的元数据，比如文件名、文件目录结构、文件属性（生成时间、副
 
 本数、文件权限），以及每个文件的块列表和块所在的DataNode等。
 
-SecondaryNameNode（2nn）：辅助NameNode更好的工作，用来监控HDFS状态的辅助后台
+- SecondaryNameNode（2nn）：辅助NameNode更好的工作，用来监控HDFS状态的辅助后台
 
 程序，每隔一段时间获取HDFS元数据快照。
 
-DataNode（dn）：在本地文件系统存储文件块数据，以及块数据的校验
+- DataNode（dn）：在本地文件系统存储文件块数据，以及块数据的校验
 
 
 
@@ -158,7 +158,12 @@ HDFS集群往往是一个NameNode（HA架构会有两个NameNode,联邦机制）
 
 
 ### HDFS API  
-Shell 命令执行  
+>  Shell 命令执行  
+
+```shell
+# 格式化文件系统
+hadoop namenode -format
+```
 
 ```shell
 hdfs dfs -ls /
@@ -177,6 +182,27 @@ Java Api 执行
 - 指定用户信息
 - 关闭集群校验
 - 放弃权限校验， Prod 借助 kerberos、sentry 安全框架管理大数据集群安全
+
+
+
+### 健康情况
+
+
+
+**Last Checkpoint Time**  2NN 最近进行 checkpoint 的时间
+
+
+
+```shell
+# 概览
+http://linux121:50070/dfshealth.html#tab-overview
+# DN 中的 FS 浏览
+http://linux121:50070/explorer.html#/
+# 日志查看
+http://linux121:50070/logs/
+```
+
+
 
 
 
@@ -207,9 +233,17 @@ Java Api 执行
 
 
 
-## NameNode
+## *NameNode
 
-### 元数据管理
+### +元数据管理
+
+存放元数据的地址
+
+```shell
+${hadoop.tmp.dir}/dfs/name/current
+```
+
+
 
 $hadoop_tmp_dir/dfs/name/current
 
@@ -574,8 +608,7 @@ org.apache.hadoop.mapreduce.lib.input.FileInputFormat#computeSplitSize
 | 参数                                            | 默认值                           | 含义                                                         |
 | ----------------------------------------------- | -------------------------------- | ------------------------------------------------------------ |
 | mapreduce.job.reduces                           |                                  | 每个 job 的 reduce 个数                                      |
-| **mapreduce.framework.name**                    | local                            | local, classic or yarn.                                      |
-| mapred.max.split.size                           |                                  | 256000000                                                    |
+| **mapreduce.framework.name**                    | local                            | 可选 local, classic or yarn.                                 |
 | mapreduce.framework.name                        |                                  |                                                              |
 | mapreduce.task.io.sort.mb                       | 100                              | 排序文件时要使用的缓冲内存总量                               |
 | mapreduce.map.sort.spill.percent                | 0.80                             | 序列化缓冲区中的软限制                                       |
@@ -1073,7 +1106,30 @@ B队列设置占用资源30%主要运行临时任务，
 
 ## 配置
 
-> [doc]()
+> [doc](https://hadoop.apache.org/docs/r2.9.2/hadoop-yarn/hadoop-yarn-common/yarn-default.xml)
+
+<p align="center">Yarn 配置</p>
+
+| name                                                         | Value                                 | Description                                                  |
+| ------------------------------------------------------------ | ------------------------------------- | ------------------------------------------------------------ |
+| **yarn.resourcemanager.hostname**                            | 0.0.0.0                               | RM 的地址                                                    |
+| **yarn.nodemanager.aux-services**                            |                                       | 以逗号分隔的服务列表，其中服务名称应仅包含a-zA-Z0-9_，并且不能以数字开头 |
+| yarn.resourcemanager.address                                 | ${yarn.resourcemanager.hostname}:8032 |                                                              |
+| yarn.resourcemanager.client.thread-count                     | 50                                    |                                                              |
+| yarn.resourcemanager.amlauncher.thread-count                 | 50                                    |                                                              |
+| yarn.resourcemanager.scheduler.address                       | ${yarn.resourcemanager.hostname}:8030 |                                                              |
+| yarn.resourcemanager.webapp.address                          | ${yarn.resourcemanager.hostname}:8088 |                                                              |
+| yarn.resourcemanager.webapp.https.address                    | ${yarn.resourcemanager.hostname}:8090 |                                                              |
+| yarn.resourcemanager.ha.failover-controller.active-standby-elector.zk.retries |                                       |                                                              |
+| yarn.resourcemanager.zk-state-store.parent-path              | /rmstore                              |                                                              |
+| yarn.resourcemanager.ha.enabled                              | false                                 | 开启 rm 高可用                                               |
+| yarn.resourcemanager.ha.automatic-failover.zk-base-path      | /yarn-leader-election                 |                                                              |
+| yarn.resourcemanager.cluster-id                              |                                       |                                                              |
+| yarn.nodemanager.hostname                                    | 0.0.0.0                               |                                                              |
+| yarn.nodemanager.container-manager.thread-count              | 20                                    |                                                              |
+| yarn.nodemanager.collector-service.thread-count              | 5                                     |                                                              |
+| yarn.nodemanager.webapp.address                              | ${yarn.nodemanager.hostname}:8042     | NM 的 web 地址                                               |
+| yarn.nodemanager.webapp.https.address                        | 0.0.0.0:8044                          |                                                              |
 
 
 
@@ -1082,6 +1138,10 @@ B队列设置占用资源30%主要运行临时任务，
 **总结**
 
 Hadoop 集群中需要启动哪些进程，作用分别是什么？
+
+
+
+
 
 | 进程                        | 作用                                              |
 | --------------------------- | ------------------------------------------------- |

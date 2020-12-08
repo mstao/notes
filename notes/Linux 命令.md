@@ -169,6 +169,32 @@ paste [-d] file1 file2
 
 
 
+**rsync**
+
+> 远程同步工具
+
+速度快、避免复制相同内容和支持符号链接。
+
+rsync只对差异文件做更新。scp是把所有文
+
+件都复制过去。
+
+- `-r`
+- `-v`: 显示复制过程
+- `-l`: 复制符号链接
+
+```
+yum install -y rsync
+```
+
+```
+rsync -rvl /opt/module root@linux123:/opt/
+```
+
+
+
+
+
 ## 基础命令
 
 cat  

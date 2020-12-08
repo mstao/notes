@@ -2,48 +2,6 @@
 
 # 基础
 
-## 方法签名
-
-方法的输入参数
-
-
-只有两列的二维矩阵：
-
-表示一组数据对  
-
-```java
-int[][] pairs;
-// sort
-Arrays.sort(pairs, (a, b) -> (a[0] - b[0]));
-// sort int
-Arrays.sort(pairs, Comparator.comparingInt(a -> a[0]));
-```
-
-
-
-Hash 记录的内容:
-
-值 -> 索引
-
-
-
-List: 
-
-Java 中的 `add(index, val)`, `set(index, val)` 
-
-
-
-**结构化，模板化，力求辅助读者培养框架思维，举一反三**
-
-
-方法的返回值
-
-返回 `LinkedHashMap`, 之后当成正常的 `Map` 使用
-
-构造返回结果，通过 `StringBuilder` 进行拼接实现，通过 `char[]` 索引值注入实现
-
-
-
 
 ## 实现
 
@@ -67,15 +25,6 @@ int maxFreq = freqs.entrySet().iterator().next().getValue();
 list.iterator().next();
 list.get(0);
 ```
-
-
-Map 的排序:
-
-- `LinkedHashMap `排序
-
-- `TreeMap` 排序
-
-- `PriorityQueue` 放入 `Map.Entry` 进行排序
 
 
 

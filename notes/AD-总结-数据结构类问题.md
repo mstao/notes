@@ -1,1771 +1,5 @@
 [TOC]
 
-
-
-# 数组问题
-
-数组输入条件
-
-- 有序无重复元素
-- 有序有重复元素
-- 全部都为数字
-
-- 旋转数组
-  - 含有重复元素
-  - 不含有重复元素
-
-- 二维矩阵
-  - 从上到下，从左到右有序
-  - 下一行元素大于上一行，行内元素有序
-
-- 直方图
-
-
-
-**无重复排序数组中元素的范围段**
-
-[228.Summary Ranges]((https://leetcode.com/problems/summary-ranges/))
-
-```
-Input:  [0,2,3,4,6,8,9]
-Output: ["0","2->4","6","8->9"]
-```
-
-```java
-public List<String> summaryRanges(int[] nums) {
-    List<String> res = new ArrayList<>();
-    if (nums.length == 0)  {
-        return res;
-    }
-    int begin = nums[0], end = nums[0];
-    Arrays.sort(nums);
-    for (int i = 1; i < nums.length; i ++) {       
-        if (nums[i] == nums[i - 1] + 1) {    // continue
-            end = nums[i];
-        } else {
-            res.add(geneRange(nums, begin, end));
-            begin = nums[i];
-            end = nums[i];
-        }
-    }
-    res.add(geneRange(nums, begin, end));    // handle tail
-    return res;
-}
-
-private String geneRange(int[] nums, int begin, int end) {
-    if (begin == end) {
-        return "" + begin;
-    }
-    return begin + "->" + end;
-}
-```
-
-
-
-**数组元素为符合某种特征的数**
-
-**错误的数字**
-
-645. Set Mismatch
-
-```
-Input: nums = [1,2,2,4]
-Output: [2,3]
-```
-
-```java
-public int[] findErrorNums(int[] nums) {
-    for (int i = 0; i < nums.length; i ++) {
-        while (nums[i] != i + 1 && nums[i] != nums[nums[i] - 1]) {   
-            swap(nums, i, nums[i] - 1);
-        }
-    }
-    for (int i = 0; i < nums.length; i ++) {
-        if (nums[i] != i + 1) {
-            return new int[]{nums[i], i + 1};
-        }
-    }
-    return null;
-}
-private void swap(int[] a, int i, int j) {
-  int t = a[i];
-  a[i] = a[j];
-  a[j] = t;
-}
-```
-
-**排序数组中删除重复的值**
-
-[26. Remove Duplicates from Sorted Array](https://leetcode.com/problems/remove-duplicates-from-sorted-array/description/)
-
-```html
-Given nums = [0,0,1,1,1,2,2,3,3,4],
-
-Your function should return length = 5, with the first five elements of nums being modified to 0, 1, 2, 3, and 4 respectively.
-```
-
-```java
-public int removeDuplicates(int[] nums) {
-    if (nums == null || nums.length == 0) return 0;
-    if (nums.length == 1) return 1;
-
-    int k = 0;
-    for (int i = 0; i < nums.length; i ++) {
-        if (i == 0 || nums[i] != nums[i - 1])  
-            nums[k ++] = nums[i];
-    }
-    return k;
-}
-```
-
-**数组中删除给定的值**
-
-[27. Remove Element](https://leetcode.com/problems/remove-element/description/)
-
-```java
-public int removeElement(int[] nums, int val) {
-    int k = 0;
-    for (int i = 0; i < nums.length; i ++)
-        if (nums[i] != val)                     
-            nums[k ++] = nums[i];
-    return k;
-}
-```
-
-**排序数组中删除相同的元素，允许相同元素最多出现两次**
-
-```html
-Given nums = [1,1,1,2,2,3],
-
-Your function should return length = 5, with the first five elements of nums being 1, 1, 2, 2 and 3 respectively.
-
-Given nums = [0,0,1,1,1,1,2,3,3],
-```
-
-```java
-public int removeDuplicates(int[] nums) {
-    if (nums.length < 2) return nums.length;
-
-    int k = 1;                 
-    int count = 1;
-    for (int i = 1; i < nums.length; i ++) {
-        if (nums[i] != nums[i-1]) {
-            nums[k ++] = nums[i];
-            count = 1;
-        } else {                    // excepted
-            if (count < 2)
-                nums[k ++] = nums[i];
-            count ++;
-        }
-    }
-    return k;
-}
-```
-
-
-
-**数组中的主元素**
-
-[169. Majority Element](https://leetcode.com/problems/majority-element/)
-
-```java
-public int majorityElement(int[] nums) {
-    int candidate = -1;
-    int count = 0;
-    for (int num : nums) {
-        if (count == 0) {    
-            count = 1;
-            candidate = num;
-            continue;
-        }
-        count = num == candidate ? ++ count : -- count;
-    }
-    return candidate;
-}
-```
-
-
-
-**找出 n/3 的主元素**
-
-```html
-Input: [3,2,3]
-Output: [3]
-Example 2:
-
-Input: [1,1,1,3,3,2,2,2]
-Output: [1,2]
-```
-
-思路： 每次遍历的元素只能够更新 candidate1 | candidate2 的 counter,   
-
-或者对 candidate 进行重新选取  
-
-或者对两者的 counter 进行 -- 操作  
-
-判断两个 candidate 在数组中出现的频次是否符合要求 
-
-```java
-public List<Integer> majorityElement(int[] nums) {
-    List<Integer> res = new ArrayList<>();
-    if (nums == null || nums.length == 0) return res;
-
-    int candidate1 = nums[0], candidate2= nums[0];
-    int count1 = 0, count2 = 0;    // iterate from 0 to len, need initialize as 0
-    for (int num : nums) {     // must if
-        if (num == candidate1)
-            count1 ++;
-        else if (num == candidate2)
-            count2 ++;
-        else if (count1 == 0) {           // need to reset
-            candidate1 = num;
-            count1 = 1;
-        } else if (count2 == 0) {
-            candidate2 = num;
-            count2 = 1;
-        } else {
-            count1 --;
-            count2 --;
-        }
-    }
-
-    count1 = count2 = 0;           // find candidate frequency
-    for (int num : nums) {
-        if (num == candidate1)
-            count1 ++;
-        else if (num == candidate2)
-            count2 ++;
-    }
-    if (count1 > nums.length/3) res.add(candidate1);
-    if (count2 > nums.length/3) res.add(candidate2);
-    return res;
-}
-```
-
-**构建乘积数组**
-
-[238. Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self)
-
-不使用除法，时间复杂度 o(n)
-
-```html
-Input:  [1,2,3,4]
-Output: [24,12,8,6]
-Note: Please solve it without division and in O(n).
-```
-
-```java
-public int[] productExceptSelf(int[] nums) {
-    int n = nums.length;
-    int[] product = new int[n];
-    Arrays.fill(product, 1);
-    int left = 1;
-    for (int i = 1; i < n; i ++) {
-        left *= nums[i-1];
-        product[i] = left;
-    }
-    int right = 1;
-    for (int i = n-2; i >= 0; i --) {    // From [n-1] begin *
-        right *= nums[i+1];
-        product[i] *= right;            // left*right
-    }
-    return product;
-}
-```
-
-**把数组中的 0 移到末尾**
-
-[283. Move Zeroes](https://leetcode.com/problems/move-zeroes/description/)
-
-```java
-public void moveZeroes(int[] nums) {
-    int k = 0;
-    for (int i = 0; i < nums.length; i ++)
-        if (nums[i] != 0)
-            nums[k ++] = nums[i];
-    Arrays.fill(nums, k, nums.length, 0);
-}
-```
-
-
-
-### 双指针
-
-**两数之和为给定数的位置**
-
-[1. Two Sum](https://leetcode.com/problems/two-sum/description/)
-
-```java
-public int[] twoSum(int[] nums, int target) {
-    Map<Integer, Integer> valIdxMap = new HashMap<>();
-    for (int i = 0; i < nums.length; i ++) {
-        if (valIdxMap.containsKey(target - nums[i]))
-            return new int[]{valIdxMap.get(target-nums[i]), i}; 
-        valIdxMap.put(nums[i], i);
-    }
-    throw new IllegalStateException();
-}
-```
-
-**容器中放入水的最大容量**
-
-[11. Container With Most Water](https://leetcode.com/problems/container-with-most-water/description/)
-
-![img](assets/question_11.jpg)
-
-```
-Example:
-Input: [1,8,6,2,5,4,8,3,7]
-Output: 49
-```
-
-```java
-public int maxArea(int[] height) {
-    int i = 0, j = height.length - 1;
-    int maxArea = Integer.MIN_VALUE;
-    while (i < j) {
-        int curArea = Math.min(height[i], height[j])  * (j - i);
-        maxArea = Math.max(maxArea, curArea);
-        if (height[i] < height[j])     // skip left part
-            i ++;
-        else             // skip down part
-            j --;
-    }
-    return maxArea;
-}
-```
-
-
-
-**有序数组两数和为给定值**
-
-[167. Two Sum II - Input array is sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/description/)
-
-```java
-public int[] twoSum(int[] nums, int target) {
-    int i = 0, j = nums.length - 1;
-    while (i < j) {                   
-        int sum = nums[i] + nums[j];
-        if (sum == target) 
-            return new int[]{i + 1, j + 1};  
-        else if (sum < target)
-            i ++;
-        else
-            j --;
-    }
-    throw new IllegalArgumentException();
-}
-```
-
-
-
-### 元组问题
-
-**3元组和为 0 的所有可能**
-
-[15. 3Sum](https://leetcode.com/problems/3sum/)
-
-```html
-Given array nums = [-1, 0, 1, 2, -1, -4],
-
-A solution set is:
-[
-  [-1, 0, 1],
-  [-1, -1, 2]
-]
-```
-思路： 处理重复问题, 注意循环边界
-```java
-public List<List<Integer>> threeSum(int[] nums) {
-    List<List<Integer>> res = new ArrayList<>();
-    if (nums.length < 3) return res;
-    Arrays.sort(nums);
-    for (int i = 0; i < nums.length - 2; i ++) {     
-        if (i > 0 && nums[i] == nums[i -1]) continue;    
-        int l = i + 1, r = nums.length - 1;         
-        while (l < r) {
-            if (l != i + 1 && nums[l] == nums[l-1]) {            
-                l ++;
-                continue;
-            }
-            if (r != nums.length - 1 && nums[r] == nums[r+1]) {    
-                r --;
-                continue;
-            }
-            int sum = nums[i] + nums[l] + nums[r];
-            if (sum == 0)
-                res.add(Arrays.asList(nums[i], nums[l ++], nums[r --]));    
-            else if (sum > 0)
-                r --;
-            else
-                l ++;
-        }
-    }
-    return res;
-}
-```
-
-
-
-### 排序
-
-**排序颜色**
-
-```java
-public void sortColors(int[] nums) {
-    int lt = -1, gt = nums.length;
-    int i = 0;
-    int pivot = 1;
-    while (i < gt) {
-        if (nums[i] == pivot) 
-            i ++;
-        else if (nums[i] < pivot) 
-            swap(nums, i ++, ++ lt);
-        else 
-            swap(nums, i, -- gt);
-    }
-}
-```
-
-
-
-**归并两个排序数组**
-
-[88.Merge Sorted Array](https://leetcode.com/problems/merge-sorted-array/description/)
-
-```html
-Input:
-nums1 = [1,2,3,0,0,0], m = 3
-nums2 = [2,5,6],       n = 3
-
-Output: [1,2,2,3,5,6]
-```
-
-```java
-public void merge(int[] nums1, int m, int[] nums2, int n) {
-    int i = m - 1, j = n - 1;
-    for (int merge = m + n - 1; merge >= 0; merge--) {
-        if (i < 0)
-            nums1[merge] = nums2[j--];
-        else if (j < 0)
-            nums1[merge] = nums1[i--];
-        else if (nums1[i] > nums2[j])
-            nums1[merge] = nums1[i--];    // select big one
-        else
-            nums1[merge] = nums2[j--];
-    }
-}
-```
-
-
-
-### **子数组**
-
-**最短的未排序的连续子数组**
-
-581.Shortest Unsorted Continuous Subarray
-
-```java
-public int findUnsortedSubarray(int[] nums) {
-    int[] aux = nums.clone();
-    Arrays.sort(aux);
-
-    int start = 0;            // find first not correct position
-    while (start < nums.length && nums[start] == aux[start]) {
-        start ++;
-    }
-
-    int end = nums.length - 1;    
-    while (end > start && nums[end] == aux[end]) {  
-        end --;
-    }
-    return end - start + 1;
-}
-```
-
-
-
-**生成杨辉三角**
-
-[118. Pascal's Triangle](https://leetcode.com/problems/pascals-triangle)
-
-```
-// TODO
-```
-
-
-
-**获得帕斯卡三角形的指定行**
-
-[119. Pascal's Triangle II](https://leetcode.com/problems/pascals-triangle-ii/)
-
-```html
-Input: 3
-Output: [1,3,3,1]
-```
-
-```java
-public List<Integer> getRow(int rowIndex) {
-    List<Integer> res = new ArrayList<>();
-    for (int i = 0; i < rowIndex + 1; i ++) {
-        res.add(1);   
-        for (int j = i - 1; j > 0; j --) {    // no need to handle 0,i position
-            res.set(j, res.get(j - 1) + res.get(j));
-        }
-    }
-    return res;
-}
-```
-
-
-
-**最大的乘积子数组**
-
-[152. Maximum Product Subarray(medium)](<https://leetcode.com/problems/maximum-product-subarray/>)
-
-```
-Input: [2,3,-2,4]
-Output: 6
-Explanation: [2,3] has the largest product 6.
-```
-
-思路： 需要处理当前遍历的值为负数的情况，维护当前最大和最小相乘结果，随着结果而不断改变的, curMax, curMin 所对应的子数组元素数量可能不一致。
-
-DP 问题的精简实现；
-
-```java
-public int maxProduct(int[] nums) {
-    int N = nums.length;
-    int maxProduct = nums[0];
-    int curMax = nums[0], curMin = nums[0];   
-    for (int i = 1; i < nums.length; i ++) {
-        if (nums[i] < 0) {
-            int t = curMax;
-            curMax = curMin;
-            curMin = t;                      
-        }
-        curMax = Math.max(curMax * nums[i], nums[i]);  // is or not continue
-        curMin = Math.min(curMin * nums[i], nums[i]);
-        maxProduct = Math.max(curMax, maxProduct);
-    }
-    return maxProduct;
-}
-```
-
-
-
-**最短的正数子数组和为给定数**
-
-[209. Minimum Size Subarray Sum(medium)](https://leetcode.com/problems/minimum-size-subarray-sum/)
-
-```java
-public int minSubArrayLen(int s, int[] nums) {
-    int minLen = Integer.MAX_VALUE;     // record result
-    int L = 0, R = -1;
-    int winSum = 0;
-    while (L < nums.length) {
-        if (R + 1 < nums.length && winSum < s) {
-            winSum += nums[++ R];
-        } else {
-            winSum -= nums[L ++];
-        }
-        if (winSum >= s) {
-            minLen = Math.min(minLen, R - L + 1);
-        }
-    }
-    return minLen == Integer.MAX_VALUE ? 0 : minLen;           // need handle init value
-}
-```
-
-
-
-**找出数组中最长的连续 1**
-
-[485. Max Consecutive Ones(easy)](https://leetcode.com/problems/max-consecutive-ones/)
-
-```java
-public int findMaxConsecutiveOnes(int[] nums) {
-    int maxLen = 0, curLen = 0;
-    for (int num : nums) {
-        curLen = num == 1 ? curLen + 1 : 0;  // judge
-        maxLen = Math.max(maxLen, curLen);
-    }
-    return maxLen;
-}
-```
-
-
-
-**连续子数组和等于给定数的数量**
-
-[560. Subarray Sum Equals K(medium)](https://leetcode.com/problems/subarray-sum-equals-k/)
-
-```java
-public int subarraySum(int[] nums, int k) {     //
-    Map<Integer, Integer> curSumCntMap = new HashMap<>();
-    curSumCntMap.put(0, 1);
-
-    int curSum = 0;
-    int count = 0;
-    for (int i = 0; i < nums.length; i ++) {
-        curSum += nums[i];
-        int key = curSum - k;
-        if (curSumCntMap.containsKey(key)) {
-            count += curSumCntMap.get(key);
-        }
-        curSumCntMap.put(curSum, curSumCntMap.getOrDefault(curSum, 0) + 1);
-    }
-    return count;
-}
-```
-
-
-
-**找出子数组和最大的子数组**
-
-[53. Maximum Subarray](https://leetcode.com/problems/maximum-subarray/)
-
-```html
-Input: [-2,1,-3,4,-1,2,1,-5,4],
-Output: 6
-Explanation: [4,-1,2,1] has the largest sum = 6.
-```
-
-```java
-public int maxSubArray(int[] nums) {
-    int preSum = nums[0];
-    int maxSum = preSum;
-    for (int i = 1; i < nums.length; i ++) {
-        preSum = (preSum > 0) ? preSum + nums[i] : nums[i];   
-        maxSum = Math.max(preSum, maxSum);
-    }
-    return maxSum;
-}
-```
-
-
-
-### **子序列**
-
-**最长的连续序列**
-
-128. Longest Consecutive Sequence
-
-```java
-public int longestConsecutive(int[] nums) {
-    int maxCount = 0;
-    Set<Integer> set = Arrays.stream(nums).boxed().collect(Collectors.toSet());
-
-    for (int num : nums) {
-        int curCount = 1;
-        int curNum = num;
-        while (set.contains(++ curNum)) {
-            curCount ++;
-            set.remove(curNum);
-        }
-        curNum = num;
-        while (set.contains(-- curNum)) {
-            curCount ++;
-            set.remove(curNum);                         // remove to prevent duplication calculation
-        }
-        maxCount = Math.max(maxCount, curCount);
-    }
-    return maxCount;
-}
-```
-
-
-
-
-
-**买股票问题**
-
-
-
-**最合适时机购买和销售股票**
-
-[121. Best Time to Buy and Sell Stock](https://leetcode.com/problems/best-time-to-buy-and-sell-stock/)
-
-```java
-public int maxProfit(int[] prices) {
-    if (prices == null || prices.length == 0)
-        return 0;
-    int curMin = prices[0];
-    int maxProfit = 0;
-    for (int i = 1; i < prices.length; i ++) {
-        curMin = Math.min(curMin, prices[i]);
-        maxProfit = Math.max(maxProfit, prices[i] - curMin);
-    }
-    return maxProfit;
-}
-```
-
-
-
-
-
-**杨辉三角形**
-
-**生成帕斯卡三角形**
-
-118. Pascal's Triangle
-
-```java
-public List<List<Integer>> generate(int numRows) {
-    List<List<Integer>> res = new ArrayList<>();
-    if (numRows == 0) return res;
-
-    res.add(Arrays.asList(1));
-    if (numRows == 1)
-        return res;
-    res.add(Arrays.asList(1,1));
-    if (numRows == 2)
-        return res;
-    for (int i = 2; i < numRows; i ++) {
-        List<Integer> preList = res.get(i-1);
-        List<Integer> curList = new ArrayList<>();
-        curList.add(1);
-        for (int j = 1; j < i; j ++)
-            curList.add(j, preList.get(j-1) + preList.get(j));  // add not set
-        curList.add(i, 1);
-        res.add(new ArrayList<>(curList));
-    }
-    return res;
-}
-```
-
-
-
-**获得帕斯卡三角形的指定行**
-
-[119. Pascal's Triangle II](https://leetcode.com/problems/pascals-triangle-ii/)
-
-```java
-public List<Integer> getRow(int rowIndex) {
-    List<Integer> res = new ArrayList<>();
-    for (int i = 0; i < rowIndex + 1; i ++) {
-        res.add(1);   // every time add one element
-        for (int j = i - 1; j > 0; j --) {    // no need to handle 0,i position
-            res.set(j, res.get(j - 1) + res.get(j));
-        }
-    }
-    return res;
-}
-```
-
-
-
-### 矩阵问题
-
-**重新构造矩阵**
-
-[566. Reshape the Matrix](https://leetcode.com/problems/reshape-the-matrix/description/)
-
-```html
-Input:
-nums =
-[[1,2],
- [3,4]]
-r = 1, c = 4
-Output:
-[[1,2,3,4]]
-
-Input:
-nums =
-[[1,2],
- [3,4]]
-r = 2, c = 4
-Output:
-[[1,2],
- [3,4]]
-```
-
-```java
-public int[][] matrixReshape(int[][] nums, int r, int c) {
-    int m = nums.length, n = nums[0].length;
-    if (m*n != r*c) return nums;
-
-    int[][] matrix = new int[r][c];
-    int index = 0;
-    for (int i = 0; i < r; i ++) {
-        for (int j = 0; j < c; j ++) {
-            matrix[i][j] = nums[index/n][index%n];   // one dimension use col to
-            index ++;
-        }
-    }
-    return matrix;
-}
-```
-
-
-
-**合并时间间隔**
-
-[56. Merge Intervals](https://leetcode.com/problems/merge-intervals/)
-
-```html
-Input: [[1,3],[2,6],[8,10],[15,18]]
-Output: [[1,6],[8,10],[15,18]]
-```
-
-```java
-public List<Interval> merge(List<Interval> intervals) {
-    if (intervals.size() < 2) return intervals;
-    List<Interval> res = new ArrayList<>();
-    intervals.sort((o1, o2) -> Integer.compare(o1.start, o2.start));          // sort to greedy
-    int start = intervals.get(0).start;    // record in global
-    int end = intervals.get(0).end;
-    for (Interval item : intervals) {
-        if (item.start <= end) {        
-            end = Math.max(end, item.end);
-        } else {    
-            res.add(new Interval(start, end));
-            start = item.start;
-            end = item.end;
-        }
-    }
-    // NOTE: handle end
-    res.add(new Interval(start, end));
-    return res;
-}
-```
-
-
-
-**将正方形矩阵顺时针旋转90°**
-
-[48. Rotate Image](https://leetcode.com/problems/rotate-image)
-
-```html
-Given input matrix =
-[
-  [ 5, 1, 9,11],
-  [ 2, 4, 8,10],
-  [13, 3, 6, 7],
-  [15,14,12,16]
-],
-rotate the input matrix in-place such that it becomes:
-[
-  [15,13, 2, 5],
-  [14, 3, 4, 1],
-  [12, 6, 8, 9],
-  [16, 7,10,11]
-]
-```
-
-```java
-public void rotate(int[][] matrix) {
-    int n = matrix.length;
-    int up = 0, left = 0, bottom = n -1, right = n - 1;
-    while (left < right)     // only one element not need rotate
-        rotateEdge(matrix, up ++, left ++, bottom --, right --);
-}
-
-// four point to rotate
-private void rotateEdge(int[][] matrix, int up, int left, int bottom, int right) {
-    int time = right - left;                 // rotate times
-    for (int i = 0; i < time; i ++) {
-        int t = matrix[up][left+i];
-        matrix[up][left+i] = matrix[bottom-i][left];
-        matrix[bottom-i][left] = matrix[bottom][right - i];
-        matrix[bottom][right - i] = matrix[up+i][right];
-        matrix[up+i][right] = t;
-    }
-}
-```
-
-
-
-**螺旋打印矩阵**
-
-[54. Spiral Matrix](https://leetcode.com/problems/spiral-matrix)
-
-```html
-Input:
-[
-  [1, 2, 3, 4],
-  [5, 6, 7, 8],
-  [9,10,11,12]
-]
-Output: [1,2,3,4,8,12,11,10,9,5,6,7]
-```
-
-```java
-public  ArrayList<Integer> printMatrix(int[][] m) {
-    ArrayList<Integer> res = new ArrayList<>();
-    if (m == null || m.length == 0) return res;
-
-    int up = 0, left = 0, bottom = m.length - 1, right = m[0].length - 1;
-    int layers = (Math.min(m.length, m[0].length) - 1) / 2 + 1;          // math ceil
-    while (layers -- > 0)           // left <= right && up <= bottom
-        visitEdge(m, up ++, left ++, bottom --, right --, res);
-    return res;
-}
-
-private void visitEdge(int[][] m, int up, int left, int bottom, int right,  ArrayList<Integer> res) {
-    if (left == right) {
-        for (int i = up; i <= bottom; i ++)
-            res.add(m[i][left]);
-        return;
-    }
-    if (up == bottom) {
-        for (int i = left; i <= right; i ++)
-            res.add(m[up][i]);
-        return;
-    }
-    // →
-    for (int i = left; i < right; i ++)
-        res.add(m[up][i]);
-    // ↓
-    for (int i = up; i < bottom; i ++)
-        res.add(m[i][right]);
-    // ←
-    for (int i = right; i > left; i --)
-        res.add(m[bottom][i]);
-    // ↑
-    for (int i = bottom; i > up; i --)
-        res.add(m[i][left]);
-}
-```
-
-
-
-**螺旋填充矩阵**
-
-[59. Spiral Matrix II](https://leetcode.com/problems/spiral-matrix-ii/)
-
-```html
-Output:
-[
- [ 1, 2, 3 ],
- [ 8, 9, 4 ],
- [ 7, 6, 5 ]
-]
-```
-
-```java
-int sequencer;
-public int[][] generateMatrix(int n) {
-    int[][] matrix = new int[n][n];
-    sequencer = 1;
-    int left = 0, up = 0, right = n -1, down = n - 1;
-    while (left <= right)
-        fillEdge(matrix, left ++, up ++, right --, down --);
-    return matrix;
-}
-
-// note: direction  {--, ++}
-//       extreme condition
-private void fillEdge(int[][] matrix, int left, int up, int right, int down) {
-    if (left == right) {
-        matrix[left][up] = sequencer ++;
-        return;
-    }
-    for (int i = left; i < right; i ++)
-        matrix[up][i] = sequencer ++;
-    for (int i = up; i < down; i ++)
-        matrix[i][right] = sequencer ++;
-    for (int i = right; i > left; i --)
-        matrix[down][i] = sequencer ++;
-    for (int i = down; i > up; i --)
-        matrix[i][left] = sequencer ++;
-}
-```
-
-
-
-**数组表示字符串对其进行加一**
-
-[66. Plus One](https://leetcode.com/problems/plus-one/)
-
-```html
-Input: [4,3,2,1]
-Output: [4,3,2,2]
-```
-
-```java
-public int[] plusOne(int[] digits) {
-    for (int i = digits.length - 1; i >= 0; i --) {   // use array to express num, [n-1] is bit
-        if (digits[i] < 9) {
-            digits[i] ++;
-            return digits;
-        }
-        digits[i] = 0;
-    }
-    int[] nums =  new int[digits.length+1];      // need carry
-    nums[0] = 1;
-    return nums;
-}
-```
-
-
-
-**将矩阵中为 0 的行和列都设置成 0**
-
-[73. Set Matrix Zeroes](https://leetcode.com/problems/set-matrix-zeroes/)
-
-```html
-Input:
-[
-  [1,1,1],
-  [1,0,1],
-  [1,1,1]
-]
-Output:
-[
-  [1,0,1],
-  [0,0,0],
-  [1,0,1]
-]
-```
-
-```java
-public void setZeroes(int[][] matrix) {
-    int m = matrix.length, n = matrix[0].length;
-    boolean[] rows = new boolean[m];             // whatever row or col need to modify 0
-    boolean[] cols = new boolean[n];
-    for (int i = 0; i < m; i ++) {
-        for (int j = 0; j < n; j ++) {
-            if (matrix[i][j] == 0) {
-                rows[i] = true;
-                cols[j] = true;
-            } 
-        }
-    }
-    for (int i = 0; i < m; i ++) {
-        for (int j = 0; j < n; j ++) {
-            if (rows[i] || cols[j])       // narrow space
-                matrix[i][j] = 0;
-        }
-    }
-}
-```
-
-
-
-**矩阵从左上到右下共有多少可能的路径**
-
-[62. Unique Paths](https://leetcode.com/problems/unique-paths/)
-
-```java
-public int uniquePaths(int m, int n) {
-    int[][] dp = new int[m][n];
-    for (int i = 0; i < m; i ++) {       // init [0][0] no need handle specially
-        dp[i][0] = 1;
-    }
-    for (int j = 0; j < n; j ++) {
-        dp[0][j] = 1;
-    }
-    for (int i = 1; i < m; i ++) {
-        for (int j = 1; j < n; j ++) {
-            dp[i][j] = dp[i-1][j] + dp[i][j-1];
-        }
-    }
-    return dp[m - 1][n - 1];
-}
-```
-
-
-
-**矩阵从左上到右下路径最小路径和**
-
-[64. Minimum Path Sum](https://leetcode.com/problems/minimum-path-sum/)
-
-```java
-public int minPathSum(int[][] grid) {
-    int m = grid.length, n = grid[0].length;
-
-    int[][] dp = new int[m][n];
-    dp[0][0] = grid[0][0];
-    for (int i = 1; i < m; i ++) {
-        dp[i][0] = dp[i - 1][0] + grid[i][0];
-    }
-    for (int j = 1; j < n; j ++) {
-        dp[0][j] = dp[0][j - 1] + grid[0][j];
-    }
-    for (int i = 1; i < m; i ++) {
-        for (int j = 1; j < n; j ++) {
-            dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
-        }
-    }
-    return dp[m - 1][n - 1];
-}
-```
-
-
-
-**矩阵中是否存在指定的单词**
-
-[79. Word Search](https://leetcode.com/problems/word-search/description/)
-
-```html
-board =
-[
-  ['A','B','C','E'],
-  ['S','F','C','S'],
-  ['A','D','E','E']
-]
-
-Given word = "ABCCED", return true.
-Given word = "SEE", return true.
-Given word = "ABCB", return false.
-```
-
-```java
-public boolean exist(char[][] board, String word) {
-    int rows = board.length;
-    int cols = board[0].length;
-    boolean[][] visited = new boolean[rows][cols];
-    for (int i = 0; i < rows; i ++) {
-        for (int j = 0; j < cols; j ++) {
-            if (backtracking(board, i, j, rows, cols, word, 0, visited)) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-private boolean backtracking(char[][] board, int r, int c, int rows, int cols, String word, int index, boolean[][] visited) {
-    if (index == word.length())
-        return true;
-    if (r >= rows || r < 0 || c >= cols || c < 0 || visited[r][c] || board[r][c] != word.charAt(index))
-        return false;
-    visited[r][c] = true;
-    boolean hasFound = backtracking(board, r - 1, c, rows, cols, word, index + 1, visited) ||
-            backtracking(board, r, c + 1, rows, cols, word, index + 1, visited) ||
-            backtracking(board, r + 1, c, rows, cols, word, index + 1, visited) ||
-            backtracking(board, r, c - 1, rows, cols, word, index + 1, visited);
-    if (!hasFound)
-        visited[r][c] = false;
-    return hasFound;
-}
-```
-
-
-
-### 旋转数组
-
-**数组旋转 k 位**
-
-[189. Rotate Array](https://leetcode.com/problems/rotate-array/)
-
-```html
-Input: [1,2,3,4,5,6,7] and k = 3
-Output: [5,6,7,1,2,3,4]
-Explanation:
-rotate 1 steps to the right: [7,1,2,3,4,5,6]
-rotate 2 steps to the right: [6,7,1,2,3,4,5]
-rotate 3 steps to the right: [5,6,7,1,2,3,4]
-```
-
-```java
-public void rotate(int[] nums, int k) {
-    if (nums.length == 1) return ;
-
-    int n = nums.length;
-    k = k % n;                     // prevent unnecessary rotate
-    reverse(nums, 0, n-k-1);
-    reverse(nums, n-k, n-1);
-    reverse(nums, 0, n-1);
-}
-```
-
-
-
-### 数组元素约束
-
-**元素范围 0_n 数组中丢失的数字**
-
-[268. Missing Number](https://leetcode.com/problems/missing-number)
-
-```html
-Input: [3,0,1]
-Output: 2
-Example 2:
-
-Input: [9,6,4,2,3,5,7,0,1]
-Output: 8
-```
-
-题目描述：数组元素在 0-n 之间，但是有一个数是缺失的，要求找到这个缺失的数。
-
-A ^ A = 0
-0 1 2 3 4 5 6    7 6 3 4 5 2    ...
-手动构造重复的对 ^0-n
-            ^[0]-[n-1]
-
-```java
-public int missingNumber(int[] nums) {
-    int res = 0;
-    for (int i = 0; i < nums.length; i ++) {
-        res ^= i;                  // [0,n-1]
-        res ^= nums[i];            // [0,n]
-    }
-    res ^= nums.length;
-    return res;
-}
-```
-
-
-
-**元素范围 1-n 找出所有消失的数**
-
-[448. Find All Numbers Disappeared in an Array](https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/)
-
-```java
-public List<Integer> findDisappearedNumbers(int[] nums) {
-    List<Integer> ret = new ArrayList<>();
-    for (int i = 0; i < nums.length; i ++)
-        while (nums[i] != i + 1 && nums[nums[i] - 1] != nums[i])
-            swap(nums, i, nums[i] - 1);
-
-    for (int i = 0; i < nums.length; i ++)
-        if (nums[i] != i + 1)        // nums[i] is redundant
-            ret.add(i + 1);          // disappear, not in slot
-    return ret;
-}
-```
-
-
-
-
-
-### 查找
-
-**排序矩阵中找出 kth 小的元素**
-
-[378. Kth Smallest Element in a Sorted Matrix](https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/)
-
-```html
-matrix = [
-   [ 1,  5,  9],
-   [10, 11, 13],
-   [12, 13, 15]
-],
-k = 8,
-```
-
-题目描述： 第 k 小的元素，非第 k 小的不同元素，每行与每列是递增的
-
-思路一： 通过 堆来进行对应的顺序添加放入，保证插入的顺序即为对应的顺序
-
-```java
-public int kthSmallest(int[][] matrix, int k) {
-    PriorityQueue<Tuple> pq = new PriorityQueue<>();
-    int m = matrix.length, n = matrix[0].length;
-    for (int i = 0; i < n; i ++)
-        pq.offer(new Tuple(0, i, matrix[0][i]));
-
-    for (int i = 0; i < k - 1; i ++) {
-        Tuple t = pq.poll();
-        if (t.x == m-1) continue;
-        pq.offer(new Tuple(t.x + 1, t.y, matrix[t.x+1][t.y]));
-    }
-    return pq.peek().val;
-}
-
-
-class Tuple implements Comparable<Tuple> {
-    int x, y;
-    int val;
-
-    Tuple(int x, int y, int val) {
-        this.x = x;
-        this.y = y;
-        this.val = val;
-    }
-
-    public int compareTo(Tuple that) {
-        return this.val - that.val;
-    }
-}
-```
-
-思路二： 二分查找实现
-
-二分查找用于范围查询，相当于为每个数添加一个属性，小于等于该数的总个数
-
-```java
-public int kthSmallest(int[][] matrix, int k) {
-    int m = matrix.length, n = matrix[0].length;
-    int lo = matrix[0][0], hi = matrix[m-1][n-1];   // [lo,hi]
-    while (lo <= hi) {
-        int mid = lo + (hi-lo)/2;
-        int cnt = countOfLessEqual(matrix, mid);
-        if (cnt < k) 
-            lo = mid + 1;
-        else 
-            hi = mid - 1;    // cnt=k kth in [lo,mid], and -1 to skip loop
-    }
-    return lo;
-}
-
-// <=mid
-private int countOfLessEqual(int[][] matrix, int key) {
-    int cnt = 0;
-    for (int i = 0; i < matrix.length; i ++) {
-        for (int j = 0; j < matrix[0].length; j ++) {
-            if (matrix[i][j] <= key) cnt ++;
-            else break;      // NOTE: use sorted property
-        }
-    }
-    return cnt;
-}
-```
-
-
-
-**<u>==&& 旋转数组上的查找==</u>**
-
-
-
-
-
-**旋转有序无重复数组中查找指定元素索引**
-
-[33. Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array)
-
-```
-Input: nums = [4,5,6,7,0,1,2], target = 0
-Output: 4
-
-Input: nums = [4,5,6,7,0,1,2], target = 3
-Output: -1
-```
-
-```java
-public int search(int[] nums, int target) {
-    int smallestIndex = -1;
-    int lo = 0, hi = nums.length - 1;
-    while (lo < hi) {
-        int mid = lo + (hi - lo) / 2;
-        if (nums[mid] < nums[hi])     // [mid] in R half,  smallest in R half
-            hi = mid;
-        else         // [mid] in L half, smallest in R half
-            lo = mid + 1;
-    }
-    smallestIndex = lo;
-
-    lo = 0;
-    hi = nums.length - 1;
-    while (lo <= hi) {         // binary search with offset
-        int mid = lo + (hi - lo) / 2;
-        int realMid = (mid + smallestIndex) % nums.length;   // add offset
-        if (nums[realMid] == target)
-            return realMid;
-        else if (nums[realMid] < target)
-            lo = mid + 1;
-        else
-            hi = mid - 1;
-    }
-    return -1;
-}
-```
-
-
-
-**旋转有序含重复元素数组中判断是否存在某个值**
-
-[81. Search in Rotated Sorted Array II](https://leetcode.com/problems/search-in-rotated-sorted-array-ii/)
-
-```java
-Input: nums = [2,5,6,0,0,1,2], target = 0
-Output: true
-Example 2:
-
-Input: nums = [2,5,6,0,0,1,2], target = 3
-Output: false
-```
-
-思路一： 找到含重复元素旋转数组中的旋转点，之后通过带偏移的二分查找进行查找。
-
-```java
-public boolean search(int[] nums, int target) {
-    if (nums == null || nums.length == 0) return false;
-
-    int firstIndex = getFirstIndex(nums);
-    if (nums[nums.length-1] >= target) {
-        int index = Arrays.binarySearch(nums, firstIndex, nums.length, target);
-        return index >= 0;
-    } else {
-        int index = Arrays.binarySearch(nums, 0, firstIndex, target);
-        return index >= 0;
-    }
-}
-
-private int getFirstIndex(int[] nums) {
-    int lo = 0, hi = nums.length - 1;
-    while (lo < hi) {
-        int mid = lo + (hi - lo) / 2;
-        if (nums[mid] == nums[lo] && nums[mid] == nums[hi])
-            return getMinIndex(nums, lo, hi);
-        if (nums[mid] <= nums[hi])
-            hi = mid;   // [mid] in sub2, first int left half, first can be [mid]
-        else
-            lo = mid + 1;
-    }
-    return lo;
-}
-
-// case1: [1,1,3,1]
-// case2: [1,1,0,1]
-// case3: [1,1,1,1]
-// NOTE: not find first element, is find first element index
-private int getMinIndex(int[] nums, int lo, int hi) {
-    for (int i = lo + 1; i < hi; i ++) {
-        if (nums[i] == nums[lo])
-            continue;
-        else if (nums[i] < nums[lo]) {    // nums[lo] as excepted
-            return i;
-        } else if (nums[i] > nums[lo]) {
-            for (int j = i + 1; j <= hi; j ++)    // find first equal [lo]
-                if (nums[j] == nums[lo])
-                    return j;
-        }
-    }
-    return lo;
-}
-```
-
-思路2： 不断在有序的某个段上进行判断之后查找，分析各种可能情况
-
-```java
-public boolean search(int[] nums, int target) {
-    int start = 0, end = nums.length - 1, mid = -1;
-    while(start <= end) {
-        mid = (start + end) / 2;
-        if (nums[mid] == target) {
-            return true;
-        }
-        //If we know for sure right side is sorted or left side is unsorted
-        if (nums[mid] < nums[end] || nums[mid] < nums[start]) {
-            if (target > nums[mid] && target <= nums[end]) {
-                start = mid + 1;
-            } else {
-                end = mid - 1;
-            }
-            //If we know for sure left side is sorted or right side is unsorted
-        } else if (nums[mid] > nums[start] || nums[mid] > nums[end]) {
-            if (target < nums[mid] && target >= nums[start]) {
-                end = mid - 1;
-            } else {
-                start = mid + 1;
-            }
-            //If we get here, that means nums[start] == nums[mid] == nums[end], then shifting out
-            //any of the two sides won't change the result but can help remove duplicate from
-            //consideration, here we just use end-- but left++ works too
-        } else {
-            end--;
-        }
-    }
-    return false;
-}
-```
-
-
-
-**在无序数组中找出重复的数，数组中的元素值在 1~n**
-
-[287. Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/)
-
-```
-Input: [1,3,4,2,2]
-Output: 2
-Example 2:
-
-Input: [3,1,3,4,2]
-Output: 3
-```
-思路1： 鸽子洞原理
-```java
-public int findDuplicate(int[] nums) {
-    int lo = 1, hi = nums.length - 1;                 // lo, hi mean value, then find count that in range in all array
-    while (lo <= hi) {
-        int mid = lo + (hi - lo) / 2;
-        int cnt = countOfLessEqual(nums, mid);
-        if (cnt > mid)
-            hi = mid - 1; // duplication in left half
-        else
-            lo = mid + 1;   // cnt=mid, mean in [lo,mid] have no duplication, duplication(key) in right [mid+1,lo]
-    }
-    return lo;
-}
-
-private int countOfLessEqual(int[] nums, int key) {    // find in all array
-    int cnt = 0;
-    for (int num : nums)
-        if (num <= key)
-            cnt ++;
-    return cnt;
-}
-```
-
-思路2： 1~n 的特性
-
-```java
-public int findDuplicate(int[] nums) {
-    int[] aux = nums.clone();
-    for (int i = 0; i < nums.length; i ++) {
-        while (aux[i] != i+1) {
-            if (aux[i] == aux[aux[i] - 1]) {
-                return aux[i];
-            }
-            swap(aux, i, aux[i] - 1);
-        }
-    }
-    return -1;
-}
-
-private void swap(int[] a, int i, int j) {
-    int t = a[i];
-    a[i] = a[j];
-    a[j] = t;
-}
-```
-
-
-
-**排序数组中第一次和最后一次出现的位置**
-
-[34. Find First and Last Position of Element in Sorted Array](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array)
-
-```
-Input: nums = [5,7,7,8,8,10], target = 8
-Output: [3,4]
-Example 2:
-
-Input: nums = [5,7,7,8,8,10], target = 6
-Output: [-1,-1]
-```
-
-思路一： 构建两个查找第一次出现和最后一次出现的二分查找算法
-
-```java
-// first occur index to reduce last search range
-public int[] searchRange(int[] nums, int aim) {
-    int first = binarySearchFirst(nums, 0, nums.length - 1, aim);
-    if (first == -1) {
-        return new int[]{-1, -1};
-    }
-    int last = binarySearchLast(nums, first, nums.length - 1, aim);   // reduce search range
-    return new int[]{first, last};
-}
-
-private int binarySearchFirst(int[] nums, int L, int R, int key) {
-    while (L <= R) {
-        int mid = L + (R - L) / 2;
-        if (nums[mid] == key) {
-            if (mid == 0 || (mid > 0 && nums[mid-1] != nums[mid]))
-                return mid;
-            else
-                R = mid - 1;
-        } else if (nums[mid] < key)
-            L = mid + 1;
-        else
-            R = mid - 1;
-    }
-    return -1;
-}
-
-private int binarySearchLast(int[] nums, int L, int R, int key) {
-    while (L <= R) {
-        int mid = L + (R - L) / 2;
-        if (nums[mid] == key) {
-            if (mid == nums.length-1 || nums[mid] != nums[mid + 1])
-                return mid;
-            else
-                L = mid + 1;
-        } else if (nums[mid] < key)
-            L = mid + 1;
-        else
-            R = mid - 1;
-    }
-    return - 1;
-}
-```
-
-思路二： 复用同一个方法逻辑，进行处理
-
-```java
-public int[] searchRange(int[] nums, int target) {
-    int first = binarySearch(nums, target);
-    int last = binarySearch(nums, target + 1) - 1;
-    if (first == nums.length || nums[first] != target) {
-        return new int[]{-1, -1};
-    } else {
-        return new int[]{first, Math.max(first, last)};
-    }
-}
-
-private int binarySearch(int[] nums, int target) {
-    int l = 0, h = nums.length; // 注意 h 的初始值
-    while (l < h) {
-        int m = l + (h - l) / 2;
-        if (nums[m] >= target) {
-            h = m;
-        } else {
-            l = m + 1;
-        }
-    }
-    return l;
-}
-```
-
-
-
-**查找给定值应该插入的位置**
-
-[35. Search Insert Position](https://leetcode.com/problems/search-insert-position/)
-
-思路一： [a,b] 区间方式查找
-
-```
-public int searchInsert(int[] nums, int target) {
-    int lo = 0, hi = nums.length - 1;
-    while (lo <= hi) {
-        int mid = lo + (hi - lo) / 2;
-        if (target == nums[mid])
-            return lo;
-        else if (target > nums[mid])
-            lo = mid + 1;
-        else
-            hi = mid - 1;
-    }
-    return lo;
-}
-```
-
-思路2： [a, b) 区间方式查找
-
-```java
-public int searchInsert(int[] nums, int target) {
-    int lo = 0, hi = nums.length;
-    while (lo < hi) {
-        int mid = lo + (hi - lo) / 2;
-        if (target > nums[mid])
-            lo = mid + 1;
-        else                    // target in left half section,   when key=[mid] ⇔ key is left half
-            hi = mid;
-    }
-    return lo;
-}
-```
-
-
-
-**在二维矩阵中判断是否存在给定数**
-
-[74. Search a 2D Matrix](https://leetcode.com/problems/search-a-2d-matrix/)
-
-```
-Input:
-matrix = [
-  [1,   3,  5,  7],
-  [10, 11, 16, 20],
-  [23, 30, 34, 50]
-]
-target = 13
-Output: false
-```
-
-题目描述： i 行元素大于 i+1 行元素，i 行元素从左到右递增，非精确性排序的矩阵。
-
-```java
-public boolean searchMatrix(int[][] matrix, int target) {
-    if (matrix == null || matrix.length == 0) return false;
-
-    int m = matrix.length, n = matrix[0].length;
-    int r = 0, c = n - 1;
-    while (r < m && c >= 0) {
-        if (matrix[r][c] == target)
-            return true;
-        else if (matrix[r][c] < target)
-            r ++;
-        else
-            c --;
-    }
-    return false;
-}
-```
-
-
-
-[442. Find All Duplicates in an Array](https://leetcode.com/problems/find-all-duplicates-in-an-array/)
-
-```
-Input:
-[4,3,2,7,8,2,3,1]
-
-Output:
-[2,3]
-```
-
-思路： 1~n 的特性
-
-```java
-public List<Integer> findDuplicates(int[] nums) {
-    List<Integer> res = new ArrayList<>();
-    for (int i = 0; i < nums.length; i ++) {
-        while (nums[i] != i + 1 && nums[i] != nums[nums[i] - 1])
-            swap(nums, i, nums[i] - 1);
-    }
-    for (int i = 0; i < nums.length; i ++)
-        if (nums[i] != i + 1)
-            res.add(nums[i]);
-    return res;
-}
-```
-
-
-
-
-
-### 其他
-
-**两个已排序数组的中位数**
-
-[4. Median of Two Sorted Arrays](https://leetcode.com/problems/median-of-two-sorted-arrays/)
-
-```
-nums1 = [1, 3]
-nums2 = [2]
-The median is 2.0
-
-nums1 = [1, 2]
-nums2 = [3, 4]
-The median is (2 + 3)/2 = 2.5
-```
-
-思路一： todo
-
-```java
-public double findMedianSortedArrays(int[] A, int[] B) {
-    int m = A.length, n = B.length;
-    int l = (m + n + 1) / 2;
-    int r = (m + n + 2) / 2;
-    return (getkth(A, 0, B, 0, l) + getkth(A, 0, B, 0, r)) / 2.0;
-}
-
-// [aL, len1)             [bL, len2)
-public double getkth(int[] A, int aL, int[] B, int bL, int k) {
-    if (aL > A.length - 1) return B[bL + k - 1];
-    if (bL > B.length - 1) return A[aL + k - 1];
-    if (k == 1) return Math.min(A[aL], B[bL]);
-
-    int aMid = Integer.MAX_VALUE, bMid = Integer.MAX_VALUE;
-    if (aL + k/2 - 1 < A.length) aMid = A[aL + k/2 - 1];
-    if (bL + k/2 - 1 < B.length) bMid = B[bL + k/2 - 1];
-
-    if (aMid < bMid)
-        return getkth(A, aL + k/2, B, bL,       k - k/2);// Check: aRight + bLeft
-    else
-        return getkth(A, aL,       B, bL + k/2, k - k/2);// Check: bRight + aLeft
-}
-```
-
-
-
 # 链表问题 
 
 链表的操作：
@@ -1850,15 +84,11 @@ public double getkth(int[] A, int aL, int[] B, int bL, int k) {
 
 链表的操作:
 
-分割
+分割、合并、排序
 
-排序
 
-合并
 
-复制
-
-构建
+复制、构建
 
 
 
@@ -3003,9 +1233,6 @@ private int length(ListNode head) {
     return len;
 }
 ```
-
-
-
 
 
 # 二叉树问题  
@@ -4916,6 +3143,1776 @@ private int getPathCountFromNode(TreeNode node, int target) {
 ```
 
 
+# 数组与矩阵
+
+数组输入条件
+
+- 有序无重复元素
+- 有序有重复元素
+- 全部都为数字
+
+- 旋转数组
+  - 含有重复元素
+  - 不含有重复元素
+
+- 二维矩阵
+  - 从上到下，从左到右有序
+  - 下一行元素大于上一行，行内元素有序
+
+- 直方图
+
+
+
+子数组问题与滑动窗口的解题思路。
+
+
+
+**无重复排序数组中元素的范围段**
+
+[228.Summary Ranges]((https://leetcode.com/problems/summary-ranges/))
+
+```
+Input:  [0,2,3,4,6,8,9]
+Output: ["0","2->4","6","8->9"]
+```
+
+```java
+public List<String> summaryRanges(int[] nums) {
+    List<String> res = new ArrayList<>();
+    if (nums.length == 0)  {
+        return res;
+    }
+    int begin = nums[0], end = nums[0];
+    Arrays.sort(nums);
+    for (int i = 1; i < nums.length; i ++) {       
+        if (nums[i] == nums[i - 1] + 1) {    // continue
+            end = nums[i];
+        } else {
+            res.add(geneRange(nums, begin, end));
+            begin = nums[i];
+            end = nums[i];
+        }
+    }
+    res.add(geneRange(nums, begin, end));    // handle tail
+    return res;
+}
+
+private String geneRange(int[] nums, int begin, int end) {
+    if (begin == end) {
+        return "" + begin;
+    }
+    return begin + "->" + end;
+}
+```
+
+
+
+**数组元素为符合某种特征的数**
+
+**错误的数字**
+
+645. Set Mismatch
+
+```
+Input: nums = [1,2,2,4]
+Output: [2,3]
+```
+
+```java
+public int[] findErrorNums(int[] nums) {
+    for (int i = 0; i < nums.length; i ++) {
+        while (nums[i] != i + 1 && nums[i] != nums[nums[i] - 1]) {   
+            swap(nums, i, nums[i] - 1);
+        }
+    }
+    for (int i = 0; i < nums.length; i ++) {
+        if (nums[i] != i + 1) {
+            return new int[]{nums[i], i + 1};
+        }
+    }
+    return null;
+}
+private void swap(int[] a, int i, int j) {
+  int t = a[i];
+  a[i] = a[j];
+  a[j] = t;
+}
+```
+
+**排序数组中删除重复的值**
+
+[26. Remove Duplicates from Sorted Array](https://leetcode.com/problems/remove-duplicates-from-sorted-array/description/)
+
+```html
+Given nums = [0,0,1,1,1,2,2,3,3,4],
+
+Your function should return length = 5, with the first five elements of nums being modified to 0, 1, 2, 3, and 4 respectively.
+```
+
+```java
+public int removeDuplicates(int[] nums) {
+    if (nums == null || nums.length == 0) return 0;
+    if (nums.length == 1) return 1;
+
+    int k = 0;
+    for (int i = 0; i < nums.length; i ++) {
+        if (i == 0 || nums[i] != nums[i - 1])  
+            nums[k ++] = nums[i];
+    }
+    return k;
+}
+```
+
+**数组中删除给定的值**
+
+[27. Remove Element](https://leetcode.com/problems/remove-element/description/)
+
+```java
+public int removeElement(int[] nums, int val) {
+    int k = 0;
+    for (int i = 0; i < nums.length; i ++)
+        if (nums[i] != val)                     
+            nums[k ++] = nums[i];
+    return k;
+}
+```
+
+**排序数组中删除相同的元素，允许相同元素最多出现两次**
+
+```html
+Given nums = [1,1,1,2,2,3],
+
+Your function should return length = 5, with the first five elements of nums being 1, 1, 2, 2 and 3 respectively.
+
+Given nums = [0,0,1,1,1,1,2,3,3],
+```
+
+```java
+public int removeDuplicates(int[] nums) {
+    if (nums.length < 2) return nums.length;
+
+    int k = 1;                 
+    int count = 1;
+    for (int i = 1; i < nums.length; i ++) {
+        if (nums[i] != nums[i-1]) {
+            nums[k ++] = nums[i];
+            count = 1;
+        } else {                    // excepted
+            if (count < 2)
+                nums[k ++] = nums[i];
+            count ++;
+        }
+    }
+    return k;
+}
+```
+
+
+
+**数组中的主元素**
+
+[169. Majority Element](https://leetcode.com/problems/majority-element/)
+
+```java
+public int majorityElement(int[] nums) {
+    int candidate = -1;
+    int count = 0;
+    for (int num : nums) {
+        if (count == 0) {    
+            count = 1;
+            candidate = num;
+            continue;
+        }
+        count = num == candidate ? ++ count : -- count;
+    }
+    return candidate;
+}
+```
+
+
+
+**找出 n/3 的主元素**
+
+```html
+Input: [3,2,3]
+Output: [3]
+Example 2:
+
+Input: [1,1,1,3,3,2,2,2]
+Output: [1,2]
+```
+
+思路： 每次遍历的元素只能够更新 candidate1 | candidate2 的 counter,   
+
+或者对 candidate 进行重新选取  
+
+或者对两者的 counter 进行 -- 操作  
+
+判断两个 candidate 在数组中出现的频次是否符合要求 
+
+```java
+public List<Integer> majorityElement(int[] nums) {
+    List<Integer> res = new ArrayList<>();
+    if (nums == null || nums.length == 0) return res;
+
+    int candidate1 = nums[0], candidate2= nums[0];
+    int count1 = 0, count2 = 0;    // iterate from 0 to len, need initialize as 0
+    for (int num : nums) {     // must if
+        if (num == candidate1)
+            count1 ++;
+        else if (num == candidate2)
+            count2 ++;
+        else if (count1 == 0) {           // need to reset
+            candidate1 = num;
+            count1 = 1;
+        } else if (count2 == 0) {
+            candidate2 = num;
+            count2 = 1;
+        } else {
+            count1 --;
+            count2 --;
+        }
+    }
+
+    count1 = count2 = 0;           // find candidate frequency
+    for (int num : nums) {
+        if (num == candidate1)
+            count1 ++;
+        else if (num == candidate2)
+            count2 ++;
+    }
+    if (count1 > nums.length/3) res.add(candidate1);
+    if (count2 > nums.length/3) res.add(candidate2);
+    return res;
+}
+```
+
+**构建乘积数组**
+
+[238. Product of Array Except Self](https://leetcode.com/problems/product-of-array-except-self)
+
+不使用除法，时间复杂度 o(n)
+
+```html
+Input:  [1,2,3,4]
+Output: [24,12,8,6]
+Note: Please solve it without division and in O(n).
+```
+
+```java
+public int[] productExceptSelf(int[] nums) {
+    int n = nums.length;
+    int[] product = new int[n];
+    Arrays.fill(product, 1);
+    int left = 1;
+    for (int i = 1; i < n; i ++) {
+        left *= nums[i-1];
+        product[i] = left;
+    }
+    int right = 1;
+    for (int i = n-2; i >= 0; i --) {    // From [n-1] begin *
+        right *= nums[i+1];
+        product[i] *= right;            // left*right
+    }
+    return product;
+}
+```
+
+**把数组中的 0 移到末尾**
+
+[283. Move Zeroes](https://leetcode.com/problems/move-zeroes/description/)
+
+```java
+public void moveZeroes(int[] nums) {
+    int k = 0;
+    for (int i = 0; i < nums.length; i ++)
+        if (nums[i] != 0)
+            nums[k ++] = nums[i];
+    Arrays.fill(nums, k, nums.length, 0);
+}
+```
+
+
+
+## 双指针
+
+**两数之和为给定数的位置**
+
+[1. Two Sum](https://leetcode.com/problems/two-sum/description/)
+
+```java
+public int[] twoSum(int[] nums, int target) {
+    Map<Integer, Integer> valIdxMap = new HashMap<>();
+    for (int i = 0; i < nums.length; i ++) {
+        if (valIdxMap.containsKey(target - nums[i]))
+            return new int[]{valIdxMap.get(target-nums[i]), i}; 
+        valIdxMap.put(nums[i], i);
+    }
+    throw new IllegalStateException();
+}
+```
+
+**容器中放入水的最大容量**
+
+[11. Container With Most Water](https://leetcode.com/problems/container-with-most-water/description/)
+
+![img](assets/question_11.jpg)
+
+```
+Example:
+Input: [1,8,6,2,5,4,8,3,7]
+Output: 49
+```
+
+```java
+public int maxArea(int[] height) {
+    int i = 0, j = height.length - 1;
+    int maxArea = Integer.MIN_VALUE;
+    while (i < j) {
+        int curArea = Math.min(height[i], height[j])  * (j - i);
+        maxArea = Math.max(maxArea, curArea);
+        if (height[i] < height[j])     // skip left part
+            i ++;
+        else             // skip down part
+            j --;
+    }
+    return maxArea;
+}
+```
+
+
+
+**有序数组两数和为给定值**
+
+[167. Two Sum II - Input array is sorted](https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/description/)
+
+```java
+public int[] twoSum(int[] nums, int target) {
+    int i = 0, j = nums.length - 1;
+    while (i < j) {                   
+        int sum = nums[i] + nums[j];
+        if (sum == target) 
+            return new int[]{i + 1, j + 1};  
+        else if (sum < target)
+            i ++;
+        else
+            j --;
+    }
+    throw new IllegalArgumentException();
+}
+```
+
+
+
+## 元组问题
+
+**3元组和为 0 的所有可能**
+
+[15. 3Sum](https://leetcode.com/problems/3sum/)
+
+```html
+Given array nums = [-1, 0, 1, 2, -1, -4],
+
+A solution set is:
+[
+  [-1, 0, 1],
+  [-1, -1, 2]
+]
+```
+思路： 处理重复问题, 注意循环边界
+```java
+public List<List<Integer>> threeSum(int[] nums) {
+    List<List<Integer>> res = new ArrayList<>();
+    if (nums.length < 3) return res;
+    Arrays.sort(nums);
+    for (int i = 0; i < nums.length - 2; i ++) {     
+        if (i > 0 && nums[i] == nums[i -1]) continue;    
+        int l = i + 1, r = nums.length - 1;         
+        while (l < r) {
+            if (l != i + 1 && nums[l] == nums[l-1]) {            
+                l ++;
+                continue;
+            }
+            if (r != nums.length - 1 && nums[r] == nums[r+1]) {    
+                r --;
+                continue;
+            }
+            int sum = nums[i] + nums[l] + nums[r];
+            if (sum == 0)
+                res.add(Arrays.asList(nums[i], nums[l ++], nums[r --]));    
+            else if (sum > 0)
+                r --;
+            else
+                l ++;
+        }
+    }
+    return res;
+}
+```
+
+
+
+## 排序
+
+**排序颜色**
+
+```java
+public void sortColors(int[] nums) {
+    int lt = -1, gt = nums.length;
+    int i = 0;
+    int pivot = 1;
+    while (i < gt) {
+        if (nums[i] == pivot) 
+            i ++;
+        else if (nums[i] < pivot) 
+            swap(nums, i ++, ++ lt);
+        else 
+            swap(nums, i, -- gt);
+    }
+}
+```
+
+
+
+**归并两个排序数组**
+
+[88.Merge Sorted Array](https://leetcode.com/problems/merge-sorted-array/description/)
+
+```html
+Input:
+nums1 = [1,2,3,0,0,0], m = 3
+nums2 = [2,5,6],       n = 3
+
+Output: [1,2,2,3,5,6]
+```
+
+```java
+public void merge(int[] nums1, int m, int[] nums2, int n) {
+    int i = m - 1, j = n - 1;
+    for (int merge = m + n - 1; merge >= 0; merge--) {
+        if (i < 0)
+            nums1[merge] = nums2[j--];
+        else if (j < 0)
+            nums1[merge] = nums1[i--];
+        else if (nums1[i] > nums2[j])
+            nums1[merge] = nums1[i--];    // select big one
+        else
+            nums1[merge] = nums2[j--];
+    }
+}
+```
+
+
+
+## **子数组与子序列**
+
+**最短的未排序的连续子数组**
+
+581.Shortest Unsorted Continuous Subarray
+
+```java
+public int findUnsortedSubarray(int[] nums) {
+    int[] aux = nums.clone();
+    Arrays.sort(aux);
+
+    int start = 0;            // find first not correct position
+    while (start < nums.length && nums[start] == aux[start]) {
+        start ++;
+    }
+
+    int end = nums.length - 1;    
+    while (end > start && nums[end] == aux[end]) {  
+        end --;
+    }
+    return end - start + 1;
+}
+```
+
+
+
+**生成杨辉三角**
+
+[118. Pascal's Triangle](https://leetcode.com/problems/pascals-triangle)
+
+```
+// TODO
+```
+
+
+
+**获得帕斯卡三角形的指定行**
+
+[119. Pascal's Triangle II](https://leetcode.com/problems/pascals-triangle-ii/)
+
+```html
+Input: 3
+Output: [1,3,3,1]
+```
+
+```java
+public List<Integer> getRow(int rowIndex) {
+    List<Integer> res = new ArrayList<>();
+    for (int i = 0; i < rowIndex + 1; i ++) {
+        res.add(1);   
+        for (int j = i - 1; j > 0; j --) {    // no need to handle 0,i position
+            res.set(j, res.get(j - 1) + res.get(j));
+        }
+    }
+    return res;
+}
+```
+
+
+
+**最大的乘积子数组**
+
+[152. Maximum Product Subarray(medium)](<https://leetcode.com/problems/maximum-product-subarray/>)
+
+```
+Input: [2,3,-2,4]
+Output: 6
+Explanation: [2,3] has the largest product 6.
+```
+
+思路： 需要处理当前遍历的值为负数的情况，维护当前最大和最小相乘结果，随着结果而不断改变的, curMax, curMin 所对应的子数组元素数量可能不一致。
+
+DP 问题的精简实现；
+
+```java
+public int maxProduct(int[] nums) {
+    int N = nums.length;
+    int maxProduct = nums[0];
+    int curMax = nums[0], curMin = nums[0];   
+    for (int i = 1; i < nums.length; i ++) {
+        if (nums[i] < 0) {
+            int t = curMax;
+            curMax = curMin;
+            curMin = t;                      
+        }
+        curMax = Math.max(curMax * nums[i], nums[i]);  // is or not continue
+        curMin = Math.min(curMin * nums[i], nums[i]);
+        maxProduct = Math.max(curMax, maxProduct);
+    }
+    return maxProduct;
+}
+```
+
+
+
+**最短的正数子数组和为给定数**
+
+[209. Minimum Size Subarray Sum(medium)](https://leetcode.com/problems/minimum-size-subarray-sum/)
+
+```java
+public int minSubArrayLen(int s, int[] nums) {
+    int minLen = Integer.MAX_VALUE;     // record result
+    int L = 0, R = -1;
+    int winSum = 0;
+    while (L < nums.length) {
+        if (R + 1 < nums.length && winSum < s) {
+            winSum += nums[++ R];
+        } else {
+            winSum -= nums[L ++];
+        }
+        if (winSum >= s) {
+            minLen = Math.min(minLen, R - L + 1);
+        }
+    }
+    return minLen == Integer.MAX_VALUE ? 0 : minLen;           // need handle init value
+}
+```
+
+
+
+**找出数组中最长的连续 1**
+
+[485. Max Consecutive Ones(easy)](https://leetcode.com/problems/max-consecutive-ones/)
+
+```java
+public int findMaxConsecutiveOnes(int[] nums) {
+    int maxLen = 0, curLen = 0;
+    for (int num : nums) {
+        curLen = num == 1 ? curLen + 1 : 0;  // judge
+        maxLen = Math.max(maxLen, curLen);
+    }
+    return maxLen;
+}
+```
+
+
+
+**连续子数组和等于给定数的数量**
+
+[560. Subarray Sum Equals K(medium)](https://leetcode.com/problems/subarray-sum-equals-k/)
+
+```java
+public int subarraySum(int[] nums, int k) {     //
+    Map<Integer, Integer> curSumCntMap = new HashMap<>();
+    curSumCntMap.put(0, 1);
+
+    int curSum = 0;
+    int count = 0;
+    for (int i = 0; i < nums.length; i ++) {
+        curSum += nums[i];
+        int key = curSum - k;
+        if (curSumCntMap.containsKey(key)) {
+            count += curSumCntMap.get(key);
+        }
+        curSumCntMap.put(curSum, curSumCntMap.getOrDefault(curSum, 0) + 1);
+    }
+    return count;
+}
+```
+
+
+
+**找出子数组和最大的子数组**
+
+[53. Maximum Subarray](https://leetcode.com/problems/maximum-subarray/)
+
+```html
+Input: [-2,1,-3,4,-1,2,1,-5,4],
+Output: 6
+Explanation: [4,-1,2,1] has the largest sum = 6.
+```
+
+```java
+public int maxSubArray(int[] nums) {
+    int preSum = nums[0];
+    int maxSum = preSum;
+    for (int i = 1; i < nums.length; i ++) {
+        preSum = (preSum > 0) ? preSum + nums[i] : nums[i];   
+        maxSum = Math.max(preSum, maxSum);
+    }
+    return maxSum;
+}
+```
+
+
+
+
+
+---
+
+**子序列**
+
+**最长的连续序列**
+
+128. Longest Consecutive Sequence
+
+```java
+public int longestConsecutive(int[] nums) {
+    int maxCount = 0;
+    Set<Integer> set = Arrays.stream(nums).boxed().collect(Collectors.toSet());
+
+    for (int num : nums) {
+        int curCount = 1;
+        int curNum = num;
+        while (set.contains(++ curNum)) {
+            curCount ++;
+            set.remove(curNum);
+        }
+        curNum = num;
+        while (set.contains(-- curNum)) {
+            curCount ++;
+            set.remove(curNum);                         // remove to prevent duplication calculation
+        }
+        maxCount = Math.max(maxCount, curCount);
+    }
+    return maxCount;
+}
+```
+
+
+
+
+
+**买股票问题**
+
+
+
+**最合适时机购买和销售股票**
+
+[121. Best Time to Buy and Sell Stock](https://leetcode.com/problems/best-time-to-buy-and-sell-stock/)
+
+```java
+public int maxProfit(int[] prices) {
+    if (prices == null || prices.length == 0)
+        return 0;
+    int curMin = prices[0];
+    int maxProfit = 0;
+    for (int i = 1; i < prices.length; i ++) {
+        curMin = Math.min(curMin, prices[i]);
+        maxProfit = Math.max(maxProfit, prices[i] - curMin);
+    }
+    return maxProfit;
+}
+```
+
+
+
+
+
+**杨辉三角形**
+
+**生成帕斯卡三角形**
+
+118. Pascal's Triangle
+
+```java
+public List<List<Integer>> generate(int numRows) {
+    List<List<Integer>> res = new ArrayList<>();
+    if (numRows == 0) return res;
+
+    res.add(Arrays.asList(1));
+    if (numRows == 1)
+        return res;
+    res.add(Arrays.asList(1,1));
+    if (numRows == 2)
+        return res;
+    for (int i = 2; i < numRows; i ++) {
+        List<Integer> preList = res.get(i-1);
+        List<Integer> curList = new ArrayList<>();
+        curList.add(1);
+        for (int j = 1; j < i; j ++)
+            curList.add(j, preList.get(j-1) + preList.get(j));  // add not set
+        curList.add(i, 1);
+        res.add(new ArrayList<>(curList));
+    }
+    return res;
+}
+```
+
+
+
+**获得帕斯卡三角形的指定行**
+
+[119. Pascal's Triangle II](https://leetcode.com/problems/pascals-triangle-ii/)
+
+```java
+public List<Integer> getRow(int rowIndex) {
+    List<Integer> res = new ArrayList<>();
+    for (int i = 0; i < rowIndex + 1; i ++) {
+        res.add(1);   // every time add one element
+        for (int j = i - 1; j > 0; j --) {    // no need to handle 0,i position
+            res.set(j, res.get(j - 1) + res.get(j));
+        }
+    }
+    return res;
+}
+```
+
+
+
+## 矩阵问题
+
+**重新构造矩阵**
+
+[566. Reshape the Matrix](https://leetcode.com/problems/reshape-the-matrix/description/)
+
+```html
+Input:
+nums =
+[[1,2],
+ [3,4]]
+r = 1, c = 4
+Output:
+[[1,2,3,4]]
+
+Input:
+nums =
+[[1,2],
+ [3,4]]
+r = 2, c = 4
+Output:
+[[1,2],
+ [3,4]]
+```
+
+```java
+public int[][] matrixReshape(int[][] nums, int r, int c) {
+    int m = nums.length, n = nums[0].length;
+    if (m*n != r*c) return nums;
+
+    int[][] matrix = new int[r][c];
+    int index = 0;
+    for (int i = 0; i < r; i ++) {
+        for (int j = 0; j < c; j ++) {
+            matrix[i][j] = nums[index/n][index%n];   // one dimension use col to
+            index ++;
+        }
+    }
+    return matrix;
+}
+```
+
+
+
+**合并时间间隔**
+
+[56. Merge Intervals](https://leetcode.com/problems/merge-intervals/)
+
+```html
+Input: [[1,3],[2,6],[8,10],[15,18]]
+Output: [[1,6],[8,10],[15,18]]
+```
+
+```java
+public List<Interval> merge(List<Interval> intervals) {
+    if (intervals.size() < 2) return intervals;
+    List<Interval> res = new ArrayList<>();
+    intervals.sort((o1, o2) -> Integer.compare(o1.start, o2.start));          // sort to greedy
+    int start = intervals.get(0).start;    // record in global
+    int end = intervals.get(0).end;
+    for (Interval item : intervals) {
+        if (item.start <= end) {        
+            end = Math.max(end, item.end);
+        } else {    
+            res.add(new Interval(start, end));
+            start = item.start;
+            end = item.end;
+        }
+    }
+    // NOTE: handle end
+    res.add(new Interval(start, end));
+    return res;
+}
+```
+
+
+
+**将正方形矩阵顺时针旋转90°**
+
+[48. Rotate Image](https://leetcode.com/problems/rotate-image)
+
+```html
+Given input matrix =
+[
+  [ 5, 1, 9,11],
+  [ 2, 4, 8,10],
+  [13, 3, 6, 7],
+  [15,14,12,16]
+],
+rotate the input matrix in-place such that it becomes:
+[
+  [15,13, 2, 5],
+  [14, 3, 4, 1],
+  [12, 6, 8, 9],
+  [16, 7,10,11]
+]
+```
+
+```java
+public void rotate(int[][] matrix) {
+    int n = matrix.length;
+    int up = 0, left = 0, bottom = n -1, right = n - 1;
+    while (left < right)     // only one element not need rotate
+        rotateEdge(matrix, up ++, left ++, bottom --, right --);
+}
+
+// four point to rotate
+private void rotateEdge(int[][] matrix, int up, int left, int bottom, int right) {
+    int time = right - left;                 // rotate times
+    for (int i = 0; i < time; i ++) {
+        int t = matrix[up][left+i];
+        matrix[up][left+i] = matrix[bottom-i][left];
+        matrix[bottom-i][left] = matrix[bottom][right - i];
+        matrix[bottom][right - i] = matrix[up+i][right];
+        matrix[up+i][right] = t;
+    }
+}
+```
+
+
+
+**螺旋打印矩阵**
+
+[54. Spiral Matrix](https://leetcode.com/problems/spiral-matrix)
+
+```html
+Input:
+[
+  [1, 2, 3, 4],
+  [5, 6, 7, 8],
+  [9,10,11,12]
+]
+Output: [1,2,3,4,8,12,11,10,9,5,6,7]
+```
+
+```java
+public  ArrayList<Integer> printMatrix(int[][] m) {
+    ArrayList<Integer> res = new ArrayList<>();
+    if (m == null || m.length == 0) return res;
+
+    int up = 0, left = 0, bottom = m.length - 1, right = m[0].length - 1;
+    int layers = (Math.min(m.length, m[0].length) - 1) / 2 + 1;          // math ceil
+    while (layers -- > 0)           // left <= right && up <= bottom
+        visitEdge(m, up ++, left ++, bottom --, right --, res);
+    return res;
+}
+
+private void visitEdge(int[][] m, int up, int left, int bottom, int right,  ArrayList<Integer> res) {
+    if (left == right) {
+        for (int i = up; i <= bottom; i ++)
+            res.add(m[i][left]);
+        return;
+    }
+    if (up == bottom) {
+        for (int i = left; i <= right; i ++)
+            res.add(m[up][i]);
+        return;
+    }
+    // →
+    for (int i = left; i < right; i ++)
+        res.add(m[up][i]);
+    // ↓
+    for (int i = up; i < bottom; i ++)
+        res.add(m[i][right]);
+    // ←
+    for (int i = right; i > left; i --)
+        res.add(m[bottom][i]);
+    // ↑
+    for (int i = bottom; i > up; i --)
+        res.add(m[i][left]);
+}
+```
+
+
+
+**螺旋填充矩阵**
+
+[59. Spiral Matrix II](https://leetcode.com/problems/spiral-matrix-ii/)
+
+```html
+Output:
+[
+ [ 1, 2, 3 ],
+ [ 8, 9, 4 ],
+ [ 7, 6, 5 ]
+]
+```
+
+```java
+int sequencer;
+public int[][] generateMatrix(int n) {
+    int[][] matrix = new int[n][n];
+    sequencer = 1;
+    int left = 0, up = 0, right = n -1, down = n - 1;
+    while (left <= right)
+        fillEdge(matrix, left ++, up ++, right --, down --);
+    return matrix;
+}
+
+// note: direction  {--, ++}
+//       extreme condition
+private void fillEdge(int[][] matrix, int left, int up, int right, int down) {
+    if (left == right) {
+        matrix[left][up] = sequencer ++;
+        return;
+    }
+    for (int i = left; i < right; i ++)
+        matrix[up][i] = sequencer ++;
+    for (int i = up; i < down; i ++)
+        matrix[i][right] = sequencer ++;
+    for (int i = right; i > left; i --)
+        matrix[down][i] = sequencer ++;
+    for (int i = down; i > up; i --)
+        matrix[i][left] = sequencer ++;
+}
+```
+
+
+
+**数组表示字符串对其进行加一**
+
+[66. Plus One](https://leetcode.com/problems/plus-one/)
+
+```html
+Input: [4,3,2,1]
+Output: [4,3,2,2]
+```
+
+```java
+public int[] plusOne(int[] digits) {
+    for (int i = digits.length - 1; i >= 0; i --) {   // use array to express num, [n-1] is bit
+        if (digits[i] < 9) {
+            digits[i] ++;
+            return digits;
+        }
+        digits[i] = 0;
+    }
+    int[] nums =  new int[digits.length+1];      // need carry
+    nums[0] = 1;
+    return nums;
+}
+```
+
+
+
+**将矩阵中为 0 的行和列都设置成 0**
+
+[73. Set Matrix Zeroes](https://leetcode.com/problems/set-matrix-zeroes/)
+
+```html
+Input:
+[
+  [1,1,1],
+  [1,0,1],
+  [1,1,1]
+]
+Output:
+[
+  [1,0,1],
+  [0,0,0],
+  [1,0,1]
+]
+```
+
+```java
+public void setZeroes(int[][] matrix) {
+    int m = matrix.length, n = matrix[0].length;
+    boolean[] rows = new boolean[m];             // whatever row or col need to modify 0
+    boolean[] cols = new boolean[n];
+    for (int i = 0; i < m; i ++) {
+        for (int j = 0; j < n; j ++) {
+            if (matrix[i][j] == 0) {
+                rows[i] = true;
+                cols[j] = true;
+            } 
+        }
+    }
+    for (int i = 0; i < m; i ++) {
+        for (int j = 0; j < n; j ++) {
+            if (rows[i] || cols[j])       // narrow space
+                matrix[i][j] = 0;
+        }
+    }
+}
+```
+
+
+
+**矩阵从左上到右下共有多少可能的路径**
+
+[62. Unique Paths](https://leetcode.com/problems/unique-paths/)
+
+```java
+public int uniquePaths(int m, int n) {
+    int[][] dp = new int[m][n];
+    for (int i = 0; i < m; i ++) {       // init [0][0] no need handle specially
+        dp[i][0] = 1;
+    }
+    for (int j = 0; j < n; j ++) {
+        dp[0][j] = 1;
+    }
+    for (int i = 1; i < m; i ++) {
+        for (int j = 1; j < n; j ++) {
+            dp[i][j] = dp[i-1][j] + dp[i][j-1];
+        }
+    }
+    return dp[m - 1][n - 1];
+}
+```
+
+
+
+**矩阵从左上到右下路径最小路径和**
+
+[64. Minimum Path Sum](https://leetcode.com/problems/minimum-path-sum/)
+
+```java
+public int minPathSum(int[][] grid) {
+    int m = grid.length, n = grid[0].length;
+
+    int[][] dp = new int[m][n];
+    dp[0][0] = grid[0][0];
+    for (int i = 1; i < m; i ++) {
+        dp[i][0] = dp[i - 1][0] + grid[i][0];
+    }
+    for (int j = 1; j < n; j ++) {
+        dp[0][j] = dp[0][j - 1] + grid[0][j];
+    }
+    for (int i = 1; i < m; i ++) {
+        for (int j = 1; j < n; j ++) {
+            dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
+        }
+    }
+    return dp[m - 1][n - 1];
+}
+```
+
+
+
+**矩阵中是否存在指定的单词**
+
+[79. Word Search](https://leetcode.com/problems/word-search/description/)
+
+```html
+board =
+[
+  ['A','B','C','E'],
+  ['S','F','C','S'],
+  ['A','D','E','E']
+]
+
+Given word = "ABCCED", return true.
+Given word = "SEE", return true.
+Given word = "ABCB", return false.
+```
+
+```java
+public boolean exist(char[][] board, String word) {
+    int rows = board.length;
+    int cols = board[0].length;
+    boolean[][] visited = new boolean[rows][cols];
+    for (int i = 0; i < rows; i ++) {
+        for (int j = 0; j < cols; j ++) {
+            if (backtracking(board, i, j, rows, cols, word, 0, visited)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+private boolean backtracking(char[][] board, int r, int c, int rows, int cols, String word, int index, boolean[][] visited) {
+    if (index == word.length())
+        return true;
+    if (r >= rows || r < 0 || c >= cols || c < 0 || visited[r][c] || board[r][c] != word.charAt(index))
+        return false;
+    visited[r][c] = true;
+    boolean hasFound = backtracking(board, r - 1, c, rows, cols, word, index + 1, visited) ||
+            backtracking(board, r, c + 1, rows, cols, word, index + 1, visited) ||
+            backtracking(board, r + 1, c, rows, cols, word, index + 1, visited) ||
+            backtracking(board, r, c - 1, rows, cols, word, index + 1, visited);
+    if (!hasFound)
+        visited[r][c] = false;
+    return hasFound;
+}
+```
+
+
+
+## 旋转数组
+
+**数组旋转 k 位**
+
+[189. Rotate Array](https://leetcode.com/problems/rotate-array/)
+
+```html
+Input: [1,2,3,4,5,6,7] and k = 3
+Output: [5,6,7,1,2,3,4]
+Explanation:
+rotate 1 steps to the right: [7,1,2,3,4,5,6]
+rotate 2 steps to the right: [6,7,1,2,3,4,5]
+rotate 3 steps to the right: [5,6,7,1,2,3,4]
+```
+
+```java
+public void rotate(int[] nums, int k) {
+    if (nums.length == 1) return ;
+
+    int n = nums.length;
+    k = k % n;                     // prevent unnecessary rotate
+    reverse(nums, 0, n-k-1);
+    reverse(nums, n-k, n-1);
+    reverse(nums, 0, n-1);
+}
+```
+
+
+
+## 数组元素约束
+
+**元素范围 0_n 数组中丢失的数字**
+
+[268. Missing Number](https://leetcode.com/problems/missing-number)
+
+```html
+Input: [3,0,1]
+Output: 2
+Example 2:
+
+Input: [9,6,4,2,3,5,7,0,1]
+Output: 8
+```
+
+题目描述：数组元素在 0-n 之间，但是有一个数是缺失的，要求找到这个缺失的数。
+
+A ^ A = 0
+0 1 2 3 4 5 6    7 6 3 4 5 2    ...
+手动构造重复的对 ^0-n
+            ^[0]-[n-1]
+
+```java
+public int missingNumber(int[] nums) {
+    int res = 0;
+    for (int i = 0; i < nums.length; i ++) {
+        res ^= i;                  // [0,n-1]
+        res ^= nums[i];            // [0,n]
+    }
+    res ^= nums.length;
+    return res;
+}
+```
+
+
+
+**元素范围 1-n 找出所有消失的数**
+
+[448. Find All Numbers Disappeared in an Array](https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/)
+
+```java
+public List<Integer> findDisappearedNumbers(int[] nums) {
+    List<Integer> ret = new ArrayList<>();
+    for (int i = 0; i < nums.length; i ++)
+        while (nums[i] != i + 1 && nums[nums[i] - 1] != nums[i])
+            swap(nums, i, nums[i] - 1);
+
+    for (int i = 0; i < nums.length; i ++)
+        if (nums[i] != i + 1)        // nums[i] is redundant
+            ret.add(i + 1);          // disappear, not in slot
+    return ret;
+}
+```
+
+
+
+
+
+## 查找
+
+**排序矩阵中找出 kth 小的元素**
+
+[378. Kth Smallest Element in a Sorted Matrix](https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/)
+
+```html
+matrix = [
+   [ 1,  5,  9],
+   [10, 11, 13],
+   [12, 13, 15]
+],
+k = 8,
+```
+
+题目描述： 第 k 小的元素，非第 k 小的不同元素，每行与每列是递增的
+
+思路一： 通过 堆来进行对应的顺序添加放入，保证插入的顺序即为对应的顺序
+
+```java
+public int kthSmallest(int[][] matrix, int k) {
+    PriorityQueue<Tuple> pq = new PriorityQueue<>();
+    int m = matrix.length, n = matrix[0].length;
+    for (int i = 0; i < n; i ++)
+        pq.offer(new Tuple(0, i, matrix[0][i]));
+
+    for (int i = 0; i < k - 1; i ++) {
+        Tuple t = pq.poll();
+        if (t.x == m-1) continue;
+        pq.offer(new Tuple(t.x + 1, t.y, matrix[t.x+1][t.y]));
+    }
+    return pq.peek().val;
+}
+
+
+class Tuple implements Comparable<Tuple> {
+    int x, y;
+    int val;
+
+    Tuple(int x, int y, int val) {
+        this.x = x;
+        this.y = y;
+        this.val = val;
+    }
+
+    public int compareTo(Tuple that) {
+        return this.val - that.val;
+    }
+}
+```
+
+思路二： 二分查找实现
+
+二分查找用于范围查询，相当于为每个数添加一个属性，小于等于该数的总个数
+
+```java
+public int kthSmallest(int[][] matrix, int k) {
+    int m = matrix.length, n = matrix[0].length;
+    int lo = matrix[0][0], hi = matrix[m-1][n-1];   // [lo,hi]
+    while (lo <= hi) {
+        int mid = lo + (hi-lo)/2;
+        int cnt = countOfLessEqual(matrix, mid);
+        if (cnt < k) 
+            lo = mid + 1;
+        else 
+            hi = mid - 1;    // cnt=k kth in [lo,mid], and -1 to skip loop
+    }
+    return lo;
+}
+
+// <=mid
+private int countOfLessEqual(int[][] matrix, int key) {
+    int cnt = 0;
+    for (int i = 0; i < matrix.length; i ++) {
+        for (int j = 0; j < matrix[0].length; j ++) {
+            if (matrix[i][j] <= key) cnt ++;
+            else break;      // NOTE: use sorted property
+        }
+    }
+    return cnt;
+}
+```
+
+
+
+**<u>==&& 旋转数组上的查找==</u>**
+
+
+
+
+
+**旋转有序无重复数组中查找指定元素索引**
+
+[33. Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array)
+
+```
+Input: nums = [4,5,6,7,0,1,2], target = 0
+Output: 4
+
+Input: nums = [4,5,6,7,0,1,2], target = 3
+Output: -1
+```
+
+```java
+public int search(int[] nums, int target) {
+    int smallestIndex = -1;
+    int lo = 0, hi = nums.length - 1;
+    while (lo < hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (nums[mid] < nums[hi])     // [mid] in R half,  smallest in R half
+            hi = mid;
+        else         // [mid] in L half, smallest in R half
+            lo = mid + 1;
+    }
+    smallestIndex = lo;
+
+    lo = 0;
+    hi = nums.length - 1;
+    while (lo <= hi) {         // binary search with offset
+        int mid = lo + (hi - lo) / 2;
+        int realMid = (mid + smallestIndex) % nums.length;   // add offset
+        if (nums[realMid] == target)
+            return realMid;
+        else if (nums[realMid] < target)
+            lo = mid + 1;
+        else
+            hi = mid - 1;
+    }
+    return -1;
+}
+```
+
+
+
+**旋转有序含重复元素数组中判断是否存在某个值**
+
+[81. Search in Rotated Sorted Array II](https://leetcode.com/problems/search-in-rotated-sorted-array-ii/)
+
+```java
+Input: nums = [2,5,6,0,0,1,2], target = 0
+Output: true
+Example 2:
+
+Input: nums = [2,5,6,0,0,1,2], target = 3
+Output: false
+```
+
+思路一： 找到含重复元素旋转数组中的旋转点，之后通过带偏移的二分查找进行查找。
+
+```java
+public boolean search(int[] nums, int target) {
+    if (nums == null || nums.length == 0) return false;
+
+    int firstIndex = getFirstIndex(nums);
+    if (nums[nums.length-1] >= target) {
+        int index = Arrays.binarySearch(nums, firstIndex, nums.length, target);
+        return index >= 0;
+    } else {
+        int index = Arrays.binarySearch(nums, 0, firstIndex, target);
+        return index >= 0;
+    }
+}
+
+private int getFirstIndex(int[] nums) {
+    int lo = 0, hi = nums.length - 1;
+    while (lo < hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (nums[mid] == nums[lo] && nums[mid] == nums[hi])
+            return getMinIndex(nums, lo, hi);
+        if (nums[mid] <= nums[hi])
+            hi = mid;   // [mid] in sub2, first int left half, first can be [mid]
+        else
+            lo = mid + 1;
+    }
+    return lo;
+}
+
+// case1: [1,1,3,1]
+// case2: [1,1,0,1]
+// case3: [1,1,1,1]
+// NOTE: not find first element, is find first element index
+private int getMinIndex(int[] nums, int lo, int hi) {
+    for (int i = lo + 1; i < hi; i ++) {
+        if (nums[i] == nums[lo])
+            continue;
+        else if (nums[i] < nums[lo]) {    // nums[lo] as excepted
+            return i;
+        } else if (nums[i] > nums[lo]) {
+            for (int j = i + 1; j <= hi; j ++)    // find first equal [lo]
+                if (nums[j] == nums[lo])
+                    return j;
+        }
+    }
+    return lo;
+}
+```
+
+思路2： 不断在有序的某个段上进行判断之后查找，分析各种可能情况
+
+```java
+public boolean search(int[] nums, int target) {
+    int start = 0, end = nums.length - 1, mid = -1;
+    while(start <= end) {
+        mid = (start + end) / 2;
+        if (nums[mid] == target) {
+            return true;
+        }
+        //If we know for sure right side is sorted or left side is unsorted
+        if (nums[mid] < nums[end] || nums[mid] < nums[start]) {
+            if (target > nums[mid] && target <= nums[end]) {
+                start = mid + 1;
+            } else {
+                end = mid - 1;
+            }
+            //If we know for sure left side is sorted or right side is unsorted
+        } else if (nums[mid] > nums[start] || nums[mid] > nums[end]) {
+            if (target < nums[mid] && target >= nums[start]) {
+                end = mid - 1;
+            } else {
+                start = mid + 1;
+            }
+            //If we get here, that means nums[start] == nums[mid] == nums[end], then shifting out
+            //any of the two sides won't change the result but can help remove duplicate from
+            //consideration, here we just use end-- but left++ works too
+        } else {
+            end--;
+        }
+    }
+    return false;
+}
+```
+
+
+
+**在无序数组中找出重复的数，数组中的元素值在 1~n**
+
+[287. Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/)
+
+```
+Input: [1,3,4,2,2]
+Output: 2
+Example 2:
+
+Input: [3,1,3,4,2]
+Output: 3
+```
+思路1： 鸽子洞原理
+```java
+public int findDuplicate(int[] nums) {
+    int lo = 1, hi = nums.length - 1;                 // lo, hi mean value, then find count that in range in all array
+    while (lo <= hi) {
+        int mid = lo + (hi - lo) / 2;
+        int cnt = countOfLessEqual(nums, mid);
+        if (cnt > mid)
+            hi = mid - 1; // duplication in left half
+        else
+            lo = mid + 1;   // cnt=mid, mean in [lo,mid] have no duplication, duplication(key) in right [mid+1,lo]
+    }
+    return lo;
+}
+
+private int countOfLessEqual(int[] nums, int key) {    // find in all array
+    int cnt = 0;
+    for (int num : nums)
+        if (num <= key)
+            cnt ++;
+    return cnt;
+}
+```
+
+思路2： 1~n 的特性
+
+```java
+public int findDuplicate(int[] nums) {
+    int[] aux = nums.clone();
+    for (int i = 0; i < nums.length; i ++) {
+        while (aux[i] != i+1) {
+            if (aux[i] == aux[aux[i] - 1]) {
+                return aux[i];
+            }
+            swap(aux, i, aux[i] - 1);
+        }
+    }
+    return -1;
+}
+
+private void swap(int[] a, int i, int j) {
+    int t = a[i];
+    a[i] = a[j];
+    a[j] = t;
+}
+```
+
+
+
+**排序数组中第一次和最后一次出现的位置**
+
+[34. Find First and Last Position of Element in Sorted Array](https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array)
+
+```
+Input: nums = [5,7,7,8,8,10], target = 8
+Output: [3,4]
+Example 2:
+
+Input: nums = [5,7,7,8,8,10], target = 6
+Output: [-1,-1]
+```
+
+思路一： 构建两个查找第一次出现和最后一次出现的二分查找算法
+
+```java
+// first occur index to reduce last search range
+public int[] searchRange(int[] nums, int aim) {
+    int first = binarySearchFirst(nums, 0, nums.length - 1, aim);
+    if (first == -1) {
+        return new int[]{-1, -1};
+    }
+    int last = binarySearchLast(nums, first, nums.length - 1, aim);   // reduce search range
+    return new int[]{first, last};
+}
+
+private int binarySearchFirst(int[] nums, int L, int R, int key) {
+    while (L <= R) {
+        int mid = L + (R - L) / 2;
+        if (nums[mid] == key) {
+            if (mid == 0 || (mid > 0 && nums[mid-1] != nums[mid]))
+                return mid;
+            else
+                R = mid - 1;
+        } else if (nums[mid] < key)
+            L = mid + 1;
+        else
+            R = mid - 1;
+    }
+    return -1;
+}
+
+private int binarySearchLast(int[] nums, int L, int R, int key) {
+    while (L <= R) {
+        int mid = L + (R - L) / 2;
+        if (nums[mid] == key) {
+            if (mid == nums.length-1 || nums[mid] != nums[mid + 1])
+                return mid;
+            else
+                L = mid + 1;
+        } else if (nums[mid] < key)
+            L = mid + 1;
+        else
+            R = mid - 1;
+    }
+    return - 1;
+}
+```
+
+思路二： 复用同一个方法逻辑，进行处理
+
+```java
+public int[] searchRange(int[] nums, int target) {
+    int first = binarySearch(nums, target);
+    int last = binarySearch(nums, target + 1) - 1;
+    if (first == nums.length || nums[first] != target) {
+        return new int[]{-1, -1};
+    } else {
+        return new int[]{first, Math.max(first, last)};
+    }
+}
+
+private int binarySearch(int[] nums, int target) {
+    int l = 0, h = nums.length; // 注意 h 的初始值
+    while (l < h) {
+        int m = l + (h - l) / 2;
+        if (nums[m] >= target) {
+            h = m;
+        } else {
+            l = m + 1;
+        }
+    }
+    return l;
+}
+```
+
+
+
+**查找给定值应该插入的位置**
+
+[35. Search Insert Position](https://leetcode.com/problems/search-insert-position/)
+
+思路一： [a,b] 区间方式查找
+
+```
+public int searchInsert(int[] nums, int target) {
+    int lo = 0, hi = nums.length - 1;
+    while (lo <= hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (target == nums[mid])
+            return lo;
+        else if (target > nums[mid])
+            lo = mid + 1;
+        else
+            hi = mid - 1;
+    }
+    return lo;
+}
+```
+
+思路2： [a, b) 区间方式查找
+
+```java
+public int searchInsert(int[] nums, int target) {
+    int lo = 0, hi = nums.length;
+    while (lo < hi) {
+        int mid = lo + (hi - lo) / 2;
+        if (target > nums[mid])
+            lo = mid + 1;
+        else                    // target in left half section,   when key=[mid] ⇔ key is left half
+            hi = mid;
+    }
+    return lo;
+}
+```
+
+
+
+**在二维矩阵中判断是否存在给定数**
+
+[74. Search a 2D Matrix](https://leetcode.com/problems/search-a-2d-matrix/)
+
+```
+Input:
+matrix = [
+  [1,   3,  5,  7],
+  [10, 11, 16, 20],
+  [23, 30, 34, 50]
+]
+target = 13
+Output: false
+```
+
+题目描述： i 行元素大于 i+1 行元素，i 行元素从左到右递增，非精确性排序的矩阵。
+
+```java
+public boolean searchMatrix(int[][] matrix, int target) {
+    if (matrix == null || matrix.length == 0) return false;
+
+    int m = matrix.length, n = matrix[0].length;
+    int r = 0, c = n - 1;
+    while (r < m && c >= 0) {
+        if (matrix[r][c] == target)
+            return true;
+        else if (matrix[r][c] < target)
+            r ++;
+        else
+            c --;
+    }
+    return false;
+}
+```
+
+
+
+[442. Find All Duplicates in an Array](https://leetcode.com/problems/find-all-duplicates-in-an-array/)
+
+```
+Input:
+[4,3,2,7,8,2,3,1]
+
+Output:
+[2,3]
+```
+
+思路： 1~n 的特性
+
+```java
+public List<Integer> findDuplicates(int[] nums) {
+    List<Integer> res = new ArrayList<>();
+    for (int i = 0; i < nums.length; i ++) {
+        while (nums[i] != i + 1 && nums[i] != nums[nums[i] - 1])
+            swap(nums, i, nums[i] - 1);
+    }
+    for (int i = 0; i < nums.length; i ++)
+        if (nums[i] != i + 1)
+            res.add(nums[i]);
+    return res;
+}
+```
+
+
+
+
+
+## 其他
+
+**两个已排序数组的中位数**
+
+[4. Median of Two Sorted Arrays](https://leetcode.com/problems/median-of-two-sorted-arrays/)
+
+```
+nums1 = [1, 3]
+nums2 = [2]
+The median is 2.0
+
+nums1 = [1, 2]
+nums2 = [3, 4]
+The median is (2 + 3)/2 = 2.5
+```
+
+思路一： todo
+
+```java
+public double findMedianSortedArrays(int[] A, int[] B) {
+    int m = A.length, n = B.length;
+    int l = (m + n + 1) / 2;
+    int r = (m + n + 2) / 2;
+    return (getkth(A, 0, B, 0, l) + getkth(A, 0, B, 0, r)) / 2.0;
+}
+
+// [aL, len1)             [bL, len2)
+public double getkth(int[] A, int aL, int[] B, int bL, int k) {
+    if (aL > A.length - 1) return B[bL + k - 1];
+    if (bL > B.length - 1) return A[aL + k - 1];
+    if (k == 1) return Math.min(A[aL], B[bL]);
+
+    int aMid = Integer.MAX_VALUE, bMid = Integer.MAX_VALUE;
+    if (aL + k/2 - 1 < A.length) aMid = A[aL + k/2 - 1];
+    if (bL + k/2 - 1 < B.length) bMid = B[bL + k/2 - 1];
+
+    if (aMid < bMid)
+        return getkth(A, aL + k/2, B, bL,       k - k/2);// Check: aRight + bLeft
+    else
+        return getkth(A, aL,       B, bL + k/2, k - k/2);// Check: bRight + aLeft
+}
+```
+
 
 # 栈和队列
 
@@ -5746,13 +5743,23 @@ public class Tuple implements Comparable<Tuple> {
 
 
 # 其他
-## Hash 表问题
+## Hash 表
+
+Map 的排序:
+
+- `LinkedHashMap `排序
+
+- `TreeMap` 排序
+
+- `PriorityQueue` 放入 `Map.Entry` 进行排序
+
+
 
 配合数组，进行统计词频、第一次、最后一次出现的位置、当前和的个数；
 
 记录数组中 val -> index
 
-配合 LinkedHashMap 实现根究 Value 排序并作为一个 Map 进行通用；
+配合 LinkedHashMap 实现根究 Value 排序并作为一个 Map 返回方便后续调用；
 
 配合 PriorityQueue 实现不断地获取最大值；
 
@@ -5784,6 +5791,10 @@ Hash 表用来去重，构建类似图形问题时，用于避免成环，形成
 Map<Integer, Integer> valIdxMap;
 Map<TreeNode, Integer> memo;
 ```
+
+
+
+
 
 
 
@@ -6495,16 +6506,24 @@ public int findLHS(int[] nums) {
 ```
 
 
-## 字符串问题
+## 字符串
 
 KMP-字符串匹配问题  
+
 Manacher-回文串问题    
+
 Trie 前缀树问题  
+
 序列化问题, 保存值，树的序列化，用于构造，根据指定的字符串构造出指定的数据结构  
+
 正则校验问题    
+
 前缀问题  
+
 回文串问题   
+
 对称性问题  
+
 滑动窗口  
 
 API ：
@@ -6526,7 +6545,7 @@ setCharAt
 填充法统一处理 ：  # 增加串长度，统一 奇偶 的处理
 
 
-## 滑动窗口问题
+## 滑动窗口
 如何向窗口中添加新元素，如何缩小窗口，在窗口滑动的哪个阶段更新结果
 
 

@@ -10,7 +10,7 @@
 
 **变量**
 
-**String 的处理**
+### **String 的处理**
 
 > 类似 Java String 处理，删除、替换、查找、子串
 
@@ -87,7 +87,7 @@ fi
 
 
 
-类型
+### 数据类型
 
 > 整型、数组，环境变量
 
@@ -170,6 +170,24 @@ read -p "in num" num2
 echo "$num1 / $num2 | bc"
 num3=`echo ""`
 ```
+
+
+
+### 参数
+
+`$#`: 输入的参数个数
+
+```shell
+# 获取文件名称
+basename <file-name>
+```
+
+```shell
+# 获取当前用户
+whoami
+```
+
+
 
 
 

@@ -182,7 +182,7 @@ void insertSort(int[] arr) {
 
 **3、链表实现插入排序**
 
-[147. Insertion Sort List(Medium)](https://leetcode.com/problems/insertion-sort-list/)
+[leetcode](https://leetcode.com/problems/insertion-sort-list/)
 
 ```java
 public ListNode insertionSortList(ListNode head) {
@@ -191,7 +191,7 @@ public ListNode insertionSortList(ListNode head) {
   }
 
   ListNode first = new ListNode(0);
-  ListNode cur = head; //the node will be inserted
+  ListNode cur = head;  //the node will be inserted
   ListNode pre = first; //insert node between pre and pre.next
   ListNode next = null; //the next node will be inserted
   while (cur != null) {
@@ -491,13 +491,15 @@ void mergeSort(int[] arr) {
 
 **3、使用链表进行归并排序**
 
-找出中间节点，分割链表；
+执行过程：
 
-对分割的链表分别进行归并排序；
+① 找出中间节点，分割链表；
 
-将链表合并；
+② 对分割的链表分别进行归并排序；
 
-相关： [148. Sort List(Medium)](https://leetcode.com/problems/sort-list/)
+③ 将链表合并；
+
+相关： [leetcode](https://leetcode.com/problems/sort-list/) | [leetcode-cn](https://leetcode-cn.com/problems/sort-list/)
 
 ```java
 public class ListNode implements Cloneable {
@@ -517,34 +519,77 @@ public class ListNode implements Cloneable {
 
 ```java
 public ListNode sortList(ListNode head) {
-    if (head == null || head.next == null)
-      return head;
-    // 1. find mid node and cut two list
-    ListNode preMid = findPreMid(head);
-    ListNode mid = preMid.next;
-    preMid.next = null;
-    // 2. handle two sub problem
-    ListNode l1 = sortList(head);
-    ListNode l2 = sortList(mid);
-    // 3. merge result
-    return merge(l1, l2);
+  if (head == null || head.next == null) {
+    return head;
   }
 
-  private ListNode findPreMid(ListNode head) {
-    ListNode pre = null, fast = head, slow = head;
-    while (fast != null && fast.next != null) {
-      pre = slow;
-      slow = slow.next;
-      fast = fast.next.next;
+  // 1. find mid node and cut two list
+  ListNode preMid = preMidNode(head);
+  ListNode mid = preMid.next;
+  preMid.next = null;
+  // 2. handle two sub problem
+  ListNode l1 = sortList(head);
+  ListNode l2 = sortList(mid);
+  // 3. merge result
+  return merge(l1, l2);
+}
+
+private ListNode preMidNode(ListNode head) {
+  ListNode pre = null, fast = head, slow = head;
+  while (fast != null && fast.next != null) {
+    pre = slow;
+    slow = slow.next;
+    fast = fast.next.next;
+  }
+  return pre;
+}
+
+private ListNode merge(ListNode l1, ListNode l2) {
+  if (l1 == null)
+    return l2;
+  if (l2 == null)
+    return l1;
+  if (l1.val < l2.val) {
+    l1.next = merge(l1.next, l2);
+    return l1;
+  } else {
+    l2.next = merge(l1, l2.next);
+    return l2;
+  }
+}
+```
+
+**4、合并 k 个已经排序的链表**
+
+[leetcode-cn](https://leetcode-cn.com/problems/merge-k-sorted-lists/) | [leetcode](https://leetcode.com/problems/merge-k-sorted-lists/)
+
+```java
+  public ListNode mergeKLists(ListNode[] lists) {
+    return mergeSortList(lists, 0, lists.length - 1);
+  }
+
+  private ListNode mergeSortList(ListNode[] lists, int lo, int hi) {
+    if (lo > hi) {
+      return null;
     }
-    return pre;
+    if (lo == hi) {
+      return lists[lo];  
+    }
+
+    int mid = lo + (hi - lo) / 2;
+    ListNode left = mergeSortList(lists, lo, mid);
+    ListNode right = mergeSortList(lists, mid + 1, hi);
+    return merge(left, right);
   }
 
+  // 合并两个排序的链表
   private ListNode merge(ListNode l1, ListNode l2) {
-    if (l1 == null)
+    if (l1 == null) {
       return l2;
-    if (l2 == null)
+    }
+    if (l2 == null) {
       return l1;
+    }
     if (l1.val < l2.val) {
       l1.next = merge(l1.next, l2);
       return l1;
@@ -554,6 +599,8 @@ public ListNode sortList(ListNode head) {
     }
   }
 ```
+
+
 
 
 
@@ -654,6 +701,35 @@ void sink(int[] arr, int k, int N) {
         k = j;
     }
     arr[k] = val;
+}
+```
+
+**3、合并 k 个已经排序的链表**
+
+```java
+public ListNode mergeKLists(ListNode[] lists) {
+  if (lists == null || lists.length == 0) {
+    return null;
+  }
+  // 初始化加载所有链表的头节点
+  PriorityQueue<ListNode> pq = new PriorityQueue<>(lists.length, Comparator.comparingInt(l -> l.val));   // list like each data flow
+  for (ListNode list : lists) {
+    if (list != null) {
+      pq.offer(list);
+    }
+  }
+
+  // 比较每条链表当前的头节点
+  ListNode first = new ListNode(-1);
+  ListNode cur = first;
+  while (!pq.isEmpty()) {
+    cur.next = pq.poll();
+    cur = cur.next;
+    if (cur.next != null) {
+      pq.offer(cur.next);
+    }
+  }
+  return first.next;
 }
 ```
 
