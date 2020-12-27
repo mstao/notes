@@ -2,7 +2,7 @@
 
 > 类似精简的 Linux 环境，含 root 权限、进程空间、用户空间和网络空间，以及运行在其中的应用程序
 
-![1566961968709](assets/1566961968709.png)
+![1566961968709](http://img.janhen.com/1566961968709.png)
 
 Client： 客户端通过 CLI 命令与 Docker 交互
 Docker daemon： 宿主机的守护进程，通过 RESTful 接口处理 Client 的命令，连接 Registry 进行镜像的拉取的推送，具体配置见 [Daemon配置](#Daemon 配置)
@@ -291,7 +291,7 @@ ip netns exec testz ip link set dev veth-test2 up
 
 > 通过link 方式实现容器之间的访问，直接通过名称而非 IP，适用于单台机器
 
-![1566531692115](assets/1566531692115.png)
+![1566531692115](http://img.janhen.com/1566531692115.png)
 
 一个容器对应一个网络空间
 
@@ -468,7 +468,7 @@ docker version
 
 > 将容器与数据存储隔离开，如 Mysql 运行程序与数据保存位置
 
-![1566571502370](assets/1566571502370.png)
+![1566571502370](http://img.janhen.com/202012172237411566571502370.png)
 
 两种持久化的方式：
 
@@ -806,7 +806,7 @@ Docker Swarm 特点：
 
 ## Swarm 架构
 
-![1566634422450](assets/1566634422450.png)
+![1566634422450](http://img.janhen.com/202012172238091566634422450.png)
 
 [Raft](http://thesecretlivesofdata.com/raft/) consensus group： 进行控制分布式场景下的协商:  内置的分布式的存储数据库，通过 Raft 协议进行同步，包含 Leader 选举、Log 复制
 
@@ -887,7 +887,7 @@ docker service rm demo
 
 > Swarm 网络通信原理，管理集群服务间的通信，访问集群中任何一个节点特定端口都会被重定向到实际运行服务的节点上
 
-![1566634990023](assets/1566634990023.png)
+![1566634990023](http://img.janhen.com/202012172238131566634990023.png)
 
 DNS 服务发现，单机情况下可以通过 service 的名称进行相互访问，多机情况下通过 swarm 进行相互访问
 
@@ -908,7 +908,7 @@ LVS： 根据虚拟 IP 找出容器中的具体的 IP 地址
 
 > 容器间实现相互访问，通过 overlay 网络实现，实现 service 与 service 之间的通信
 
-![1568514162156](assets/1568514162156.png)
+![1568514162156](http://img.janhen.com/202012172238171568514162156.png)
 
 whoami 镜像： 提供 web 服务，访问 8000 端口，返回 container 的 hostname
 
@@ -1003,7 +1003,7 @@ DNS + VIP + iptables + LVS 实现的过程图：
 
 Ingress Network 的数据包走向图
 
-![1568515008492](assets/1568515008492.png)
+![1568515008492](http://img.janhen.com/202012172238261568515008492.png)
 
 在  IPTables + IPVS 发往目的网络
 
@@ -1098,7 +1098,7 @@ docker stack rm wordpress
 >
 > 关联： [Doc-CLI](https://docs.docker.com/engine/reference/commandline/secret/)
 
-![1566631044524](assets/1566631044524.png)
+![1566631044524](http://img.janhen.com/202012172238471566631044524.png)
 
 Secret 类型： username password， SSH key, TLS 认证，不想让人看到的数据
 
@@ -1185,8 +1185,6 @@ docker stack services wordpress
 进行 service 的更新，不会暂停运行的项目
 
 @Q: 存在一段时间有 1.0和2.0并存的情况，如何处理??
-
-// todo C 深入，处理此种情况??
 
 ```shell
 # 创建 overlay 网络，启动服务

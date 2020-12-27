@@ -1,3 +1,5 @@
+[TOC]
+
 Topic: 主题
 
 Brokder:
@@ -78,7 +80,7 @@ consumer 采用 pull 模式从 brokder 中读取数据，<font color="green">可
 
 
 
-<img src="assets/image-20201121171728810.png" alt="image-20201121171728810" style="zoom: 50%;" />
+<img src="http://img.janhen.com/image-20201121171728810.png" alt="image-20201121171728810" style="zoom: 50%;" />
 
 Producer:
 
@@ -210,8 +212,7 @@ kafka-console-producer.sh --brokder-list localhost:9092 \
   --topic topic_1
 ```
 
-
-<img src="assets/image-20201116213957800.png" alt="image-20201116213957800" style="zoom: 67%;" />
+<img src="http://img.janhen.com/image-20201116213957800.png" alt="image-20201116213957800" style="zoom: 67%;" />
 
 acks: 副本分区进行...， 保证可靠性，    同步确认/异步确认
 
@@ -255,7 +256,7 @@ Log.dirs: 持久化的数据目录, 可指定多个
 
 ## 生产
 
-<img src="assets/image-20201116223818141.png" alt="image-20201116223818141" style="zoom: 50%;" />
+<img src="http://img.janhen.com/image-20201116223818141.png" alt="image-20201116223818141" style="zoom: 50%;" />
 
 <p align="center">生产者发送过程</p>
 
@@ -281,7 +282,7 @@ Interceptor 可能被运行在多个线程中，在具体实现中**<font color=
 
 ### 原理分析
 
-<img src="assets/image-20201117215502433.png" alt="image-20201117215502433" style="zoom: 60%;" />
+<img src="http://img.janhen.com/image-20201117215502433.png" alt="image-20201117215502433" style="zoom: 60%;" />
 
 <p align="center">生产者执行原理</p>
 
@@ -297,13 +298,13 @@ Interceptor 可能被运行在多个线程中，在具体实现中**<font color=
 
 Request.required.acks
 
-0 
+- 0 
 
-1
+- 1
 
--1
+- -1
 
-all
+- all
 
 
 
@@ -313,19 +314,13 @@ all
 org.apache.kafka.clients.producer.ProducerConfig
 ```
 
-Bootstrap.servers:
+bootstrap.servers:
 
-Key.serializer:
+key.serializer:
 
 Value.serializer:
 
-Acks: 默认为 
-
-  all, 
-
-  0 -> 不等待 brokder 消息的去人, 
-
-  acks ->1, 消息写到主分区即可，不用等待 fOLLOER 的确认。
+Acks:  确认机制
 
 Retries:
 
@@ -1319,7 +1314,7 @@ Follower 副本进程卡住，同步太慢...
 LEOLog end offset，日志末端位移
 HW: HW 不会大于 LEO 值
 
-<img src="assets/image-20201120222351177.png" alt="image-20201120222351177" style="zoom:50%;" />
+<img src="http://img.janhen.com/image-20201120222351177.png" alt="image-20201120222351177" style="zoom:50%;" />
 
 Leader 收到消息更新自己的 LEO，在 Follower 执行 FETCH 请求的时候更新 Leader 中的 Follower 中的 LEO。
 
@@ -1363,7 +1358,7 @@ epoch 未 Leader 的版本好，Leader 变更一次， + 1。
 
 **生产阶段重复**
 
-<img src="assets/image-20201120230200106.png" alt="image-20201120230200106" style="zoom:80%;" />
+<img src="http://img.janhen.com/image-20201120230200106.png" alt="image-20201120230200106" style="zoom:80%;" />
 
 Max.in.flight.requests.per.connnection 默认 5，单个连接上发送的未确认请求的最大数量。
 

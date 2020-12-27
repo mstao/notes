@@ -1,3 +1,5 @@
+[TOC] 
+
 # Sqoop ETL 工具
 
 > 数据清洗工具，在 RDBMS 和 HDFS 之间导入导出
@@ -105,7 +107,9 @@ permission javax.management.MBeanTrustPermission "register";
 
 
 
+# kettle
 
+> 开源ETL工具。支持数据库、FTP、文件、rest接口、hdfs、hive等平台的据进 行抽取、转换、传输等操作，Java编写跨平台，C/S架构，不支持浏览器模式。
 
 
 

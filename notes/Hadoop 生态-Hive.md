@@ -128,7 +128,7 @@ Q: Hive 关联表对应 MapReduce 如何实现？
 
 
 
-HiveQL 于 SQL 的比较：
+<p align="center">HiveQL 于 SQL 的比较</p>
 
 | 比较项        | SQL                        | HiveQL                                  |
 | ------------- | -------------------------- | --------------------------------------- |
@@ -138,13 +138,10 @@ HiveQL 于 SQL 的比较：
 | 数据保存      | 块设备、本地文件系统       | HDFS                                    |
 | 延时          | 低                         | 高                                      |
 | 多表播入      | 不支持                     | 支持                                    |
-| 子查询        | 完全支持                   | 只能用在From子旬中                      |
+| 子查询        | 完全支持                   | 只能用在 From 子句中                    |
 | 视图          | Updatable                  | Read-only                               |
 | 可扩展性      | 低                         | 高                                      |
 | 数据规模      | 小                         | 大                                      |
-|               | 0EE000                     | 0080E0                                  |
-
-
 
 
 
@@ -152,15 +149,13 @@ HiveQL 于 SQL 的比较：
 
 基本数据类型
 
-Integer  、TINYINT、SMALINT、、INT、BIGINT
+- 整数类型： Integer  、TINYINT、SMALINT、INT、BIGINT
 
-FLOAT、DOUBLE:  
+- 浮点数类型： FLOAT、DOUBLE、DECIMAL(17byte)
 
-DECIMAL: 17byte  
+- 字符类型： STRING(任意长度)、VARCHAR(1-65535)
 
-STRING: 任意长度
-
-VARCHAR: 1-65535  
+- 日期类型： 
 
 
 
@@ -172,26 +167,10 @@ cast 进行强制类型转换，失败返回空
 
 
 四种集合类型  
-array: 有序的相同类型集合
-map:  key 为基本类型
-struct:  不同类型字段的集合
-union: 不同类型元素存储在统一字段的不同行中  
-
-
-
-默认分隔符：
-
-\n:
-
-^A:
-
-^B:
-
-^C
-
-
-
-
+- array: 有序的相同类型集合
+- map:  key 为基本类型
+- struct:  不同类型字段的集合
+- union: 不同类型元素存储在统一字段的不同行中  
 
 
 
@@ -222,10 +201,10 @@ yangyang,caicai_susu,xiao yang:18_xiaoxiao yang:19,chao yang_beijing
 ```sql
 -- 表创建
 create table test(
-name string,
-friends array<string>,
-children map<string, int>,
-address struct<street:string, city:string>
+  name string,
+  friends array<string>,
+  children map<string, int>,
+  address struct<street:string, city:string>
 )
 row format delimited fields terminated by ','
 collection items terminated by '_'
@@ -241,12 +220,13 @@ FROM test WHERE name = 'songsong';
 
 
 
+### +表类型
+外部表： 指定 external 关键字，元数据 + 数据分开管理，删除表定义，数据不会删除
 
+内部表： 删除表的时候数据会删除
 
-### 表类型
-外部表： 指定 external 关键字，删除表定义，数据不会删除
-内部表： 数据会删除
 分桶表： 实现 DML 事务时必须
+
 分区表： 
 
 
@@ -267,25 +247,43 @@ Q: 为何分桶？
 
 
 
+
+
+在数据仓库中
+
+ODS 外部表，从外部进来
+
+DW 内部表
+
+ADS 内部表
+
+
+
+计算过程中使用到的临时表，数据随用随删，使用内部表。
+
+
+
+
+
+
+
 ### 文本文件编码
 支持自定义文件存储格式  
 
- ctrl+v + ctrl+c  
 
-行与行 \n  
-字段之间 ^A  
-元素之间 ^B
-k-v 之间： ^C  
+
+默认的文件分割
+
+- 行与行 \n  
+- 字段之间 ^A  
+- 元素之间 ^B
+- k-v 之间： ^C  
 
 
 
 ### 读时模式  
 写时模式 -> 写数据检查 -> RDBMS  
 读时模式 -> 读时检查 -> Hive   
-
-
-
-
 
 
 
@@ -320,89 +318,7 @@ hive -f xxx.hql
 
 
 
-### *DQL
 
-排序字句：
-
-order by: 全局有序
-
-sort by： 每个 MR 内部有序
-
-distribute by: 分区排序，将数据按照 distribute by 字段分区
-
-Cluster by： distrubute by 于 sort by 同一个字段时使用
-
-
-
-
-
-### *函数
-
-*日期函数
-
-
-
-
-
-**条件函数**
-
-if
-
-Case when: 使用较多
-
-Coalesce:
-
-Is null / isnotnull:
-
-nvl
-
-nulif:
-
-Explode: 配合 lateral view 于 explode 联用，解决 uDTF 不能添加额外列的问题
-
-```sql
-
-```
-
-
-
-
-
-***窗口函数：**
-
-聚集函数：
-
-序列函数：
-
-排名函数：
-
-
-
-
-
-**自定义函数**
-
-
-
-
-
-### DML
-
-事务
-
-
-
-事务的限制：
-
-行级别
-
-不支持 begin, commit, rollback, 自动提交
-
-必须 ORC 文件格式，表必须是分桶表，表必须是 内部表
-
-默认事务关闭
-
-  
 
 
 ## 元数据管理
@@ -420,8 +336,14 @@ hive.start.cleanup.scratchdir  默认为 false
 
 ### HiveServer2
 
+> 管理元数据，生产环境中常使用。
+
+
+
 ### beeline
 beeline 可以连接 Hive， MySQL...  
+
+
 
 
 ### HCatalog
@@ -437,7 +359,9 @@ hcat -e "create database tt2";
 hcat -f xxx.hql
 
 
-## 数据存储格式 
+
+
+## +数据存储格式 
 TEXTFILE（默认格式） 、
 SEQUENCEFILE、
 RCFILE、
@@ -482,27 +406,36 @@ RCFile:
 
 
 ### ORCFile  
+
+> 表位 ORC 可支持事务操作
+
 组成  
 文件脚注(file footer)：  
 postscript：  
 stripe: 条带  ，默认 250M  
+
 - Index Data:  1W行一个, 条带统计信息, 数据在条带中的位置  
 - Row data:  水平 --> 垂直, 列为单位存储数据  
 - Stripe Footer: stripe 元数据信息  
 
-
 三个级别的索引：  
+
 文件级别、条带级、行组级  
 
 无需指定分割符，自动处理  
 
 
 
-
 ### Parquet  
-apache 顶级项目 
+
+> apache 顶级项目
+>
+> [site](https://parquet.apache.org/)
+
 通用型强  
+
 **与语言和平台无关**  
+
 二进制存储的  
 
 文件中包含数据和元数据  
@@ -515,7 +448,6 @@ Column Chunk: 存储当前行组内的某一行数据
 Page: 压缩读取数据的最小单元  
 8K ~ 1M 之间，越大压缩率越高  
 
-
 Footer: 数据的 schema 信息    
 每个行组的元数据信息：  
 每个 column chunk 的元数据信息：  
@@ -526,15 +458,18 @@ Footer: 数据的 schema 信息
 压缩比  
 ORC > Parquet > text  
 
-
 执行查询 
 ORC 与 Parquet  相当  
 
-
-
 - TextFile文件更多的是作为跳板来使用(即方便将数据转为其他格式)  
 - 有update、delete和事务性操作的需求，通常选择ORCFile  
-- 没有事务性要求，希望支持Impala、Spark，多种计算框架/查询引擎，建议选择Parquet
+- 没有事务性要求，希望支持 Impala、Spark，多种计算框架/查询引擎，建议选择 Parquet
+
+
+
+
+
+
 
 
 ## Hive 调优
@@ -612,8 +547,6 @@ Hive 将查询转换成一个或多个阶段，MapReduce 阶段、抽样阶段�
 
 
 
-
-
 推测执行   
 
 
@@ -623,8 +556,6 @@ Hive 将查询转换成一个或多个阶段，MapReduce 阶段、抽样阶段�
 
 
 Fetch模式
-
-
 
 
 
@@ -690,10 +621,6 @@ computeSliteSize(Math.max(minSize,Math.min(maxSize,blocksize)))=blocksize=128M
 
 
 
-
-
-
-
 **调整 Reduce 数**  
 
 
@@ -702,17 +629,154 @@ computeSliteSize(Math.max(minSize,Math.min(maxSize,blocksize)))=blocksize=128M
 
 
 
-## HQL 编写
-
 连续值问题
-
-
-
-
 
 Hive 自带的序列化与反序列化
 
 https://cwiki.apache.org/confluence/display/Hive/DeveloperGuide#DeveloperGuide-HiveSerDe
+
+
+
+### *json 数据处理
+
+Hive 处理 json 数据的方式
+
+- 内建的函数 get_json_object、json_string
+- 自定义 UDF 函数
+- 使用序列化反序列化工具
+
+
+
+**方式一: 内建的函数处理**
+
+处理简单的 json 串。
+
+- `get_json_object(string json_string, string path)`: 解析json字符串json_string，返回path指定的内容；
+
+- `json_tuple(jsonStr, k1, k2, ...)`: ：参数为一组键k1，k2，...和json字符串，返回值的元组。该方法比 get_json_object高效，可以在一次调用中输入多个键, 对嵌套结果的解析操作复杂；
+
+- `explode` / `lateral view`，使用explod将Hive一行中复杂的 array 或 map 结构拆分成多行。
+
+```sql
+CREATE TABLE IF NOT EXISTS jsont1( 
+  username string, 
+  age int, 
+  sex string, 
+  json string 
+) row format delimited fields terminated by ';';
+load data local inpath '/root/lagoudw/data/weibo.json' overwrite into table jsont1;
+```
+
+```sql
+-- get 单层值 
+select username, age, sex, 
+  get_json_object(json, "$.id") id, 
+  get_json_object(json, "$.ids") ids, 
+  get_json_object(json, "$.total_number") num 
+from jsont1;
+```
+
+```sql
+-- get 数组
+select username, age, sex, 
+  get_json_object(json, "$.id") id, 
+  get_json_object(json, "$.ids[0]") ids0, 
+  get_json_object(json, "$.ids[1]") ids1, 
+  get_json_object(json, "$.ids[2]") ids2, 
+  get_json_object(json, "$.ids[3]") ids3, 
+  get_json_object(json, "$.total_number") num 
+from jsont1;
+```
+
+```sql
+-- json_tuple 一次处理多个字段
+select json_tuple(json, 'id', 'ids', 'total_number') from jsont1;
+```
+
+含其他字段时，不能直接展开，需要使用 explod 展开
+
+```sql
+-- 拆分 json
+select username, age, sex, id, ids, num 
+from jsont1 
+lateral view json_tuple(json, 'id', 'ids', 'total_number') t1 as id, ids, num;
+
+-- 拆分 JSON -> 拆分 jsonarray
+with tmp as( select username, age, sex, id, ids, num
+            from jsont1 
+            lateral view json_tuple(json, 'id', 'ids', 'total_number') t1 as id, ids, num ) 
+select username, age, sex, id, ids1, num
+from tmp 
+lateral view explode(split(regexp_replace(ids, "\\[|\\]", ""), ",")) t1 as ids1;
+```
+
+**方式二: 使用 UDF 处理**
+
+能处理大部分数据，更灵活。
+
+```sql
+-- 创建临时函数
+add jar /root/lagoudw/jars/bigdata-hive-1.0-SNAPSHOT.jar;
+create temporary function json_json_array as "com.janhen.bigdata.hive.ParseJsonArray";
+
+select username, age, sex, parse_json_array(json, "ids") ids 
+from jsont1;
+
+select username, age, sex, ids1 
+from jsont1 
+lateral view explode(parse_json_array(json, "ids")) t1 as ids1;
+
+select username, age, sex, id, num 
+from jsont1 
+lateral view json_tuple(json, 'id', 'total_number') t1 as id, num;
+-- 合并
+select username, age, sex, ids1, id, num 
+from jsont1 
+lateral view explode(parse_json_array(json, "ids")) t1 as ids1 
+lateral view json_tuple(json, 'id', 'total_number') t1 as id, num;
+```
+
+
+
+**方式三: 使用SerDe处理**
+
+对象的序列化用途：
+
+- 把对象转换成字节序列后保存到文件中
+
+- 对象数据的网络传送
+
+Read : HDFS files => InputFileFormat => <key, value> => Deserializer => Row object
+
+Write : Row object => Seriallizer => <key, value> => OutputFileFormat => HDFS files
+
+```json
+{"id": 1,"ids": [101,102,103],"total_number": 3}
+{"id": 2,"ids": [201,202,203,204],"total_number": 4}
+{"id": 3,"ids": [301,302,303,304,305],"total_number": 5}
+{"id": 4,"ids": [401,402,403,304],"total_number": 5}
+{"id": 5,"ids": [501,502,503],"total_number": 3}
+```
+
+```sql
+create table jsont2(
+  id int,
+  ids array<string>,
+  total_number int
+)
+ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe';
+load data local inpath '/data/lagoudw/data/json2.dat' into table jsont2;
+```
+
+
+
+**JSON 处理方式比较**
+
+1、简单格式的json数据，使用 `get_json_object`、`json_tuple` 处理
+
+2、对于嵌套数据类型，可以使用 UDF
+
+3、纯 json 串可使用 JsonSerDe 处理更简单
 
 
 

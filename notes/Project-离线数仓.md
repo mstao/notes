@@ -63,7 +63,7 @@
 
 
 
-**数据仓库与数据库的区别**
+#### 数据仓库与数据库的区别
 
 OLTP: 联机事务处理 ==> 数据库
 
@@ -93,17 +93,34 @@ OLAP: 联机分析处理 ==> 数据仓库
 
 面向事务设计的
 
+
+
+定期加载数据 T + 1
+
+征信系统 T + 30, 每 30 天从银行中获取交易信息。
+
 <p align="center">数据库与数据仓库对比</p>
 
-| 对比内容          | 数据库                       | 数据仓库                          |
-| ----------------- | ---------------------------- | --------------------------------- |
-| 数据内容          | 近期值、当前值               | 历史的、归档的数据                |
-| 数据目标          | 面向业务操作                 | 面向管理决策、面向分析（主 题）   |
-| 数据特性          | 动态频繁更新                 | 静态、不能直接更新；定时添 加数据 |
-| 数据结构          | 高度结构化、满足第三范 式    | 简单的、冗余的、满足分析的        |
-| 使用频率          | 高                           | 低                                |
-| 数据访问量        | 访问量大；每次访问的数据量少 | 访问量小；每次访问的数据量大      |
-| 对响应时间的 要求 | 高                           | 低（不敏感）                      |
+| 对比内容         | 数据库                       | 数据仓库                          |
+| ---------------- | ---------------------------- | --------------------------------- |
+| 数据内容         | 近期值、当前值               | 历史的、归档的数据                |
+| 数据目标         | 面向业务操作                 | 面向管理决策、面向分析（主 题）   |
+| 数据特性         | 动态频繁更新                 | 静态、不能直接更新； 定时添加数据 |
+| 数据结构         | 高度结构化、满足第三范式     | 简单的、冗余的、满足分析的        |
+| 使用频率         | 高                           | 低                                |
+| 数据访问量       | 访问量大；每次访问的数据量少 | 访问量小；每次访问的数据量大      |
+| 对响应时间的要求 | 高                           | 低（不敏感）                      |
+
+- 数据仓库主要用于解决企业级的<font color="green">数据分析问题</font>或者管理和决策 
+
+- 数据仓库是为分析数据而设计，数据库是为捕获和存储数据而设计 
+
+- 数据仓库是面向分析，<font color="green">面向主题</font>设计的，即信息是按主题进行组织的，属于分析型；数据库是面向 事务设计的，属于操作型 
+
+- 数据仓库在设计是有意<font color="green">引入数据冗余</font>（目的是为了提高查询的效率），采用反范式的方式来设计； 数据库设计是尽量避免冗余（第三范式），一般采用符合范式的规则来设计 
+- 数据仓库较大，数据仓库中的数据来源于多个<font color="green">异构的数据源</font>，而且保留了企业的历史数据；数据库 存储有限期限、单一领域的业务数据
+
+
 
 
 
@@ -151,35 +168,25 @@ OLAP: 联机分析处理 ==> 数据仓库
 
 ### *数据仓库分层
 
-**分层的原因**
-
-- 清晰的数据结构
-- 将复杂的问题简单化： 分解成多个步骤，每一层都是单一的问题
-- 减少重复开发: 如 json 数据的解析
-- 屏蔽原始数据的异常: 只影响相关的某一层，不会向上传播；
-- 方便做数据的血缘追踪：
-
-**数据分层**
-
 <img src="assets/image-20201127220622195.png" alt="image-20201127220622195" style="zoom: 67%;" />
 
-**1、数据运营层(ODS)**
+**1、数据运营层(ODS Operate Data Store)**
 
-Operate Data Store
+数据仓库源头系统的数据<font color="green">原封不动的存储一份</font>。
 
-数据仓库源头系统的数据<font color="green">原封不动的存储一份</font>
-
-
+无需做太多的数据清洗。
 
 **2、数据仓库层(DW Data Warehouse)**
 
 (1) 数据明细层(DWD Data Warehouse Detail)
 
-对 ODS 层的数据做一定的数据清洗和转换
+对 ODS 层的数据<font color="green">做一定的数据清洗和转换的数据</font>。
 
-(2) 数据服务层(DWS Data Warehouse Service)
+(2) *数据服务层(DWS Data Warehouse Service)
 
 对数据进行轻度的汇总，得到业务汇总表或宽表。
+
+<font color="green">微聚的数据</font>。
 
 (3) 公共维度层(DIM)
 
@@ -187,7 +194,21 @@ Operate Data Store
 
 **3、应用数据层(ADS Application Data Store)**
 
+面向需求。
+
 (1) ADS(DM) 层，汇总得到业务相关的指标，面向业务，可做报表。
+
+
+
+
+
+**分层的原因**
+
+- 清晰的数据结构
+- 将复杂的问题简单化: 分解成多个步骤，每一层都是单一的问题
+- 减少重复开发:  如 json 数据的解析
+- 屏蔽原始数据的异常: 只影响相关的某一层，不会向上传播；
+- 方便做数据的血缘追踪：
 
 
 
@@ -227,7 +248,7 @@ Operate Data Store
 
 
 
-**维度表：**
+### **维度表：**
 
 <font color="green">观察事务的角度</font>
 
@@ -236,6 +257,10 @@ Operate Data Store
 
 
 组合起来
+
+
+
+
 
 ### 星型表
 
@@ -266,6 +291,13 @@ Operate Data Store
 > <font color="green">共用维度表</font>
 
 <img src="assets/image-20201128090733605.png" alt="image-20201128090733605" style="zoom:67%;" />
+
+### 建模
+
+- 选择业务、选择分析主题
+- 定义数据粒度
+- 选定维度
+- 确定事实(分析指标)
 
 
 
@@ -508,7 +540,7 @@ Fusion Insight: 华为 hadoop2.7.2 ，主要是国企、大型项目使用
 
 **软件选型**
 
-数据采集: **Flume**, Sqoop, Logstash, **DataX**, Kafka(实时)
+数据采集(导入导出): **Flume**, Sqoop, Logstash, **DataX**, Kafka(实时)
 
 数据存储: **HDFS**, HBase(实时)
 
@@ -518,7 +550,7 @@ Fusion Insight: 华为 hadoop2.7.2 ，主要是国企、大型项目使用
 
 元数据管理: **Atlas**
 
-数据质量管理: **Griffin**
+数据质量管理(监控): **Griffin**
 
 即席查询：**Impala**, Kylin(中国开源), ClickHouse, Presto, Druid
 
@@ -540,7 +572,9 @@ Fusion Insight: 华为 hadoop2.7.2 ，主要是国企、大型项目使用
 
 
 
-**集群规模规划**
+### **集群规模规划**
+
+磁盘容量(<font color="green">数据量</font>)
 
 计算能力、存储量
 
@@ -584,6 +618,22 @@ Fusion Insight: 华为 hadoop2.7.2 ，主要是国企、大型项目使用
 
 ![image-20201128102452229](assets/image-20201128102452229.png)
 
+数据采集(导入导出)
+
+数据存储:  Hive ..
+
+数据处理
+
+任务调度
+
+可视化
+
+元数据管理(可选)
+
+数据质量监控(可选)
+
+
+
 
 
 ### 开发规范
@@ -622,7 +672,9 @@ ads层 -> ads_{业务线|业务项目} (统计指标等)
 
 > 日志文件 ==> HDFS
 
-Flume 
+日志数据： 相对简单，数据量大
+
+业务数据： 数据库中的表，
 
 
 
@@ -650,7 +702,7 @@ ODS 层的数据与源数据的格式基本相同。
 ```sql
 use ODS;
 create external table ods.ods_start_log(
-  `str` string;
+  `str` string
 )
 comment '用户启动日志'
 partitioned by (dt string)
@@ -659,7 +711,7 @@ location '/user/data/logs/start';
 
 ```sql
 -- 加载数据
-alter table ods.ods_start_log add partition(dt='2020-08-02');
+alter table ods.ods_start_log add partition(dt='2020-07-21');
 drop table ods.ods_start_log;
 ```
 
@@ -681,141 +733,6 @@ hive -e "$sql"
 ```
 
 
-
-### json 数据处理
-
-Hive 处理 json 数据的方式
-
-- 内建的函数 get_json_object、json_string
-- 自定义 UDF 函数
-- 使用序列化反序列化工具
-
-
-
-**方式一: 内建的函数处理**
-
-`get_json_object(string json_string, string path)`: 解析json字符串json_string，返回path指定的内容；
-
-`json_tuple(jsonStr, k1, k2, ...)`: ：参数为一组键k1，k2，...和json字符串，返回值的元组。该方法比 get_json_object高效，可以在一次调用中输入多个键, 对嵌套结果的解析操作复杂；
-
-`explode`，使用explod将Hive一行中复杂的 array 或 map 结构拆分成多行。
-
-```sql
-CREATE TABLE IF NOT EXISTS jsont1( 
-  username string, 
-  age int, 
-  sex string, 
-  json string 
-) row format delimited fields terminated by ';';
-load data local inpath '/data/lagoudw/data/weibo.json' overwrite into table jsont1;
-```
-
-```sql
--- get 单层值 
-select username, age, sex, 
-  get_json_object(json, "$.id") id, 
-  get_json_object(json, "$.ids") ids, 
-  get_json_object(json, "$.total_number") num 
-from jsont1;
-```
-
-```sql
--- get 数组
-select username, age, sex, 
-  get_json_object(json, "$.id") id, 
-  get_json_object(json, "$.ids[0]") ids0, 
-  get_json_object(json, "$.ids[1]") ids1, 
-  get_json_object(json, "$.ids[2]") ids2, 
-  get_json_object(json, "$.ids[3]") ids3, 
-  get_json_object(json, "$.total_number") num 
-from jsont1;
-```
-
-```sql
--- json_tuple 一次处理多个字段
-select json_tuple(json, 'id', 'ids', 'total_number') from jsont1;
-```
-
-含其他字段时，不能直接展开，需要使用 explod 展开
-
-```sql
-select username, age, sex, id, ids, num 
-from jsont1 
-lateral view json_tuple(json, 'id', 'ids', 'total_number') t1 as id, ids, num;
-
-with tmp as( select username, age, sex, id, ids, num
-            from jsont1 
-            lateral view json_tuple(json, 'id', 'ids', 'total_number') t1 as id, ids, num ) 
-select username, age, sex, id, ids1, num
-from tmp 
-lateral view explode(split(regexp_replace(ids, "\\[|\\]", ""), ",")) t1 as ids1;
-```
-
-**方式二: 使用 UDF 处理**
-
-```sql
--- 创建临时函数
-add jar /data/lagoudw/jars/cn.lagou.dw-1.0-SNAPSHOT-jar-withdependencies.jar;
-create temporary function json_json_array as "cn.lagou.dw.hive.udf.ParseJsonArray";
-
-select username, age, sex, parse_json_array(json, "ids") ids 
-from jsont1;
-
-select username, age, sex, ids1 
-from jsont1 
-lateral view explode(parse_json_array(json, "ids")) t1 as ids1;
-
-select username, age, sex, id, num 
-from jsont1 
-lateral view json_tuple(json, 'id', 'total_number') t1 as id, num;
--- 合并
-select username, age, sex, ids1, id, num 
-from jsont1 
-lateral view explode(parse_json_array(json, "ids")) t1 as ids1 
-lateral view json_tuple(json, 'id', 'total_number') t1 as id, num;
-```
-
-
-
-**方式三: 使用SerDe处理**
-
-对象的序列化用途：
-
-- 把对象转换成字节序列后保存到文件中
-
-- 对象数据的网络传送
-
-Read : HDFS files => InputFileFormat => <key, value> => Deserializer => Row object
-
-Write : Row object => Seriallizer => <key, value> => OutputFileFormat => HDFS files
-
-```json
-{"id": 1,"ids": [101,102,103],"total_number": 3}
-{"id": 2,"ids": [201,202,203,204],"total_number": 4}
-{"id": 3,"ids": [301,302,303,304,305],"total_number": 5}
-{"id": 4,"ids": [401,402,403,304],"total_number": 5}
-{"id": 5,"ids": [501,502,503],"total_number": 3}
-```
-
-```sql
-create table jsont2(
-  id int,
-  ids array<string>,
-  total_number int
-)
-ROW FORMAT SERDE 'org.apache.hive.hcatalog.data.JsonSerDe';
-load data local inpath '/data/lagoudw/data/json2.dat' into table jsont2;
-```
-
-
-
-**JSON 处理方式比较**
-
-1、简单格式的json数据，使用 `get_json_object`、`json_tuple` 处理
-
-2、对于嵌套数据类型，可以使用 UDF
-
-3、纯 json 串可使用 JsonSerDe 处理更简单
 
 
 
@@ -1662,9 +1579,85 @@ python $DATAX_HOME/bin/datax.py -p "-Ddo_date=$do_date" $JSON/export_member_acti
 
 
 
+### 问题定位
+
+Hive SQL  ==>. Map/Reduce Task. ==> 每个 Task 处理多少数据量（默认256M） ==> 每个 Task 分配多大内存
 
 
 
+使用 text, pauper, orc 缺省的都是 256M，存在压缩
+
+
+
+
+
+Hive On MR/ Tez / Spark / Flink 如何选择？
+
+HDP. ==> Tez, MR 技术路线， DAG, 减少数据的落地。
+
+CDH ==> Impala(MPP 架构， C++ 程序)
+
+
+
+批处理主要使用 Spark, Flink 主要用于流式计算。
+
+
+
+
+
+作业幂等，通过 insert override ...
+
+
+
+数据仓库大多数是增量表，使用拉链表
+
+基本都是增量表；
+
+优势： 节约存储，复杂度高
+
+实际上使用较少， interview 使用较多。
+
+
+
+
+
+拉链表回滚。。
+
+
+
+​                   
+
+## 广告业务
+
+广告的曝光量，点击量，购买量，点击率，购买率。
+
+
+
+事件日志，按照积累的量和事件维度进行发送一批事件，节省流量。
+
+
+
+采集消息：
+
+
+
+Action:
+
+Duration:
+
+Shop_id;
+
+Event_type:
+
+Show_style:
+
+Product_id:
+
+place:
+
+sort:
+
+​       
 
 
 

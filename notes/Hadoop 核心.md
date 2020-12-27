@@ -132,7 +132,7 @@ get:    去  NN 上查找 file 对应元数据信息
 
 通过统一的命名空间目录树来定位文件；
 
-<img src="assets/image-20200913081633164.png" alt="image-20200913081633164" style="zoom: 50%;" />
+<img src="http://img.janhen.com/image-20200913081633164.png" alt="image-20200913081633164" style="zoom: 50%;" />
 
 HDFS集群往往是一个NameNode（HA架构会有两个NameNode,联邦机制）+ 多个DataNode组 成；
 
@@ -187,11 +187,7 @@ Java Api 执行
 
 ### 健康情况
 
-
-
 **Last Checkpoint Time**  2NN 最近进行 checkpoint 的时间
-
-
 
 ```shell
 # 概览
@@ -205,12 +201,10 @@ http://linux121:50070/logs/
 
 
 
-
-
 ## *读写流程
 
 **读取流程**  
-<img src="assets/image-20201121142318261.png" alt="image-20201121142318261" style="zoom:67%;" />
+<img src="http://img.janhen.com/image-20201121142318261.png" alt="image-20201121142318261" style="zoom:67%;" />
 
 1. 客户端通过 Distributed FileSystem 向 NN 请求下载文件，NN 通过查询元数据， 返回文件块所在的 DN 地址。
 2. 挑选一台 DN（就近原则，然后随机）服务器，请求读取数据。
@@ -220,7 +214,7 @@ http://linux121:50070/logs/
 
 
 **写入流程**  
-<img src="assets/image-20201121142459379.png" alt="image-20201121142459379" style="zoom:67%;" />
+<img src="http://img.janhen.com/image-20201121142459379.png" alt="image-20201121142459379" style="zoom:67%;" />
 
 1. 客户端通过 Distributed FileSystem 模块向 NN 请求上传文件，NN 检查目标文件是否已存在，父目录是否存在。
 2. NameNode返回是否可以上传。
@@ -324,7 +318,7 @@ NN 机器进行升级，如软件、硬件升级，此时集群无法使用；
 
 **ZK 实现 HA 故障转移过程**
 
-<img src="assets/image-20201121143425742.png" alt="image-20201121143425742" style="zoom: 50%;" />
+<img src="http://img.janhen.com/image-20201121143425742.png" alt="image-20201121143425742" style="zoom: 50%;" />
 
 1、NN(NN1) 假死
 
@@ -529,16 +523,14 @@ Mem + Dist，NameNode 内存 + FsImage 的磁盘文件
 | dfs.namenode.safemode.extension         | 30000                                      | 确定达到阈值级别后以毫秒为单位的安全模式扩展。 |
 | dfs.namenode.checkpoint.dir             | file://${hadoop.tmp.dir}/dfs/namesecondary |                                                |
 | dfs.image.compression.codec             | org.apache.hadoop.io.compress.DefaultCodec |                                                |
-|                                         |                                            |                                                |
 
 
 
 # MapReduce
 >  基于 Google 论文2004年12月。
 >
->  一个分布式的离线并行计算框架
+>  一个分布式的离线并行计算框架， 拆解任务、分散处理、汇整结果
 >
->  拆解任务、分散处理、汇整结果
 
 Map、Shuffle、Reduce    
 
@@ -652,7 +644,7 @@ split 大小默认是 blocksize，块的数量约等于分片的数量，1.1 比
 
 ### *工作机制
 
-![image-20201121154826274](assets/image-20201121154826274.png)
+![image-20201121154826274](http://img.janhen.com/image-20201121154826274.png)
 
 Read 阶段：
 
@@ -720,7 +712,7 @@ sort:
 
 ### *工作流程
 
-![image-20201121154732193](assets/image-20201121154732193.png)
+![image-20201121154732193](http://img.janhen.com/image-20201121154732193.png)
 
 分区、排序、溢写，copy 到对应 reduce 机器上，增加 combiner，压缩溢血文件。
 
@@ -993,7 +985,7 @@ SequenceFileOutputFormat
 
 > 作业调度与集群资源管理的框架。
 
-<img src="assets/image-20201121163919879.png" alt="image-20201121163919879" style="zoom: 50%;" />
+<img src="http://img.janhen.com/image-20201121163919879.png" alt="image-20201121163919879" style="zoom: 50%;" />
 
 - ResourceManager：处理客户端请求、启动/监控ApplicationMaster、监控NodeManager、资源分配与调度；
 
@@ -1002,8 +994,6 @@ SequenceFileOutputFormat
 - ApplicationMaster：数据切分、为应用程序申请资源，并分配给内部任务、任务监控与容错。
 
 - Container：对任务运行环境的抽象，封装了CPU、内存等多维资源以及环境变量、启动命令等任务运行相关的信息。
-
-
 
 
 
@@ -1029,23 +1019,15 @@ NodeManager: 处理 ResouceManager、AppMaster 的命令
 
 ### 执行过程
 
-![image-20201121164010636](assets/image-20201121164010636.png)
+![image-20201121164010636](http://img.janhen.com/image-20201121164010636.png)
 
 1、作业提交
 
-
-
 2、作业初始化
-
-
 
 3、任务分配
 
-
-
 4、任务运行
-
-
 
 5、进度和状态更新
 
@@ -1072,7 +1054,7 @@ NodeManager: 处理 ResouceManager、AppMaster 的命令
 
 通过为每个组织分配专门的队列，然后再为每个队列分配一定的集 群资源，这样整个集群就可以通过设置多个队列的方式给多个组织提供服务了。
 
-![image-20201121164304044](assets/image-20201121164304044.png)
+![image-20201121164304044](http://img.janhen.com/image-20201121164304044.png)
 
 （3）Fair Scheduler
 
@@ -1133,15 +1115,9 @@ B队列设置占用资源30%主要运行临时任务，
 
 
 
-
-
 **总结**
 
 Hadoop 集群中需要启动哪些进程，作用分别是什么？
-
-
-
-
 
 | 进程                        | 作用                                              |
 | --------------------------- | ------------------------------------------------- |

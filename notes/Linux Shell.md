@@ -154,8 +154,6 @@ do
 done
 ```
 
-
-
 浮点数运算
 
 > 较少使用，bs 为 bash 内建的运算器， scale 精确度默认为0
@@ -169,6 +167,20 @@ read -p "in num" num1
 read -p "in num" num2
 echo "$num1 / $num2 | bc"
 num3=`echo ""`
+```
+
+数组操作
+
+```shell
+request_addr_arr=(
+  "linux121"
+  "linux122"
+  "linux123"
+)
+for request_addr in "${request_addr_arr[@]}";
+do
+  echo "request_addr: ${request_addr}"
+done
 ```
 
 

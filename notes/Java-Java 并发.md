@@ -1,10 +1,8 @@
-Java 代码首先会编译成Java字节码，字节码被类加载器加载到JVM里，JVM执行字节码，最终需要转化为汇编指令在CPU上进行执行。
-
-Java中所使用的并发机制依赖于 JVM 的实现和 CPU 的指令。
-
-
-
 # 线程
+
+> Java 代码首先会编译成Java字节码，字节码被类加载器加载到JVM里，JVM执行字节码，最终需要转化为汇编指令在CPU上进行执行。
+>
+> Java中所使用的并发机制依赖于 JVM 的实现和 CPU 的指令。
 
 ## 创建方式
 
@@ -41,7 +39,7 @@ t1.start();
 
 ## 生命周期
 
-![img](assets/96706658-b3f8-4f32-8eb3-dcb7fc8d5381.jpg)
+<img src="http://img.janhen.com/20201217224805image-20201217224803962.png" alt="image-20201217224803962" style="zoom: 67%;" />
 
 ```java
 public enum State {
@@ -258,7 +256,7 @@ shutdown() 方法会等待线程都执行完毕之后再关闭，但是如果调
 
 ## 其他性质
 
-<img src="assets/image-20201031111430904.png" alt="image-20201031111430904" style="zoom: 33%;" />
+<img src="http://img.janhen.com/20201217224608image-20201031111430904.png" alt="image-20201031111430904" style="zoom: 33%;" />
 
 **(1) 进程与线程的比较**
 
@@ -314,8 +312,6 @@ Java 中通过将每个线程映射为一个进程实现的；
 
 
 
-
-
 # 线程间通信
 
 while 循环监测
@@ -356,9 +352,7 @@ while 循环监测
 
 ## 等待/通知机制
 
-Object.wait, notify 机制，需要配合 synchronized 一起使用
-
-
+>  Object.wait, notify 机制，需要配合 synchronized 一起使用
 
 1、wait()/notify 方法
 
@@ -456,7 +450,7 @@ ThreadLocal 的作用是<font color="green">提供线程内的局部变量</font
 
 **底层结构**
 
-<img src="assets/394b8da0-ba21-11e8-87f1-559c9b456754" alt="img" style="zoom:67%;" />
+<img src="http://img.janhen.com/20201217224620394b8da0-ba21-11e8-87f1-559c9b456754.jpg" alt="img" style="zoom:67%;" />
 
 一个Thread中只有一个ThreadLocalMap，
 
@@ -539,10 +533,6 @@ public static <S> ThreadLocal<S> withInitial(Supplier<? extends S> supplier) {
 }
 ```
 
-
-
-
-
 **与同步机制的比较**
 
 ​        a.ThreadLocal与同步机制都是为了 <u>解决多线程中相同变量的访问冲突问题</u>。 
@@ -593,17 +583,9 @@ static class Entry extends WeakReference<ThreadLocal<?>> { /** The value associa
 }
 ```
 
-
-
-
-
 这里我们就需要重新认识一下，什么是：**当垃圾收集器工作时，无论当前内存是否足够，都会回收掉只被弱引用关联的对象**，这里的重点是：**只被弱引用关联的对象**
 
-
-
 上述过程尽管 GC 执行了垃圾收集，但是弱引用还是可以访问到结果的，也就是没有被回收，这是因为除了一个弱引用 userWeakReference 指向了User实例对象，还有 user 指向 User 的实例对象，只有当user和User实例对象的引用断了的时候，弱引用的对象才会被真正的回收
-
-
 
 并不是所有弱引用的对象都会在第二次GC回收的时候被回收，而是  <u>回收掉只被弱引用关联的对象</u> 。因此，使用弱引用的时候要注意到！希望以后在面试的时候，不要上来张口就说，弱引用在第二次执行GC之后就会被回收！
 
@@ -732,8 +714,6 @@ public ThreadPoolExecutor(int corePoolSize,
 
 
 
-
-
 ## Executors 
 
 ① Executors.newCachedThreadPool 
@@ -756,9 +736,7 @@ Executors.newSingleThreadExecutor()返回一个线程池(这个线程池只有�
 ScheduledExecutorService scheduledThreadPool= Executors.newScheduledThreadPool(3); scheduledThreadPool.schedule(newRunnable(){ @Override public void run() { System.out.println("延迟三秒"); } }, 3, TimeUnit.SECONDS); scheduledThreadPool.scheduleAtFixedRate(newRunnable(){ @Override public void run() { System.out.println("延迟1秒后每三秒执行一次"); } },1,3,TimeUnit.SECONDS);
 ```
 
-⑤ 
-
-**线程池配置**
+⑤ **线程池配置**
 
 CPU 密集型任务，就需要尽量压榨 CPU，参考值可以设为 NCPU + 1IO 密集型任务，参考值可以设置为 2 * NCPU；
 
@@ -830,7 +808,7 @@ Java内存模型(JMM)解决了可见性和有序性的问题，而锁解决了�
 
 ### *volatile 
 
-<img src="assets/image-20201031124307603.png" alt="image-20201031124307603"  />
+<img src="http://img.janhen.com/20201217224645image-20201031124307603.png" alt="image-20201031124307603"  />
 
 能够在线程之间保持可见性，能够被 **多线程同时读**，并且保证不会读到过期的值，但 **只能被单线程写**。
 基于 happens-before 原则，对 volatile 字段的写入操作先于读操作，即使两个线程同时修改和获取 volatile 变量。
@@ -867,7 +845,7 @@ d.volatile不会提供任何原子操作，它也不能用来修饰final类型�
 
 ② 为了保证写回到的数据被其他线程立即可见，借助  缓存一致性协议  实现，每个处理器 嗅探总线 上传播的数据检查自己是否过期，过期强制从系统内存中把数据读到处理器缓存中。
 
-![1553822343527](assets/1553822343527.png)
+![1553822343527](http://img.janhen.com/202012172246521553822343527.png)
 
 
 
@@ -1267,11 +1245,9 @@ Thread 对象的结束先于 join() 方法返回
 
 
 
-
-
 **锁的对比**
 
-// TODO
+
 
 
 
@@ -1381,7 +1357,7 @@ public void syncMethod() {
 
 () 底层实现
 
-![1553496683656](assets/1553496683656.png)
+![1553496683656](http://img.janhen.com/202012172247111553496683656.png)
 
 是非公平锁，等待的线程会先尝试自旋获取锁，如果获取不到就进入 ContentionList；
 
@@ -1688,8 +1664,6 @@ Future 的 get() 可能会阻塞当前线程的执行，会抛出 InterruptedExc
 使用生产者消费者模式实现的一个例子；
 模仿分布式爬虫；
 
-
-
 单生产者单消费者
 
 单生产者多消费者
@@ -1698,3 +1672,9 @@ Future 的 get() 可能会阻塞当前线程的执行，会抛出 InterruptedExc
 
 多生产者多消费者
 
+
+
+# Refs
+
+- 《Java 并发编程的艺术》
+- 《深入理解Java虚拟机(第二版)》
