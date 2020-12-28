@@ -38,7 +38,7 @@ load data local inpath "/root/data/t3.dat" into table t3;
 
 
 
-#### 1、找出全部夺得3连贯的队伍
+1、找出全部夺得3连贯的队伍
 
 ```
 team,year
@@ -91,7 +91,10 @@ having countNum >= 3;
 
 
 
-#### 2、找出每个id在在一天之内所有的波峰与波谷值
+2、找出一天之内所有的波峰与波谷值
+
+找出每个id在在一天之内所有的波峰与波谷值
+
 ```
 id,time,price
 sh66688,9:35,29.48
@@ -250,7 +253,8 @@ order by id, price desc;
 
 
 
-#### 3.1、每个id浏览时长、步长
+3.1、每个id浏览时长、步长
+
 -- 字符日期解析并转换成 minute
 -- 按照 Id 分组，进行最值、数量聚合得出结果
 
@@ -263,7 +267,7 @@ group by id;
 
 
 
-#### 3.2 带有间隔的时长
+3.2 带有间隔的时长
 
 -- 未作出
 -- 得到 id, 时间(分钟), 间隔
@@ -335,18 +339,9 @@ schematool -dbType mysql -initSchema
 
 # 先启动 HDFS 服务、Yarn 服务
 hive
-
 SHOW functions;
 SHOW databases;
-
 create database test;
-
-
-
-# 日志位置
-$HIVE_HOME/tmp/root
-
-
 
 # ================================================
 # DDL
@@ -358,12 +353,9 @@ CREATE DATABASE IF NOT EXISTS mydb1
 COMMENT 'test comment'
 LOCATION '/usr/hive/test/mydb.db';
 
-
 drop database mydb1;
 drop database mydb2;
 drop database mydb3;
-
-
 
 # ================================================
 # DDL-建表
@@ -379,8 +371,6 @@ drop database mydb3;
 # 默认内部表创建，外部表 external
 # 删除内部表，定义和数据同时删除
 # 外部表，不删除数据
-
-
 -- Inner table
 CREATE TABLE t1 (
     id int,
@@ -388,7 +378,6 @@ CREATE TABLE t1 (
     hobby array<string>,
     addr map<string, string>
 )
-
 row format delimited
 fields terminated by ";"
 collection items terminated by ","
@@ -396,21 +385,13 @@ map keys terminated by ":"
 
 
 desc t1;
-
 desc formatted t1;
-
 
 -- Load data
 load data local inpath '/home/hadoop/data/t1.dat' into table t1;
-
 SELECT * FROM t1;
-
 dfs -ls /usr/hive/warehouse/mydb.db/t1
-
 dfs -cat /usr/hive/warehouse/mydb.db/t1
-
-
-
 
 CREATE external TABLE t1 (
     id int,
@@ -425,14 +406,11 @@ CREATE external TABLE t1 (
 ALTER TABLE t1 set tblproperties("EXTERNAL"="TRUE");
 DESC t1;
 
-
-
 # ================================================
 # DDL-分区表
 # ================================================
 -- 只查询部分分区数据时，可避免全表扫描，提高查询效率
 -- 生产中用的较多， 按照时间、地域进行划分
-
 create table if not exists t3 (
     id int,
     name string,
@@ -440,12 +418,12 @@ create table if not exists t3 (
     addr map<string,string>
 )
 partition by (dt string)
-
 row format delimited
 fields terminated by ':'
 collection items terminated by ','
 map keys terminated by ':';
 
+-- 静态导入指定的分区
 load data local inpath "/home/hadoop/data/t1.dat"
 into table t3
 partition(dt="2020-06-01");
@@ -460,22 +438,22 @@ partition(dt="2020-06-02");
 
 -- 查看分区表中的内容
 dfs -ls /usr/hive/warehouse/mydb.db/t3/dt=2020-06-01;
-
 show partititon t3;
 
 alter table add partition(dt="2020-06-03");
 alter table add partition(dt="2020-06-04");
 
 dfs -ls /usr/hive/warehouse/mydb.db/t3/dt=2020-06-01;
-
 dfs -cp /usr/hive/warehouse/mydb.db/t3/dt=2020-06-01 /usr/hive/warehouse/mydb.db/t3/dt=2020-06-08;
 
+-- 加载指定位置下的分区
 alter table add partition(dt="2020-06-07")
 location '/usr/hive/warehouse/mydb.db/t3/dt=2020-06-07';
 
-
+-- 更改分区表的位置
 alter table t3 partition(dt="2020-06-07") set location '/usr/hive/warehouse/mydb.db/t3/dt=2020-06-08'
 
+-- 删除分区表中的分区
 alter table t3 drop partition (dt="2020-06-04"),partition(dt="2020-06-05");
 
 
@@ -484,7 +462,6 @@ alter table t3 drop partition (dt="2020-06-04"),partition(dt="2020-06-05");
 # DDL-分桶表
 # ================================================
 -- 分桶字段.hashCode % 桶的个数
-
 create table course (
     id int,
     name string,
@@ -506,9 +483,7 @@ load data local inpath '/home/hadoop/data/course.dat' into table course_common;
 
 -- insert .. select .. 将桶中的数据加载进桶中
 insert into table course select * from course_common;
-
 dfs -ls /usr/hive/warehouse/mydb.db/course/xx
-
 
 
 # ================================================
@@ -522,9 +497,7 @@ alter table course_common1 change column score score string;
 -- string => int ...
 alter table course_common1 change column score score int;
 alter table course_common1 add columns (common string);
-
 alter table course_common1 replace colomns (id string, subject string, score string);
-
 
 drop table course_common1;
 
@@ -561,14 +534,12 @@ stored as orc
 tblproperties ('transactional'='true');
 
 
-
 create table if not exists temp1(
     name string,
     nid int,
     phone string,
     ntime date
 )row format delimited fields terminated by ",";
-
 load data local inpath '/home/hadoop/data/zxz_data.txt'
 overwrite into table temp1;
 

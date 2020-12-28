@@ -2,6 +2,8 @@
 
 # *Hive 
 
+![image-20201227222112736](assets/image-20201227222112736.png)
+
 ## 基础说明
 
 > **将 SQL 转换成 MapReduce 任务的工具**   
@@ -361,7 +363,7 @@ hcat -f xxx.hql
 
 
 
-## +数据存储格式 
+## 数据存储格式 
 TEXTFILE（默认格式） 、
 SEQUENCEFILE、
 RCFILE、
