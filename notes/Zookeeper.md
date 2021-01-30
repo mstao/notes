@@ -72,8 +72,6 @@ numChildren = 17
 
 
 
-
-
 ### 事务
 
 改变 ZK 服务状态的操作。
@@ -95,12 +93,6 @@ numChildren = 17
 WatchManager： 存储 Watch 对象
 
 当 Zookeeper 目录变更的时候，通知 Watch
-
-
-
-
-
-
 
 
 
@@ -185,10 +177,6 @@ ZAB，Zookeeper原⼦消息⼴播协议）的协议作为其数据⼀致性的�
 
 
 
-
-
-
-
 出现数据复制，存在网络问题，导致数据不一致。
 
 
@@ -207,6 +195,8 @@ ZAB，Zookeeper原⼦消息⼴播协议）的协议作为其数据⼀致性的�
 (3) 超过半数 ACK 则 Commit  
 
 对于掉线的 Follower，恢复正常后进入数据同步阶段最终于 Leader 保持一致。
+
+
 
 ### Leader 奔溃
 

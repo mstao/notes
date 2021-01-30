@@ -731,8 +731,15 @@ drop role
 
 
 
-
 ## 函数
+
+```sql
+SHOW FUNCTIONS;
+DESC FUNCTION <function_name>;
+DESC FUNCTION EXTENDED <function_name>;
+```
+
+
 
 ### *日期函数
 
@@ -1082,7 +1089,7 @@ UDF
 -- ================================================
 -- UDF（User Defined Function）。用户自定义函数，一进一出
 -- UDAF（User Defined Aggregation Function）。用户自定义聚集函数，多进一 出；类似于：count/max/min
--- UDTF（User Defined Table-Generating Functions）。用户自定义表生成函 数，一进多出；类似于：explode
+-- UDTF（User Defined Table-Generating Functions）。用户自定义表生成函数，一进多出；类似于：explode
 
 -- =======================
 -- 临时性使用

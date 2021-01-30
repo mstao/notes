@@ -593,7 +593,7 @@ org.apache.hadoop.mapreduce.lib.input.FileInputFormat#computeSplitSize
 
 ### 配置参数
 
-> [mapred-site.xmo](https://hadoop.apache.org/docs/r2.9.2/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml)
+> [mapred-site.xml](https://hadoop.apache.org/docs/r2.9.2/hadoop-mapreduce-client/hadoop-mapreduce-client-core/mapred-default.xml)
 
 <p align="center">MapReduce 运行的参数配置</p>
 

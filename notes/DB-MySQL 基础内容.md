@@ -114,7 +114,7 @@ explain
 
 EXPLAIN 关键字模拟优化器执行 SQL 查询语句
 
-![1551841270019](..\assets\1551841270019.png)
+![1551841270019](../assets/1551841270019.png)
 
 ```sql
 explain select star, evaluator_no from indicator_evaluate order by evaluator_no desc;

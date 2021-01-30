@@ -616,13 +616,21 @@ sudo vim server.xml    //找到对应位置编辑
 
 
 
-## 服务器初始化
+## *服务器初始化
+
+更新 yum 源
+
+https://developer.aliyun.com/article/645748
+
+
 
 fzf
 
 ```
+yum install -y git 
 git clone --depth 1 https://gitee.com/janhen/fzf.git ~/.fzf
 ~/.fzf/install
+source ~/.bashrc
 ```
 
 lrzsz
@@ -753,7 +761,7 @@ vi /etc/selinux/config
 
 ### 时间校准
 
-```
+```shell
 timedatectl list-timezones
 # 将硬件时钟调整为与本地时钟一致, 0 为设置为 UTC 时间
 timedatectl set-local-rtc 1 
@@ -761,7 +769,7 @@ timedatectl status
 timedatectl set-timezone Asia/Shanghai
 ```
 
-```
+```shell
 yum -y install ntp
 ntpdate ntp1.aliyun.com
 ```
@@ -800,29 +808,143 @@ host "anode2"
 ssh anode1
 ```
 
-端口更改
 
-```shell
-vim /etc/ssh/sshd_config
-service sshd restart
-```
 
 SSH 免密码密钥认证
 
+- `-t`参数，指定密钥的加密算法，一般 ∈ {dsa, rsa}。
+- `-b`参数指定密钥的二进制位数
+- `-N`参数用于指定私钥的密码
+- `-p`参数用于重新指定私钥的密码， 命令执行后输入，需要旧密码 + 两次新密码输入
+
 ```shell
 ssh-keygen -t rsa
-# 将公钥传递给远程 root 
-ssh-copy-id -i /root/.ssh/id_rsa.pub root@172.17.10.158
-
-ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.80.207
-ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.80.179
-ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.80.134
-ssh-copy-id -i /root/.ssh/id_rsa.pub root@192.168.80.62
-
-ssh-copy-id -i /root/.ssh/id_rsa.pub -oPort=6000 root@127.0.0.1
-
-ssh-copy-id -i /c/Users/Lenovo/.ssh/id_rsa root@192.168.80.24
-
-ssh root@172.17.10.158
+# 修改权限，防止其他人读取
+chmod 600 ~/.ssh/id_rsa
+chmod 600 ~/.ssh/id_rsa.pub
 ```
 
+上传公钥
+
+```shell
+# 手动上传
+cat ~/.ssh/id_rsa.pub | ssh user@host "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys"
+chmod 644 ~/.ssh/authorized_keys
+# 将公钥传递给远程 root, 自动到 ~/.ssh 下找
+ssh-copy-id -i /root/.ssh/id_rsa.pub root@172.17.10.158
+ssh-copy-id -i id_rsa root@172.17.10.158
+```
+
+
+
+命令参数
+
+- `-C`参数表示压缩数据传输。
+
+- `-c`参数指定加密算法
+- `-D`参数指定本机的 Socks 监听端口，该端口收到的请求，都将转发到远程的 SSH 主机，又称动态端口转发
+- `-F`参数指定配置文件。
+- `-m`参数指定校验数据完整性的算法
+- `-p`参数指定 SSH 客户端连接的服务器端口
+- `-t`参数在 ssh 直接运行远端命令时，提供一个互动式 Shell
+
+```shell
+# 执行命令， 不会提供互动式的 Shell 环境
+ssh username@hostname command
+
+# 互动式的 Shell 环境
+ssh -t server.example.com emacs
+```
+
+
+
+配置文件
+
+- `/etc/ssh/ssh_config`: 客户端全局配置
+- `~/.ssh/config`: 个人配置文件
+
+- `~/.ssh/known_hosts`：包含 SSH 服务器的公钥指纹。
+- `~/.ssh/id_rsa`：用于 SSH 协议版本2 的 RSA 私钥
+- `~/.ssh/id_rsa.pub`：用于SSH 协议版本2 的 RSA 公钥。
+
+
+
+配置内容
+
+个人配置, 针对所有主机和针对特定主机生效
+
+- `Port 2035`：指定客户端连接的 SSH 服务器端口。
+
+- `ConnectTimeout 60`：客户端进行连接时，服务器在指定秒数内没有回复，则中断连接尝试。
+- `ConnectionAttempts 10`：客户端进行连接时，最大的尝试次数。
+- `StrictHostKeyChecking yes`：`yes`表示严格检查，服务器公钥为未知或发生变化，则拒绝连接
+- `BindAddress 192.168.10.235`：指定本机的 IP 地址（如果本机有多个 IP 地址）。
+- `CheckHostIP yes`：检查 SSH 服务器的 IP 地址是否跟公钥数据库吻合。
+- `Compression yes`：是否压缩传输信号。
+- `PasswordAuthentication`: 是否允许密码登录，修改后重启 sshd 生效
+
+```
+Host *
+     Port 2222
+
+Host remoteserver
+     HostName remote.example.com
+     User neo
+     Port 2112
+```
+
+
+
+
+
+scp
+
+- `-P`参数用来指定远程主机的 SSH 端口
+- `-r`参数表示是否以递归方式复制目录
+- `-v`参数用来显示详细的输出。
+
+```shell
+# 复制多个文件
+scp source1 source2 destination
+```
+
+```SHELL
+# 将本机的 documents 目录拷贝到远程主机，
+# 会在远程主机创建 documents 目录
+$ scp -r documents username@server_ip:/path_to_remote_directory
+
+# 将本机整个目录拷贝到远程目录下
+$ scp -r localmachine/path_to_the_directory username@server_ip:/path_to_remote_directory/
+
+# 将本机目录下的所有内容拷贝到远程目录下
+$ scp -r localmachine/path_to_the_directory/* username@server_ip:/path_to_remote_directory/
+```
+
+两台远程主机复制
+
+```shell
+$ scp user@host1:directory/SourceFile user@host2:directory/SourceFile
+```
+
+
+
+rsync
+
+不支持两台远程计算机之间的同
+
+可以当作文件复制工具，替代`cp`和`mv`命令
+
+检查发送方和接收方已有的文件，仅传输有变动的部分（默认规则是文件大小或修改时间有变动）。
+
+
+
+
+
+sftp
+
+- `mkdir directory`：创建一个远程目录。
+- `rmdir path`：删除一个远程目录。
+- `put localfile [remotefile]`：本地文件传输到远程主机。
+- `get remotefile [localfile]`：远程文件传输到本地。
+
+https://wangdoc.com/ssh/basic.html

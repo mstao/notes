@@ -206,6 +206,12 @@ ALTER TABLE
 ALTER TABLE mytable DROP COLUMN col;
 ```
 
+修改表的字符集
+
+```sql
+alter table <tab> convert to character set utf8;
+```
+
 
 
 

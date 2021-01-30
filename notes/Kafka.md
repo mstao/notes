@@ -164,92 +164,6 @@ Consumer Group:
 
 ## 安装
 
-### 命令
-
-**服务的启停**
-
-```shell
-# 前台启动
-kafka-server-start.sh -daemon $KAFKA_HOME/config/server.properties
-kafka-server-stop.sh
-
-# 后台启动
-curl linux123/log -d "message send to kafka ..0000000088888"
-
-vi $KAFKA_HOME/config/server.properties
-bootstrap.servers=linux121:9092,linux122:9092,linux123:9092
-```
-
-**主题操作**
-
-```shell
-# 查看主题
-kafka-topic.sh --zookeeper loclhost:2181/myKafka --list
-
-# broker count ====> replication-factor
-kafka-topic.sh --zookeeper localhost:2181/myKafka \
-  --create --topic topic_1 \
-  --partitons 1 \
-  --replication-factor 1
-  
-kafka-topic.sh --zookeeper localhost:2181/myKafka \
-  --describe --topic topic_1
-# 调高主题的分区数
-```
-**消费者操作**
-```shell
-kafka-console-consumer.sh --bootstrap-server localhost:9092 \
-  --topic topic_1
-  
-# 从头消费
-kafka-console-consumer.sh --bootstrap-server localhost:9092 \
-  --topic topic_1 \
-  --from-beginning
-```
-**生产者操作**
-```shell
-kafka-console-producer.sh --brokder-list localhost:9092 \
-  --topic topic_1
-```
-
-<img src="http://img.janhen.com/image-20201116213957800.png" alt="image-20201116213957800" style="zoom: 67%;" />
-
-acks: 副本分区进行...， 保证可靠性，    同步确认/异步确认
-
-Retries: 重试的次数..
-
-
-
-### 配置
-
-**内外网隔离配置**
-
-**listener**: 用于指定当前Broker向外发布服务的地址和端口。与 advertised.listeners 配合，用于做内外网隔离。
-
-listerner.security.protocol.map:
-
-inter.broker.listener.name
-
-listeners
-
-advertised.listeners
-
-配置监听器名称与安全协议的映射关系, 内外部的监听器。
-
-
-
-Broader.id: 建议与主机相关
-
-
-
-Log.dirs: 持久化的数据目录, 可指定多个
-
-
-
-**partition**
-
-在需要严格保证消息的消费顺序的场景下，需要将partition数目设为1。
-
 
 
 # 高级特性
@@ -307,44 +221,6 @@ Request.required.acks
 - all
 
 
-
-### **配置参数**
-
-```
-org.apache.kafka.clients.producer.ProducerConfig
-```
-
-bootstrap.servers:
-
-key.serializer:
-
-Value.serializer:
-
-Acks:  确认机制
-
-Retries:
-
-compression.type： 默认 NONE，gzip, snappy, lz4。。
-
-partitioner.class
-
-retry.backoff.ms
-
-request.timeout.ms
-
-batch.size
-
-client.id: 生产者发送请求的时候传递给broker的id字符串。
-
-send.buffer.bytes
-
-buffer.memory
-
-connections.max.idle.ms
-
-linger.ms
-
-max.block.ms
 
 
 
@@ -554,76 +430,6 @@ DescribeGroup: 用于管理
 
 
 
-### 参数配置
-
-bootstrap.servers
-
-key.deserializer
-
-value.deserializer
-
-interceptor.classes
-
-gorup.id
-
-client.id
-
-
-
-**再平衡参数**
-
-max.poll.interval.ms: 心跳
-
-session.timeout.ms: 心跳超时时间
-
-max.poll.interval.ms
-
-
-
-
-
-auto.offset.reset： Kafka中没有初始偏移量或当前偏移量在服务器中不存在时的处理， earliest， latest, none, anything
-
-enable.auto.commit: 设置为true，消费者会自动周期性地向服务器提交偏移量。
-
-auto.commit.interval.ms: 自动提交间隔
-
-fetch.min.bytes
-
-fetch.max.wait.ms
-
-fetch.max.bytes
-
-connections.max.idle.ms
-
-check.crcs
-
-exclude.internal.topics
-
-isolation.level： 控制如何读取事务消息。
-
-heartbeat.interval.ms
-
-max.poll.records
-
-
-
-max.partition.fetch.bytes
-
-send.buffer.bytes
-
-retry.backoff.ms
-
-
-
-offsets.topic.num.partitions： __consumer_offsets 分区个数
-
-partition.assignment.strategy: 指定分配策略
-
-unclean.leader.election.enable： 所有的 ISR 副本都失败，是否可立即选择非 ISR 集合中的可用副本
-
-
-
 
 
 ## 主题
@@ -665,35 +471,7 @@ kafka-topics.sh --zookeeper localhost:2181/myKafka --delete --topic topic_x
 
 
 
-### **参数配置**
 
-Cleanup.policy: 默认 delete, 对旧日志的利用方式，可选 compact
-
-Compress.type= 压缩格式 gzip, snappy， 默认是没有压缩的, producer 为...
-
-delete.retention.ms
-
-flush.ms
-
-flush.messages
-
-Max.message.bytes=512:  
-
-Retention.bytes: 默认不配置, 日志保留的最大大小
-
-Rendition.ms: 默认保留的日志时间
-
-Segment.bytes: 默认 1G，持久化存储时分段
-
-Segment.index.bytes: 10MB,   .log, .index, .idx，一般不关注
-
-Segment.ms: 7days
-
-Unclean.leader.election.enable: true 是否可让不在 ISR 中 replicas 设置作为 leader, 可能丢数据
-
-min.cleanable.dirty.ratio=0.5: 避免清楚压缩率超过 50% 的数据
-
-Min.insync.replicas=1: lacks 中对与 ISR 的确认..
 
 
 
@@ -1091,15 +869,7 @@ RocketMQ 在消费消息时，使用了 mmap。kafka 使用了 sendFile。
 
 
 
-### 参数配置
 
-配置项(LJ)
-
-log.index.interval.bytes: 4096(4K) 网络中的索引项达到此大小，写 .index
-
-Log.roll.hours: 168(7天)
-
-Log.index.size.max.bytes: 10485760(10MB) 限制索引文件的大小...
 
 
 
@@ -1439,6 +1209,254 @@ Request.timeout.ms 默认30s，进行消息确认。
 
 
 
+
+
+### 命令
+
+**服务的启停**
+
+```shell
+# 前台启动
+kafka-server-start.sh -daemon $KAFKA_HOME/config/server.properties
+kafka-server-stop.sh
+
+# 后台启动
+curl linux123/log -d "message send to kafka ..0000000088888"
+
+vi $KAFKA_HOME/config/server.properties
+bootstrap.servers=linux121:9092,linux122:9092,linux123:9092
+```
+
+**主题操作**
+
+```shell
+# 查看主题
+kafka-topic.sh --zookeeper loclhost:2181/myKafka --list
+
+# broker count ====> replication-factor
+kafka-topic.sh --zookeeper localhost:2181/myKafka \
+  --create --topic topic_1 \
+  --partitons 1 \
+  --replication-factor 1
+  
+kafka-topic.sh --zookeeper localhost:2181/myKafka \
+  --describe --topic topic_1
+# 调高主题的分区数
+```
+
+**消费者操作**
+
+```shell
+kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+  --topic topic_1
+  
+# 从头消费
+kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+  --topic topic_1 \
+  --from-beginning
+```
+
+**生产者操作**
+
+```shell
+kafka-console-producer.sh --brokder-list localhost:9092 \
+  --topic topic_1
+```
+
+<img src="http://img.janhen.com/image-20201116213957800.png" alt="image-20201116213957800" style="zoom: 67%;" />
+
+acks: 副本分区进行...， 保证可靠性，    同步确认/异步确认
+
+Retries: 重试的次数..
+
+
+
+### 配置
+
+**内外网隔离配置**
+
+**listener**: 用于指定当前Broker向外发布服务的地址和端口。与 advertised.listeners 配合，用于做内外网隔离。
+
+listerner.security.protocol.map:
+
+inter.broker.listener.name
+
+listeners
+
+advertised.listeners
+
+配置监听器名称与安全协议的映射关系, 内外部的监听器。
+
+Broader.id: 建议与主机相关
+
+Log.dirs: 持久化的数据目录, 可指定多个
+
+**partition**
+
+在需要严格保证消息的消费顺序的场景下，需要将partition数目设为1。
+
+
+
+
+
+bootstrap.servers
+
+key.deserializer
+
+value.deserializer
+
+interceptor.classes
+
+gorup.id
+
+client.id
+
+
+
+**再平衡参数**
+
+max.poll.interval.ms: 心跳
+
+session.timeout.ms: 心跳超时时间
+
+max.poll.interval.ms
+
+
+
+
+
+auto.offset.reset： Kafka中没有初始偏移量或当前偏移量在服务器中不存在时的处理， earliest， latest, none, anything
+
+enable.auto.commit: 设置为true，消费者会自动周期性地向服务器提交偏移量。
+
+auto.commit.interval.ms: 自动提交间隔
+
+fetch.min.bytes
+
+fetch.max.wait.ms
+
+fetch.max.bytes
+
+connections.max.idle.ms
+
+check.crcs
+
+exclude.internal.topics
+
+isolation.level： 控制如何读取事务消息。
+
+heartbeat.interval.ms
+
+max.poll.records
+
+
+
+max.partition.fetch.bytes
+
+send.buffer.bytes
+
+retry.backoff.ms
+
+
+
+offsets.topic.num.partitions： __consumer_offsets 分区个数
+
+partition.assignment.strategy: 指定分配策略
+
+unclean.leader.election.enable： 所有的 ISR 副本都失败，是否可立即选择非 ISR 集合中的可用副本
+
+
+
+
+
+
+
+**主题相关参数**
+
+Cleanup.policy: 默认 delete, 对旧日志的利用方式，可选 compact
+
+Compress.type= 压缩格式 gzip, snappy， 默认是没有压缩的, producer 为...
+
+delete.retention.ms
+
+flush.ms
+
+flush.messages
+
+Max.message.bytes=512:  
+
+Retention.bytes: 默认不配置, 日志保留的最大大小
+
+Rendition.ms: 默认保留的日志时间
+
+Segment.bytes: 默认 1G，持久化存储时分段
+
+Segment.index.bytes: 10MB,   .log, .index, .idx，一般不关注
+
+Segment.ms: 7days
+
+Unclean.leader.election.enable: true 是否可让不在 ISR 中 replicas 设置作为 leader, 可能丢数据
+
+min.cleanable.dirty.ratio=0.5: 避免清楚压缩率超过 50% 的数据
+
+Min.insync.replicas=1: lacks 中对与 ISR 的确认..
+
+
+
+**物理存储**
+
+配置项(LJ)
+
+log.index.interval.bytes: 4096(4K) 网络中的索引项达到此大小，写 .index
+
+Log.roll.hours: 168(7天)
+
+Log.index.size.max.bytes: 10485760(10MB) 限制索引文件的大小...
+
+
+
+**生产参数**
+
+```
+org.apache.kafka.clients.producer.ProducerConfig
+```
+
+bootstrap.servers:
+
+key.serializer:
+
+Value.serializer:
+
+Acks:  确认机制
+
+Retries:
+
+compression.type： 默认 NONE，gzip, snappy, lz4。。
+
+partitioner.class
+
+retry.backoff.ms
+
+request.timeout.ms
+
+batch.size
+
+client.id: 生产者发送请求的时候传递给broker的id字符串。
+
+send.buffer.bytes
+
+buffer.memory
+
+connections.max.idle.ms
+
+linger.ms
+
+max.block.ms
+
+
+
+
+
 ## 其他
 
 MQ 之间的对比
@@ -1448,3 +1466,4 @@ RabbitMQ 遵循 AMQP 协议
 RocketMQ 根据 Tag 进行消息过滤
 
 Kafka 吞吐量高，实时性不如 RabbitMQ 好。
+

@@ -4,6 +4,8 @@
 
 # 基础算法
 
+[mindmap](../mindmap/算法.xmind)
+
 **编码**
 
 **数学归纳法**
@@ -877,6 +879,8 @@ int binarySearchOffset(int[] nums, int key, int offset) {
 
 
 # 基础结构
+
+[mindmap](../mindmap/数据结构.xmind)
 
 **结构维护**
 
@@ -1851,7 +1855,7 @@ Node： 包含多个向前指向，一个向后指向，存放数据的指针
 
   
 
-## **Key 冲突处理方法**
+## Key 冲突处理方法
 
 （1） 开放地址法
 

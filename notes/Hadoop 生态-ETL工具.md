@@ -93,7 +93,9 @@ permission javax.management.MBeanTrustPermission "register";
 
 ![image-20201129113942274](assets/image-20201129113942274.png)
 
-
+- Reader：Reader�为数据采集模块，负责采集数据源的数据，将数据发送给Framework。  
+- Writer： Writer为数据写入模块，负责不断向Framework取数据，并将数据写入到目的端。  
+- Framework：Framework用于连接reader和writer，作为两者的数据传输通道，并处理缓冲，流控，并发，数据转换等核心技术问题。  
 
 支持单机多线程模式完成同步作业运行，Task 为最小的调度单元。
 
@@ -101,11 +103,24 @@ permission javax.management.MBeanTrustPermission "register";
 
 <p align="center">DataX 作业生命周期时序图</p>
 
+解决异构数据源同步问题，DataX将复杂的网状的同步链路变成了星型数据链路  
 
 
+DataX3.0 优势：  
+- 可靠的数据质量监控
+- 丰富的数据转换功能
+- 精准的速度控制： 提供了包括通道(并发)、记录流、字节流三种流控模式
+- 强劲的同步性能
+- 健壮的容错机制
+- 极简的使用体验
 
+### 使用
+```shell
+python datax.py -r {YOUR_READER} -w {YOUR_WRITER}
+```
 
-
+[introduction](https://github.com/alibaba/DataX/blob/master/introduction.md)  
+[userGuid](https://github.com/alibaba/DataX/blob/master/userGuid.md)
 
 # kettle
 
