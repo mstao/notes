@@ -17,7 +17,7 @@
 1DB = 1024 NB
 ```
 
-![image-20201201082140039](assets/image-20201201082140039.png)
+![image-20201201082140039](http://img.janhen.com/20210130165217image-20201201082140039.png)
 
 
 
@@ -46,7 +46,7 @@ Nutch —> Google论文（GFS、MapReduce）
 
 **Hadoop 的特点**
 
-![image-20201201084326281](assets/image-20201201084326281.png)
+![image-20201201084326281](http://img.janhen.com/20210130165220image-20201201084326281.png)
 
 Hadoop的缺点
 

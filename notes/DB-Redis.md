@@ -105,7 +105,7 @@ typedef struct redisObject {
 } robj;
 ```
 
-<img src="assets/1552957729759.png" alt="1552957729759" style="zoom: 67%;" />
+<img src="http://img.janhen.com/202101301644411552957729759.png" alt="1552957729759" style="zoom: 67%;" />
 
 （2） 特性
 
@@ -406,7 +406,7 @@ Level： span，下一个指向
 
 Node： 包含多个向前指向，一个向后指向，存放数据的指针
 
-![1551944105711](assets/1551944105711.png)
+![1551944105711](http://img.janhen.com/202101301644501551944105711.png)
 
 
 **跳表与红黑树的比较**
@@ -441,7 +441,7 @@ redis 通过引用计数法实现了缓存 1~9999 的整形值，score 共享，
 
 **1、底层结构|INIT**
 
-![1551943084702](assets/1551943084702.png)
+![1551943084702](http://img.janhen.com/202101301644541551943084702.png)
 
 （1） 字典整体结构： 
 
@@ -833,7 +833,7 @@ dir ./
 
 ⑤ 使用新的AOF文件替换掉旧的AOF文件；
 
-<img src="assets/1552961188914.png" alt="1552961188914" style="zoom:50%;" />
+<img src="http://img.janhen.com/202101301645011552961188914.png" alt="1552961188914" style="zoom:50%;" />
 
 
 
@@ -858,7 +858,7 @@ redis-check-dump
 
 优先加载 AOF，当没有 AOF 时才加载 RDB。当 AOF 或者 RDB 存在错误，则加载失败。
 
-<img src="assets/1554025266331.png" alt="1554025266331" style="zoom: 80%;" />
+<img src="http://img.janhen.com/202101301645051554025266331.png" alt="1554025266331" style="zoom: 80%;" />
 
 
 
@@ -1139,7 +1139,7 @@ Jedis(host, port, timeout, soTimeout)
 
 （1） 单个连接
 （2） 配置连接池连接
-<img src="./assets/1552958097274.png" alt="1552958097274" style="zoom: 67%;" />
+<img src="http://img.janhen.com/202101301645121552958097274.png" alt="1552958097274" style="zoom: 67%;" />
 
 （3） 两者的比较
 
@@ -1289,7 +1289,7 @@ boolean follow(int userId, int entityType, int entityId) {
 
 指令的生命周期
 
-<img src="assets/1552960789929.png" alt="1552960789929" style="zoom: 50%;" />
+<img src="http://img.janhen.com/202101301645171552960789929.png" alt="1552960789929" style="zoom: 50%;" />
 
 两点说明：
 （1）慢查询发生在第3阶段
@@ -1381,7 +1381,7 @@ publisher
 channel
 subscriber
 
-<img src="assets/1552961014160.png" alt="1552961014160" style="zoom: 33%;" />
+<img src="http://img.janhen.com/202101301645231552961014160.png" alt="1552961014160" style="zoom: 33%;" />
 
 
 
@@ -1421,7 +1421,7 @@ pubsub numsub [channel.] // assigned channel subcribe num
 
 抢任务执行，多个消息订阅者只能够有一个订阅者获得消息进行执行；
 
-<img src="assets/1552961051857.png" alt="1552961051857" style="zoom:33%;" />
+<img src="http://img.janhen.com/202101301645281552961051857.png" alt="1552961051857" style="zoom:33%;" />
 
 通过链表结构以及阻塞实现
 
@@ -1500,11 +1500,11 @@ script load ""
 
 在复制期间产生的相关缓冲区复制；
 
-![1554643864921](assets/1554643864921.png)
+![1554643864921](http://img.janhen.com/202101301645371554643864921.png)
 
-![1554643893834](assets/1554643893834.png)
+![1554643893834](http://img.janhen.com/202101301645411554643893834.png)
 
-![1554643929087](assets/1554643929087.png)
+![1554643929087](http://img.janhen.com/202101301645461554643929087.png)
 
 **心跳监测**
 
@@ -1563,7 +1563,7 @@ Sentinel（哨兵）可以监听集群中的服务器，并在主服务器进入
 >
 > 去中心化方式，包括 sharding(分区)、replication(复制)、falivor()
 
-<img src="assets/image-20201115144106872.png" alt="image-20201115144106872" style="zoom:33%;" />
+<img src="http://img.janhen.com/20210130164550image-20201115144106872.png" alt="image-20201115144106872" style="zoom:33%;" />
 
 通信关系
 
@@ -1675,7 +1675,7 @@ Redis 集群中内置了 16384 个哈希槽，当需要在 Redis 集群中放置
 
 **重新分片**
 
-<img src="assets/image-20201115155804209.png" alt="image-20201115155804209" style="zoom: 50%;" />
+<img src="http://img.janhen.com/20210130164556image-20201115155804209.png" alt="image-20201115155804209" style="zoom: 50%;" />
 
 场景变更：
 
@@ -1811,7 +1811,7 @@ AP: 高可用模型
 >
 > Redisson在基于NIO的Netty框架上，生产环境使用分布式锁。
 
-<img src="assets/image-20201115154158813.png" alt="image-20201115154158813" style="zoom: 33%;" />
+<img src="http://img.janhen.com/20210130164602image-20201115154158813.png" alt="image-20201115154158813" style="zoom: 33%;" />
 
 通过 Lua 脚本加锁
 

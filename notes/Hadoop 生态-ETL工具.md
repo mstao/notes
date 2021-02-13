@@ -91,7 +91,7 @@ permission javax.management.MBeanTrustPermission "register";
 >
 > 包括 MySQL、Oracle、SqlServer、Postgre、HDFS、Hive、ADS、HBase、TableStore(OTS)、MaxCompute(ODPS)、DRDS 等各种异构数据源之间高效的数据同步功能。
 
-![image-20201129113942274](assets/image-20201129113942274.png)
+![image-20201129113942274](http://img.janhen.com/20210130165448image-20201129113942274.png)
 
 - Reader：Reader�为数据采集模块，负责采集数据源的数据，将数据发送给Framework。  
 - Writer： Writer为数据写入模块，负责不断向Framework取数据，并将数据写入到目的端。  
@@ -99,7 +99,7 @@ permission javax.management.MBeanTrustPermission "register";
 
 支持单机多线程模式完成同步作业运行，Task 为最小的调度单元。
 
-![image-20201129114053385](assets/image-20201129114053385.png)
+![image-20201129114053385](http://img.janhen.com/20210130165450image-20201129114053385.png)
 
 <p align="center">DataX 作业生命周期时序图</p>
 

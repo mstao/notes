@@ -217,7 +217,7 @@ public ListNode insertionSortList(ListNode head) {
 
 #### 希尔排序
 
-<img src="assets/image-20201122224138741.png" alt="image-20201122224138741" style="zoom: 33%;" />
+<img src="http://img.janhen.com/20210130164857image-20201122224138741.png" alt="image-20201122224138741" style="zoom: 33%;" />
 
 <p align="center">希尔排序可视轨迹</p>
 
@@ -323,7 +323,7 @@ int partition(int[] arr, int lo, int hi) {
 
 **2、三路快排优化**
 
-<img src="assets/image-20201122224436315.png" alt="image-20201122224436315" style="zoom: 33%;" />
+<img src="http://img.janhen.com/20210130164902image-20201122224436315.png" alt="image-20201122224436315" style="zoom: 33%;" />
 
 <p align="center">三向切分快排可视轨迹</p>
 
@@ -427,7 +427,7 @@ void quickSort(int[] arr, int lo, int hi) {
 
 **1、基础归并排序**
 
-<img src="assets/image-20201122224009106.png" alt="image-20201122224009106" style="zoom: 33%;" />
+<img src="http://img.janhen.com/20210130164907image-20201122224009106.png" alt="image-20201122224009106" style="zoom: 33%;" />
 
 <p align="center">自顶向下归并排序可视轨迹</p>
 
@@ -466,7 +466,7 @@ void merge(int[] arr, int lo, int mid, int hi) {
 
 **2、 自底向上的归并排序**
 
-<img src="assets/image-20201122223815424.png" alt="image-20201122223815424" style="zoom:33%;" />
+<img src="http://img.janhen.com/20210130164913image-20201122223815424.png" alt="image-20201122223815424" style="zoom:33%;" />
 
 <p align="center">自底向上的归并排序可视轨迹</p>
 
@@ -608,7 +608,7 @@ private ListNode merge(ListNode l1, ListNode l2) {
 
 ### 堆排序
 
-<img src="assets/image-20201122225020506.png" alt="image-20201122225020506" style="zoom:33%;" />
+<img src="http://img.janhen.com/20210130164926image-20201122225020506.png" alt="image-20201122225020506" style="zoom:33%;" />
 
 <p align="center">堆排序可视轨迹</p>
 
@@ -2008,7 +2008,7 @@ E:000
 
 解码也是使用上面的哈夫曼树来，从根节点开始，遇到0就往左走，遇到1就往右走，走到叶子节点就是该字符了，完成一个字符解码，下一个字符解码又从根节点开始走。
 
-<img src="assets/5184817_1506229417770_81A46849FABAB44F4CD2A83B1AB1FA7F.png" alt="img" style="zoom: 50%;" />
+<img src="http://img.janhen.com/202101301649445184817_1506229417770_81A46849FABAB44F4CD2A83B1AB1FA7F.png" alt="img" style="zoom: 50%;" />
 
 
 

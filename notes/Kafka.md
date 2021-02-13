@@ -350,7 +350,7 @@ kafka-consumer-groups.sh --bootstrap-server linux121:9092 \
 
 **消费组的状态**
 
-<img src="assets/image-20201118204202363.png" alt="image-20201118204202363" style="zoom: 50%;" />
+<img src="http://img.janhen.com/20210130164345image-20201118204202363.png" alt="image-20201118204202363" style="zoom: 50%;" />
 
 Dead：组内已经没有任何成员的最终状态
 

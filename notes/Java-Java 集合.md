@@ -1,6 +1,6 @@
 #  概览
 
-![image-20201030211357543](assets/image-20201030211357543.png)
+![image-20201030211357543](http://img.janhen.com/20210130172316image-20201030211357543.png)
 
 1、Collections
 
@@ -1817,7 +1817,7 @@ if (hiHead != null) {
 
 ## HashTable
 
-<img src="assets/image-20201031105952779.png" alt="image-20201031105952779" style="zoom: 33%;" />
+<img src="http://img.janhen.com/20210130172343image-20201031105952779.png" alt="image-20201031105952779" style="zoom: 33%;" />
 
 与 JDK7 的 HashMap 基本一致；
 
@@ -2057,7 +2057,7 @@ public synchronized V put(K key, V val) {
 
 ## ConcurrentHashMap(7)
 
-<img src="assets/image-20201031105854190.png" alt="image-20201031105854190" style="zoom:33%;" />
+<img src="http://img.janhen.com/20210130172336image-20201031105854190.png" alt="image-20201031105854190" style="zoom:33%;" />
 
 ConcurrentHashMap 和 HashMap 实现上类似，最主要的差别是 ConcurrentHashMap 采用了分段锁（Segment），每个分段锁维护着几个桶（HashEntry），多个线程可以同时访问不同分段锁上的桶，从而使其并发度更高（并发度就是 Segment 的个数）。
 
@@ -2227,7 +2227,7 @@ public int size() {
 
 ## *ConcurrentHashMap(8)
 
-![image-20201031105915401](assets/image-20201031105915401.png)
+![image-20201031105915401](http://img.janhen.com/20210130172332image-20201031105915401.png)
 
 
 

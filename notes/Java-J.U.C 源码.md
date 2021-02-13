@@ -42,7 +42,7 @@
 
 只要基于 AQS 机制便能够具备两种特性
 
-<img src="assets/1552634940837.png" alt="1552634940837" style="zoom:67%;" />
+<img src="http://img.janhen.com/202101301726391552634940837.png" alt="1552634940837" style="zoom:67%;" />
 
 - 使用 Node 实现 FIFO 队列，可以用于构建锁或者其他同步装置的基础框架
 - 利用了一个 int 类型表示状态
@@ -58,7 +58,7 @@
 
 - 提供共享式或独占式的获取方式
 
-![1552636705615](assets/1552636705615.png)
+![1552636705615](http://img.janhen.com/202101301726421552636705615.png)
 **两大核心：**
 
 - state: volatile 的 int 变量，代表共享资源
@@ -476,9 +476,9 @@ AtomicReferenceFieldUpdater
 
 阻塞队列的四种方法： 
 
-![1552635139942](assets/1552635139942.png)
+![1552635139942](http://img.janhen.com/202101301727441552635139942.png)
 
-![1553499862597](assets/1553499862597.png)
+![1553499862597](http://img.janhen.com/202101301726491553499862597.png)
 
 ### ArrayBlockingQueue
 
@@ -819,7 +819,7 @@ Node使用的是AQS中定义的Node。也就是说AQS中的同步队列和Condit
 一个Condition对象包含一个等待队列，Condition拥有首节点和尾节点。当前线程调
 用Condition.await() 方法，将会以当前线程构造节点，并将该节点从尾部加入到等待队列，等待队列的基本结构如下图：
 
-![1553838808834](assets/1553838808834.png)
+![1553838808834](http://img.janhen.com/202101301726541553838808834.png)
 
 
 
@@ -832,7 +832,7 @@ Node使用的是AQS中定义的Node。也就是说AQS中的同步队列和Condit
 <u>和多个等待队列</u>  ，这是因为通过lock.newCondition() 可以创建多个Condition条
 件，而这多个Condition对象都是在同一个锁的基础上创建的，在同一时刻也只能由一个线程获取到该锁。
 
-![1553838928905](assets/1553838928905.png)
+![1553838928905](http://img.janhen.com/202101301727001553838928905.png)
 
 
 
@@ -844,7 +844,7 @@ Node使用的是AQS中定义的Node。也就是说AQS中的同步队列和Condit
 
 可以看出同步队列的首节点并不是直接加入到等待队列的尾节点，而是封装成等待队列的节点才插入到等待队列的尾部的。
 
-![1553839003852](assets/1553839003852.png)
+![1553839003852](http://img.janhen.com/202101301727511553839003852.png)
 
 
 
@@ -853,7 +853,7 @@ Node使用的是AQS中定义的Node。也就是说AQS中的同步队列和Condit
 调用当前线程的 Condition.signal() 方法，将会唤醒在等待队列中等待时间最长的节点也就是首节点，在唤醒节点之前，会将该节点移到同步队列中。
 节点从等待队列加入到同步队列的过程如下：
 
-![1553839070089](assets/1553839070089.png)
+![1553839070089](http://img.janhen.com/202101301727031553839070089.png)
 
 通过调用同步器的方法将等待队列中的头结点线程安全的移到同步队列的尾节点，当前线程在使用LockSupport唤醒该节点的线程。
 被唤醒后的线程，将会从 await（） 方法中的while循环中退出，进而调用同步器的方法加入到获取同步状态的竞争中。
@@ -936,10 +936,10 @@ ReentrantLock
 state 初始化为0，未锁定装填
 
 A 线程 lock 时， 
-![1552636782238](assets/1552636782238.png)
+![1552636782238](http://img.janhen.com/202101301728061552636782238.png)
 
 可重入，+1，释放相对应的个数
-![1552636786098](assets/1552636786098.png)
+![1552636786098](http://img.janhen.com/202101301728091552636786098.png)
 
 transient 独占线程
 
@@ -1027,7 +1027,7 @@ WriteLock
 
 而ReentrantReadWriteLock实现了ReadWriteLock接口，那么他就是  <u>具体的工厂接口实现类</u>，ReadLock和WriteLock就成了  <u>具体产品的实现类</u>，一个简单的工厂方法模式使用案例，值得学习。
 
-![1553826265053](assets/1553826265053.png)
+![1553826265053](http://img.janhen.com/202101301727101553826265053.png)
 
 
 
@@ -1049,7 +1049,7 @@ WriteLock
 如何在一个整型变量上维护多种状态，就需要"**按位切割使用**" 这个变量，读写锁将变
 量切分成两个部分，**高16位表示读，低16位表示写**，划分方式如下图：
 
-![1553828274145](assets/1553828274145.png)
+![1553828274145](http://img.janhen.com/202101301727131553828274145.png)
 
 
 
@@ -1195,7 +1195,7 @@ API：
 作用于并发执行的线程，而非主线程的单线程；
 同时 await(timeout, TimeUnion) 并发线程仍然会执行完
 
-![1553694284812](assets/1553694284812.png)
+![1553694284812](http://img.janhen.com/202101301727171553694284812.png)
 
 **底层结构**
 
@@ -1384,7 +1384,7 @@ Semaphore基本能完成ReentrantLock的所有工作，使用方法也与之类�
 
 # *Executor 
 
-<img src="assets/1553493883332.png" alt="1553493883332" style="zoom:67%;" />
+<img src="http://img.janhen.com/202101301727211553493883332.png" alt="1553493883332" style="zoom:67%;" />
 
 
 
@@ -1476,7 +1476,7 @@ public static ExecutorService newFixedThreadPool(int nThreads) {
 
 > 4、一个线程无事可做，超过一定的时间（keepAliveTime）时，线程池会判断，如果当前运行的线程数大于 corePoolSize，那么这个线程就被停掉。所以线程池的所有任务完成后，它最终会收缩到 corePoolSize 的大小。
 
-![1553499764484](assets/1553499764484.png)
+![1553499764484](http://img.janhen.com/202101301727241553499764484.png)
 
 
 
@@ -1506,13 +1506,13 @@ public static ExecutorService newFixedThreadPool(int nThreads) {
 何为Executor框架的两级调度模型，简单的来说就是我们使用的**Java线程被一对一映射为本地操作系统线程**。Java线程启动的时候会启动一个本地操作系统线程，当该Java线程终止时，这个操作系统线程也会被回收。操作系统会调度所有线程并将它们分配给可用的CPU。
 由此出现了应用程序通过Executor框架控制上层的调用，而下层的调度由操作系统的内核来控制，从而形成了两级的调度模型，并且下层的调度不受应用程序的控制，任务的两级调度模型如下图：
 
-![1553839726394](assets/1553839726394.png)
+![1553839726394](http://img.janhen.com/202101301727271553839726394.png)
 
 
 
 ### **结构和使用流程**
 
-![1553839790923](assets/1553839790923.png)
+![1553839790923](http://img.janhen.com/202101301727301553839790923.png)
 
 1、主线程首先要创建实现Runnable或Callable接口的任务对象。工具类Executors可
 以把一个Runnable对象封装成为一个Callable对象（`Executors.callable(Runnable task)` 或者`Executors.callable(Runnable task, Object result)`） ；
@@ -1688,7 +1688,7 @@ public ThreadPoolExecutor(int corePoolSize,
 
 **阻塞队列**
 
-![1553499807030](assets/1553499807030.png)
+![1553499807030](http://img.janhen.com/202101301727361553499807030.png)
 
 **线程池使用情况监控**
 

@@ -1,6 +1,6 @@
 # IO
 
-<img src="assets/image-20201031105123219.png" alt="image-20201031105123219" style="zoom: 67%;" />
+<img src="http://img.janhen.com/20210130172835image-20201031105123219.png" alt="image-20201031105123219" style="zoom: 67%;" />
 
 <img src="assets/image-20201031105144064.png" alt="image-20201031105144064" style="zoom:67%;" />
 

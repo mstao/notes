@@ -2,7 +2,7 @@
 
 # Impala
 
-![image-20201102200733355](assets/image-20201102200733355.png)
+![image-20201102200733355](http://img.janhen.com/20210130165731image-20201102200733355.png)
 
 交互式查询工具    
 支持 parquet 存储  

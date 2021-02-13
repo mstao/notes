@@ -2,7 +2,7 @@
 
 > 类似精简的 Linux 环境，含 root 权限、进程空间、用户空间和网络空间，以及运行在其中的应用程序
 
-![1566961968709](http://img.janhen.com/1566961968709.png)
+![1566961968709](http://img.janhen.com/202101301651031566961968709.png)
 
 Client： 客户端通过 CLI 命令与 Docker 交互
 Docker daemon： 宿主机的守护进程，通过 RESTful 接口处理 Client 的命令，连接 Registry 进行镜像的拉取的推送，具体配置见 [Daemon配置](#Daemon 配置)
@@ -291,7 +291,7 @@ ip netns exec testz ip link set dev veth-test2 up
 
 > 通过link 方式实现容器之间的访问，直接通过名称而非 IP，适用于单台机器
 
-![1566531692115](http://img.janhen.com/1566531692115.png)
+![1566531692115](http://img.janhen.com/202101301651101566531692115.png)
 
 一个容器对应一个网络空间
 

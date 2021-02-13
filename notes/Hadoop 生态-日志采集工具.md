@@ -35,7 +35,7 @@ Flume 1.8+
 
 ## Flume
 
-![image-20201226102711887](assets/image-20201226102711887.png)
+![image-20201226102711887](http://img.janhen.com/20210130165358image-20201226102711887.png)
 
 Agent： JVM 进程，Flume 数据传输的基本单元。运行在日志手机节点服务器上。
 
@@ -53,7 +53,7 @@ Body：..
 
 串行模式  
 
-![image-20201226103429649](assets/image-20201226103429649.png)
+![image-20201226103429649](http://img.janhen.com/20210130165403image-20201226103429649.png)
 
 
 
@@ -61,7 +61,7 @@ Body：..
 
 复制模式： 单Souce多Channel、Sink模式  
 
-![image-20201226103451571](assets/image-20201226103451571.png)
+![image-20201226103451571](http://img.janhen.com/20210130165406image-20201226103451571.png)
 
 
 
@@ -69,20 +69,20 @@ Body：..
 
 解决负载 均衡和故障转移问题。
 
-![image-20201226103514789](assets/image-20201226103514789.png)
+![image-20201226103514789](http://img.janhen.com/20210130165410image-20201226103514789.png)
 
 
 
 聚合模式： 最常用  
 传送到一个集中收集日志的flume，再由此flume上传到hdfs、hive、hbase、消息队列中  
 
-![image-20201226103600691](assets/image-20201226103600691.png)
+![image-20201226103600691](http://img.janhen.com/20210130165413image-20201226103600691.png)
 
 
 
 ### 执行过程
 
-![image-20201226103744350](assets/image-20201226103744350.png)
+![image-20201226103744350](http://img.janhen.com/20210130165418image-20201226103744350.png)
 
 1. Source接收事件，交给其Channel处理器处理事件  
 

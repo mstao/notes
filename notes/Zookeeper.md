@@ -18,7 +18,7 @@ Dubbo： 分布式。。。
 
 ### 架构
 
-<img src="assets/image-20201028221932970.png" alt="image-20201028221932970" style="zoom: 43%;" />
+<img src="http://img.janhen.com/20210130110918image-20201028221932970.png" alt="image-20201028221932970" style="zoom: 43%;" />
 
 Leader: 核心组件，事务请求唯一处理者。非手动指定，需要选举。
 
@@ -86,7 +86,7 @@ numChildren = 17
 
 > 可通过 Watch 机制实现发布订阅模式。
 
-<img src="assets/image-20201028230035512.png" alt="image-20201028230035512" style="zoom:67%;" />
+<img src="http://img.janhen.com/20210130164028image-20201028230035512.png" alt="image-20201028230035512" style="zoom:67%;" />
 
 注册： 监听目录变化(子节点)
 
@@ -243,7 +243,7 @@ Client 维护一个 List 存储上线的服务器。
 
 分布式锁
 
-<img src="assets/image-20201101073315062.png" alt="image-20201101073315062" style="zoom: 67%;" />
+<img src="http://img.janhen.com/20210130110932image-20201101073315062.png" alt="image-20201101073315062" style="zoom: 67%;" />
 
 锁： 某个节点下最小序号的节点。
 
@@ -275,7 +275,7 @@ Zookeeper 实现分布式锁的性能相对 Redis 低。
 
 ### HDFS 的 HA 搭建
 
-![image-20201102204647188](assets/image-20201102204647188.png)
+![image-20201102204647188](http://img.janhen.com/20210130110939image-20201102204647188.png)
 
 
 
