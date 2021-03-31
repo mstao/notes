@@ -3456,7 +3456,7 @@ public int[] twoSum(int[] nums, int target) {
 
 [11. Container With Most Water](https://leetcode.com/problems/container-with-most-water/description/)
 
-![img](assets/question_11.jpg)
+![img](http://img.janhen.com/20210324215723question_11.jpg)
 
 ```
 Example:
@@ -4363,17 +4363,7 @@ public int missingNumber(int[] nums) {
 [448. Find All Numbers Disappeared in an Array](https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/)
 
 ```java
-public List<Integer> findDisappearedNumbers(int[] nums) {
-    List<Integer> ret = new ArrayList<>();
-    for (int i = 0; i < nums.length; i ++)
-        while (nums[i] != i + 1 && nums[nums[i] - 1] != nums[i])
-            swap(nums, i, nums[i] - 1);
 
-    for (int i = 0; i < nums.length; i ++)
-        if (nums[i] != i + 1)        // nums[i] is redundant
-            ret.add(i + 1);          // disappear, not in slot
-    return ret;
-}
 ```
 
 

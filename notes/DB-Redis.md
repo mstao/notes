@@ -1811,7 +1811,7 @@ AP: 高可用模型
 >
 > Redisson在基于NIO的Netty框架上，生产环境使用分布式锁。
 
-<img src="http://img.janhen.com/20210130164602image-20201115154158813.png" alt="image-20201115154158813" style="zoom: 33%;" />
+<img src="http://img.janhen.com/20210130164602image-20201115154158813.png" alt="image-20201115154158813"  />
 
 通过 Lua 脚本加锁
 

@@ -37,8 +37,6 @@ Reduce   Sort
 
 
 
-Tez是Apache开源的<font color="green">支持**DAG**（有向无环图）作业的计算框架</font>，是支持Hadoop 2.x
-
-的重要引擎。
+Tez是Apache开源的<font color="green">支持**DAG**（有向无环图）作业的计算框架</font>，是支持Hadoop 2.x的重要引擎。
 
 ![image-20201129142851567](assets/image-20201129142851567.png)

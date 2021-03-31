@@ -446,12 +446,6 @@ GROUP BY student_id;       --
 
 
 
-![1551857013614](.\assets\1551857013614.png)
-
-
-
-
-
 
 
 多个字段
@@ -1188,10 +1182,6 @@ flush privileges
 source /developer/mmall.sql;
 select * from mmall_user\G;            
 ```
-
-
-
-
 
 
 

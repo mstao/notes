@@ -380,7 +380,7 @@ ODS 层的数据与源数据的格式基本相同。
 
 每天添加分区的方式将已经采集到 HDFS 中的数据加载到 Hive 表中操作。
 
-```sql
+```SQL
 use ODS;
 create external table ods.ods_start_log(
   `str` string
@@ -986,7 +986,7 @@ hive -e "$sql"
 |      | 20W  |           | 5W   | 2日留存数 |
 | 30W  |      |           | 4W   | 3日留存数 |
 
-```sql
+```SQL
 -- 会员留存明细
 drop table if exists dws.dws_member_retention_day;
 create table dws.dws_member_retention_day (

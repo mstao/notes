@@ -1,8 +1,6 @@
+[TOC]
+
 # 基础
-
-// todo 基础架构图
-
-
 
 服务层：
 
@@ -10,13 +8,13 @@
 
 **查询语句的执行流程**
 
-![1553910277229](assets/1553910277229.png)
+![1553910277229](http://img.janhen.com/202102261610131553910277229.png)
 
 - 连接器
 
 - 查询缓存
 
-MySQL8 移除
+MySQL 8 移除
 
 - 分析器
 
@@ -24,9 +22,7 @@ MySQL8 移除
 
 
 
-优化器的作用：
-
-选择索引是优化器的⼯作。⽽优化器选择索引的⽬的，是找到⼀个最优的执⾏⽅案，并⽤最⼩的代价去执⾏语句。在数据库⾥⾯，扫描⾏数是影响执⾏代价的因素之⼀。<u>扫描的⾏数</u> 越少，意味着 <u>访问磁盘数据的次数</u> 越少，消耗的CPU资源越少。
+优化器的作用：选择索引是优化器的⼯作。⽽优化器选择索引的⽬的，是找到⼀个最优的执⾏⽅案，并⽤最⼩的代价去执⾏语句。在数据库⾥⾯，扫描⾏数是影响执⾏代价的因素之⼀。<u>扫描的⾏数</u> 越少，意味着 <u>访问磁盘数据的次数</u> 越少，消耗的CPU资源越少。
 当然，扫描⾏数并不是唯⼀的判断标准，优化器还会结合 <u>是否使⽤临时表、是否排序</u> 等因素进⾏综合判断。
 
 ```
@@ -35,16 +31,14 @@ MySQL8 移除
 
 <u>Q: MySQL是怎样得到索引的基数的呢？</u>
 
-MySQL采样统计的⽅法，采样统计的时候，InnoDB默认会选择N个数据⻚，统计这些⻚⾯上的不同值，得到⼀个平均值，然后乘以这个索引的⻚⾯数，就得到了这个索引的基数。
-⽽数据表是会持续更新的，索引统计信息也不会固定不变。所以，当变更的数据⾏数超过1/M的时候，会⾃动触发重新做⼀次索引统计。
-
-
+MySQL采样统计的⽅法，采样统计的时候，InnoDB 默认会选择 N 个数据⻚，统计这些⻚⾯上的不同值，得到⼀个平均值，然后乘以这个索引的⻚⾯数，就得到了这个索引的基数。
+⽽数据表是会持续更新的，索引统计信息也不会固定不变。所以，当变更的数据⾏数超过 1/M 的时候，会⾃动触发重新做⼀次索引统计。
 
 (5) 执行器
 
 **执行更新语句的流程**
 
-![1553911424532](assets/1553911424532.png)
+![1553911424532](http://img.janhen.com/202103072200261553911424532.png)
 
 <u>MySQL可以恢复到半个⽉内任意⼀秒的状态</u>；
 
@@ -52,7 +46,7 @@ MySQL采样统计的⽅法，采样统计的时候，InnoDB默认会选择N个�
 
 两阶段提交，以及 Insert Buffer 插入缓冲
 
-```sql
+```SQL
 UPDATE T SET c=c+1 WHERE ID=2;
 ```
 
@@ -62,35 +56,27 @@ UPDATE T SET c=c+1 WHERE ID=2;
 
 
 
-
-
-
-
 # 日志
 
-## 慢查询 日志
+## 慢查询日志
 
 > MySQL 的动态参数，可以随关随停
 
-开启慢查询；
+配置项：
 
-设置慢查询的时间阈值；
+- slow_query_log： 开启慢查询；
 
-设置慢查询日志文件目录；
+- long_query_time： 设置慢查询的时间阈值；
 
-```sql
+- slow_query_log_file：设置慢查询日志文件目录；
+
+```SQL
 SHOW VARIABLES LIKE '%quer%';       --慢查询日志开启、位置、时长，查询缓冲、
 SHOW STATUS LIKE '%slow_queries%';    -- 当前慢查询数
 -- Set slow query
 SET GLOBAL slow_query_log=on;
 SET GLOBAL long_query_time=1;     -- 当前会话有效, 修改 my.ini 永久
 ```
-
-![1551840061193](..\assets\1551840061193.png)
-
-
-
-
 
 慢查询日志的性能剖析工具：
 
@@ -104,8 +90,6 @@ SET GLOBAL long_query_time=1;     -- 当前会话有效, 修改 my.ini 永久
 
 正常的格式
 
-![1551840844345](..\assets\1551840844345.png)
-
 
 
 
@@ -114,9 +98,9 @@ explain
 
 EXPLAIN 关键字模拟优化器执行 SQL 查询语句
 
-![1551841270019](../assets/1551841270019.png)
+![1551841270019](http://img.janhen.com/202103072224361551841270019.png)
 
-```sql
+```SQL
 explain select star, evaluator_no from indicator_evaluate order by evaluator_no desc;
 ```
 
@@ -124,24 +108,20 @@ explain select star, evaluator_no from indicator_evaluate order by evaluator_no 
 
 id: 代表执行的顺序
 
-**(1)  *type:** 
+- type:  找到数据行的方式, 数据的访问类型 取值为如下
 
-找到数据行的方式
+  - all :全表扫描
 
-数据的访问类型 取值为如下
+  - index: ALL 和 INDEX 都读全表，INDEX 从索引读的， ALL 从硬盘读的
 
-1)all :全表扫描
+  - range：   between, in, >, < 等的查询，无需扫全表
 
-2)index: ALL 和 INDEX 都读全表，INDEX 从索引读的， ALL 从硬盘读的
-
-3):range：   between, in, >, < 等的查询，无需扫全表
-
-4)ref：非唯一性索引扫描，返回匹配.. 
-5)eq_ref:唯一性索引扫描，对于每一个索引键，表中只有一条记录与之匹配。常见于主键 或者唯一索引扫
-描。
-6)const:表示通过索引一次就找到了，const用于比较为primary key(主键索引)或者是unique索引，因为
-只匹配一行，所以很快，若将主键作为where条件，MySQL就会把该查询作为一个常量
-7)system ：表中只有一条记录(等同于系统表) 这是const特例，平时不会出现。
+  - ref：非唯一性索引扫描，返回匹配.. 
+  - eq_ref:唯一性索引扫描，对于每一个索引键，表中只有一条记录与之匹配。常见于主键 或者唯一索引扫
+    描。
+  - const:表示通过索引一次就找到了，const用于比较为primary key(主键索引)或者是unique索引，因为
+    只匹配一行，所以很快，若将主键作为where条件，MySQL就会把该查询作为一个常量
+  - system ：表中只有一条记录(等同于系统表) 这是const特例，平时不会出现。
 
 ```shell
 # 最好达到 ref OR range 级别
@@ -149,8 +129,6 @@ system>const>eq_ref>
 ref>range>
 index>all
 ```
-
-![1551841109013](..\assets\1551841109013.png)
 
 
 
@@ -165,12 +143,10 @@ sql语句)；
 
 
 
-参数情况
+extra 中出现下面两项意味着 MySQL 不能使用索引，效率会有很大的影响，需尽早优化
 
-- filesort: 外部索引排序
-- temporary: 使用临时表，在 order by 和 group by 中常见
-
-![1551841158512](..\assets\1551841158512.png)
+- Using filesort: 外部索引排序，不是从表中按索引次序读取相关内容，可能在内存或磁盘上排序，MySQL 无法利用索引完成的排序。
+- Using temporary: 使用临时表，在 order by 和 group by 中常见
 
 
 
@@ -178,13 +154,13 @@ sql语句)；
 **3) select_type** 
 
 查询的类型 有以下六种取值
-1)：simplye:表示简单查询 ，不包含子查询以及union
-2)：primary 若查询中包含了任何的子查询，最外层的主查询标识为primary
-3):subquery 标识为子查询
-4):derived :在from子查询的结果会被放入为衍生虚表(临时表)
-5)union:若第二个select 出现在union之后，则会标记为union(若union包含在from子句的子查询中，外
-层的的select标识为derived)
-6)union result：从union表中获取数据的select 标识
+
+- simplye:表示简单查询 ，不包含子查询以及union
+- primary 若查询中包含了任何的子查询，最外层的主查询标识为primary
+- subquery 标识为子查询
+- derived :在from子查询的结果会被放入为衍生虚表(临时表)
+- union:若第二个select 出现在union之后，则会标记为union(若union包含在from子句的子查询中，外层的的select标识为derived)
+- union result：从union表中获取数据的select 标识
 
 
 
@@ -192,8 +168,8 @@ sql语句)；
 
 (4) KEY
 
-【possiable_keys】:理论上可能使用到的索引
-`key`:实际上使用的索引,为null表示为索引失效
+- 【possiable_keys】:理论上可能使用到的索引
+  `key`:实际上使用的索引,为null表示为索引失效
 
 若在查询的时候使用了覆盖索引，那么该索引就不会出现在possible_keys中，而只会出现在key列中
 什么是**覆盖索引**：建立复合索引的时候的列和顺序匹配查询语句的字段个数和顺序
@@ -215,9 +191,7 @@ key_len显示的值为索引字段的最大可能长度，而非使用长度，�
 
 **① 修改SQL:** 在业务允许的情况下使得语句走对应的索引；
 
-![1551841378638](..\assets\1551841378638.png)
-
-```
+```SQL
 EXPLAIN SELECT evaluator_no, course_id from evaluator;
 ```
 
@@ -225,11 +199,9 @@ EXPLAIN SELECT evaluator_no, course_id from evaluator;
 
 **② 添加索引：**对于无法通过修改 SQL 满足业务的情况下，而此 SQL 又进行多次的查询，对其进行添加索引处理
 
-```
+```SQL
 alter table <table> add index idx_name(<col>);
 ```
-
-
 
 
 
@@ -241,9 +213,9 @@ alter table <table> add index idx_name(<col>);
 
 记住抽样统计，同时查询是否排序、是否使用临时表进行索引的选择；
 
-![1551841656997](..\assets\1551841656997.png)
+![1551841656997](http://img.janhen.com/202103072224511551841656997.png)
 
-```sql
+```SQLsql
 EXPLAIN SELECT COUNT( id ) FROM person_info_large;     
 			-- 测试使用什么所以更好
 <sql> FORCE INDEX(<index>);
@@ -266,9 +238,9 @@ EXPLAIN SELECT COUNT( id ) FROM person_info_large;
 
 两者日志的区别：
 
-1. redo log是InnoDB引擎特有的；binlog是MySQL的Server层实现的，所有引擎都可以使⽤。
-2. redo log是物理⽇志，记录的是“在某个数据⻚上做了什么修改”；binlog是逻辑⽇志，记录的是这个语句的原始逻辑，⽐如“给ID=2这⼀⾏的c字段加1 ”。
-3. redo log是 <u>循环写</u> 的，空间固定会⽤完；binlog是可以 <u>追加写⼊</u> 的。“追加写”是指binlog⽂件写到⼀定⼤⼩后会切换到下⼀个，并不会覆盖以前的⽇志。
+1. redo log 是InnoDB引擎特有的；binlog是MySQL的Server层实现的，所有引擎都可以使⽤。
+2. redo log 是物理⽇志，记录的是“在某个数据⻚上做了什么修改”；binlog是逻辑⽇志，记录的是这个语句的原始逻辑，⽐如“给ID=2这⼀⾏的c字段加1 ”。
+3. redo log 是 <u>循环写</u> 的，空间固定会⽤完；binlog是可以 <u>追加写⼊</u> 的。“追加写”是指binlog⽂件写到⼀定⼤⼩后会切换到下⼀个，并不会覆盖以前的⽇志。
 
 
 
@@ -287,7 +259,7 @@ EXPLAIN SELECT COUNT( id ) FROM person_info_large;
 
 ## redolog (物理)
 
-> InnoDB在处理更新语句的时候，只做了写⽇志这⼀个磁盘操作。这个⽇志叫作redo log(重做⽇志)，在更新内存写完redo log后，就返回给客户端，本次更新成功。
+> InnoDB在处理更新语句的时候，只做了写⽇志这⼀个磁盘操作。这个⽇志叫作 redo log (重做⽇志)，在更新内存写完 redo log 后，就返回给客户端，本次更新成功。
 >
 
 只有 InnoDB 有，其他引擎没有；
@@ -305,8 +277,6 @@ redolog 循环写，不持久保存，有大小限制，一般为 4 * 1GB；
 ## undo 日志
 
 >  属于 InnoDB 存储引擎特有的日志，做事务的处理。
-
-
 
 相关的一些问题
 
@@ -371,7 +341,7 @@ InnoDB的刷盘速度就是要参考这两个因素：⼀个是脏⻚⽐例，�
 
 **根据上述算得的F1(M)和F2(N)两个值，取其中较⼤的值记为R，之后引擎就可以按照innodb_io_capacity定义的能⼒乘以R%来控制刷脏⻚的速度。**
 
-![1553991442351](..\assets\1553991442351.png)
+![1553991442351](http://img.janhen.com/202103072225031553991442351.png)
 
 
 
@@ -422,15 +392,9 @@ SHOW INDEX FROM <myTab>;
 
 
 
-
-
-
-
 **索引的适用场景**
 
 选择性较高的场景；
-
-
 
 不适合索引的场景：
 
@@ -498,7 +462,7 @@ B+ 树适合用于遍历和范围的选择，底层叶子节点是双向链表�
 
 无需二次扫表，直接扫描索引中的 B+ 树即可获取全部数据；
 
-```sql
+```SQL
 show index from <table>;
 ```
 
@@ -562,7 +526,7 @@ Change buffer 使用场景：
 
 不指定前缀长度，默认包含整个字符串；
 
-```sql
+```SQL
 ALTER TABLE SUser ADD INDEX idx1(email);   
 -- only prefix
 ALTER TABLE SUser ADD INDEX idx2(email(6));    
@@ -605,7 +569,7 @@ ALTER TABLE SUser ADD INDEX idx2(email(6));
 我们在建⽴索引时关注的是区分度，区分度越⾼越好。因为区分度越⾼，意味着重复的键值越少。因此，我们可以通过统计索引上有多少个不同的值来判断要使⽤多⻓的前缀。
 可以使⽤下⾯这个语句，算出这个列上有多少个不同的值，95% 作为参考
 
-```sql
+```SQL
 SELECT COUNT(DISTINCT LEFT(email, 4)) AS L4,
 COUNT(DISTINCT LEFT(email, 5)) AS L5,
 COUNT(DISTINCT LEFT(email, 6)) AS L6,
@@ -621,7 +585,7 @@ FROM SUser;
 即使你将index2的定义修改为email(18)的前缀索引，这时候虽然index2已经包含了所有的信息，但InnoDB还是要回到id索引再查⼀下，因为系统并不确定前缀索引的定义是否截断了完整信息。
 也就是说，使⽤前缀索引就⽤不上覆盖索引对查询性能的优化了，这也是你在选择是否使⽤前缀索引时需要考虑的⼀个因素。
 
-```sql
+```SQL
 ALTER TABLE SUser ADD INDEX idx_email(eamil(20));
 -- 
 SELECT id, name, email
@@ -639,7 +603,7 @@ WHERE email='zhangssxyz@xxx.com';
 
 由于身份证号的最后6位没有地址码这样的重复逻辑，所以最后这6位很可能就提供了⾜够的区分度，先使⽤count(distinct)⽅法做验证
 
-```sql
+```SQL
 -- MySQL 函数 revere 操作，插入处理
 INSERT INTO T(col.., id_card) VALUES (xxx, revere('input_id_card_string'));
 -- 查询的处理
@@ -658,12 +622,12 @@ WHERE id_card=reverse('input_id_card_string');
 
 这样，索引的⻓度变成了4个字节，⽐原来⼩了很多。
 
-```sql
+```SQL
 -- 新增加一列，4byte 存放索引 hash 后的值
 ALTER TABLE t ADD id_card_crc INT UNSIGNED, ADD index(id_card_crc);
 ```
 
-```sql
+```SQL
 -- 插入逻辑， crc32 hash 值以及原始的值
 INSERT INTO T(co1..., id_card_crc, id_card) VALUES (xxx, crc32('input_card_string'), 'input_id_card_string');                        -- INDEX can duplication
 
@@ -718,9 +682,7 @@ SELECT *
 如果通过调整顺序，可以少维护⼀个索引，那么这个顺序往往就是需要优先考虑采⽤的。
 考虑的原则就是空间了。⽐如上⾯这个市⺠表的情况，name字段是⽐age字段⼤的 ，那我就建议你创建⼀个(name,age)的联合索引和⼀个(age)的单字段索引
 
-
-
-![1551846748988](..\assets\1551846748988.png)
+![1551846748988](http://img.janhen.com/202103072220221551846748988.png)
 
 
 
@@ -757,7 +719,7 @@ SQL语句条件⽤的是 where t_modified='2018-7-1’ 的话，B+树提供的�
 (1) 显示调用函数
 在t_modified字段加了month()函数操作，导致了全索引扫描
 
-```sql
+```SQL
 CREATE TABLE `tradelog` (
 `id` int(11) NOT NULL,
 `tradeid` varchar(32) DEFAULT NULL,
@@ -788,7 +750,7 @@ WHERE (t_modified >= '2016-7-1' AND t_modified<'2016-8-1') OR
 
 字符串隐式得转换成数字进行操作；
 
-```sql
+```SQL
 select * 
 from tradelog 
 where tradeid=110717;
@@ -821,7 +783,7 @@ select d.* from tradelog l, trade_detail d where d.tradeid=l.tradeid and l.id=2;
 
 两个字符集不同：
 
-```sql
+```SQL
 select * from trade_detail where tradeid=$L2.tradeid.value;
 -- 等同于，对列粒度的字符进行编码转换比较
 select * from trade_detail where CONVERT(traideid USING utf8mb4)=$L2.tradeid.value;
@@ -836,13 +798,13 @@ select * from trade_detail where CONVERT(traideid USING utf8mb4)=$L2.tradeid.val
 
 方案一： 把trade_detail表上的tradeid字段的字符集也改成utf8mb4，这样就没有字符集转换的问题了。
 
-````sql
+```SQL
 ALTER TABLE trade_detail MODIFY tradeid varchar(32) character SET utf8mb4 DEFAULT NULL;
 ````
 
 方案二： 在无法修改字符集的情况下，或者表中的数据很多的情况下
 
-```sql
+```SQL
 select d.* from tradelog l , trade_detail d where d.tradeid=CONVERT(l.tradeid USING utf8) and l.id=2;
 ```
 
@@ -850,7 +812,7 @@ select d.* from tradelog l , trade_detail d where d.tradeid=CONVERT(l.tradeid US
 
 (4) 简单的计算
 
-```sql
+```SQL
 SELECT * 
 FROM trade_detail 
 WHERE trade_step=trade_step + 1;
@@ -901,7 +863,7 @@ TH:  搜索日志表在程序中的使用，若都是单表的查询，没有修
 
 **第⼀种⽅法是，采⽤force index强⾏选择⼀个索引**。MySQL会根据词法解析的结果分析出可能可以使⽤的索引作为候选项，然后在候选列表中依次判断每个索引需要扫描多少⾏。如果force index指定的索引在候选索引列表中，就直接选择这个索引，不再评估其他索引的执⾏代价。
 
-```sql
+```SQL
 -- FORCE INDEX 的使用
 SELECT * 
 FROM t FORCE INDEX(a) 
@@ -926,7 +888,7 @@ LIMIT 1;
 现在order by b,a 这种写法，要求按照b,a排序，就意味着使⽤这两个索引都需要排序。因此，扫描⾏数成了影响决策的主要条件，于是此时优化器选了只需要扫描1000⾏的索引a。
 当然，这种修改并不是通⽤的优化⼿段，只是刚好在这个语句⾥⾯有limit 1，因此如果有满⾜条件的记录， order by b limit 1和order by b,a limit 1 都会返回b是最⼩的那⼀⾏，逻辑上⼀致，才可以这么做。
 
-```sql
+```SQL
 SELECT * 
 FROM t FORCE INDEX(a) 
 WHERE a BETWEEN 1 AND 1000 
@@ -964,7 +926,7 @@ FROM (SELECT * FROM t WHERE (a BETWEEN 1 AND 1000) AND (B BETWEEN 50000 AND 1000
 
 『分布式锁』：分布式锁实现有两种：基于Redis和基于Zookeeper，基于这两种 业界也有开源的解决方案。
 
-```sql
+```SQL
 ... FOR UPDATE;				-- 悲观策略
 ... LOCK IN SHARE MODE;  
 SHOW test_optimistic SET money=223, version=0+1 WHERE version=0 AND id=2;     -- version 中的 0 由调用者提供
@@ -993,7 +955,7 @@ MySQL提供了⼀个加全局读锁的⽅法，命令是 `Flush tables with read
 
 可以⽤unlock tables主动释放锁，也可以在客户端断开的时候⾃动释放。
 
-```sql
+```SQL
 lock tables … read/write
 ```
 
@@ -1111,7 +1073,7 @@ TH: 对于程序更新的语句，对数据的更新查看影响的行数，若�
 
 显示加悲观锁
 
-```sql
+```SQL
 SELECT ... FROM ...  FOR UPDATE;    -- 显示加悲观锁
 ```
 
@@ -1264,7 +1226,7 @@ undo 信息的数据字典：
 
 一条语句失败并抛出异常，不会导致先前已经执行的语句自动会馆，
 
-```sql
+```SQL
 
 -- salfpoint
 ROLLBACK 
@@ -1350,7 +1312,7 @@ XA 事务由一个或多个资源管理器、一个事务管理器以及一个�
 
 好处二： 用户可以知道现在大概已经执行到了哪个阶段
 
-```sql
+```SQL
 UPDATE account 
 SET account_total=account_total+1 + (1+interest_rate);
 ```
@@ -1363,7 +1325,7 @@ SET account_total=account_total+1 + (1+interest_rate);
 
 **更新丢失：** 
 
-![1551851135178](..\assets\1551851135178.png)
+![1551851135178](http://img.janhen.com/202103072221061551851135178.png)
 
 
 
@@ -1509,7 +1471,7 @@ MySQL InnoDB默认行级锁。行级锁都是基于索引的，如果一条SQL�
 
 **InnoDB也支持通过特定的语句进行显示锁定，这些语句不属于SQL规范：**
 
-```sql
+```SQL
 -- InnoDB 显示加表锁
 SELECT ... LOCK IN SHARE MODE
 SELECT ... FOR UPDATE
@@ -1539,13 +1501,13 @@ InnoDB 对行级上锁时，会上表级别的易向锁；
 
 二段锁： 加锁和解锁
 
-```sql
+```SQL
 UPDATE person_info_large SET title="Test" WHERE id = 1;
 SHOW VARIABLES LIKE 'autocommit';
 SET autocommit=0;      -- 当前 Session, 关闭
 ```
 
-```sql
+```SQL
 # 行级锁，阻塞住
 SELECT * FROM person_info_large WHERE id=3 LOCK IN SHARE MODE;
 					-- Add Read Lock, 其他 session 无法加 Write 锁
@@ -1558,7 +1520,7 @@ UPDATE person_info_large SET title="test" WHERE id=4;
 
 (2)当不走索引时，整张表都被锁住
 
-```sql
+```SQL
 SELECT * FROM person_info_large WHERE mottto="xxx" LOCK IN SHARE MODE;
 				-- motto 无索引
 UPDATE person_info_large SET title="zzz" WHERE motto="yyy";
@@ -1670,9 +1632,9 @@ DB_ROW_ID: 无主件时隐式的 ID
 
 **(3) read view**: 可见性算法
 
-<img src="..\assets\1551854704429.png" alt="1551854704429" style="zoom:50%;" />
+<img src="http://img.janhen.com/202103072224031551854704429.png" alt="1551854704429" style="zoom:50%;" />
 
-<img src="..\assets\1551854739908.png" alt="1551854739908" style="zoom:50%;" />
+<img src="http://img.janhen.com/202103072224191551854739908.png" alt="1551854739908" style="zoom:50%;" />
 
 
 
@@ -1729,7 +1691,7 @@ Gap 锁会用在非唯一索引或者不走 index 的当前读中：
 - 非唯一索引
 - 不走索引的当前读，尽量避免
 
-```
+```SQL
 -- ------------------ALL not exist -----------------
 # session1
 BEGIN；
@@ -1817,7 +1779,7 @@ session1 进行写
 
 session2 进行写，阻塞，排它锁
 
-```sql
+```SQL
 LOCK TABLES person_info_myisam READ | WRITE;       -- 显示锁 READ, WRITE
 ```
 
@@ -1825,7 +1787,7 @@ LOCK TABLES person_info_myisam READ | WRITE;       -- 显示锁 READ, WRITE
 
 为 `SELECT` 添加排它锁
 
-```sql
+```SQL
 SELECT <> FOR UPDATE;
 ```
 
@@ -2056,7 +2018,7 @@ Q: 为什么表数据删掉⼀半，表⽂件⼤⼩不变？
 
 只是这个临时表B不需要你⾃⼰创建，MySQL会⾃动完成转存数据、交换表名、删除旧表的操作。
 
-```sql
+```SQL
 ALTER TABLE A engin=InnoDB;
 -- 隐含等价于
 alter table t engine=innodb,ALGORITHM=inplace;
@@ -2188,7 +2150,7 @@ count(*)、count(主键id)、count(字段)和count(1)等不同⽤法的性能
 
 ## 索引与排序
 
-```sql
+```SQL
 SELECT city, name, age 
 FROM t 
 WHERE city='杭州' 
@@ -2259,7 +2221,7 @@ Q: select * from t where city in (“杭州”," 苏州 ") order by name limit 1
 
 如果把这条SQL语句⾥“limit 100”改成“limit 10000,100”的话，处理⽅式其实也差不多，即：要把上⾯的两条语句改成写：
 
-```sql
+```SQL
 -- 拆分 in 成单独的 SQL
 select * from t where city="杭州" order by name limit 10100;
 select * from t where city="苏州" order by name limit 10100;
@@ -2275,7 +2237,7 @@ select * from t where city="苏州" order by name limit 10100;
 再⽤归并排序的⽅法取得按name顺序第10001~10100的name、id的值，然后拿着这100个id到数据库中去查出所有记录。
 上⾯这些⽅法，需要你根据性能需求和开发的复杂度做出权衡。
 
-```sql
+```SQL
 select id,name from t where city="杭州" order by name limit 10100;
 select id,name from t where city="苏州" order by name limit 10100;
 ```
@@ -2290,20 +2252,20 @@ select id,name from t where city="苏州" order by name limit 10100;
 
 Using temporary，Using filesort，使用临时表，需执行排序操作；
 
-```sql
+```SQL
 SELECT word
 FROM words 
 ORDER BY rand()             -- order
 LIMIT 3;
 ```
 
-![1553994912485](assets/1553994912485.png)
+![1553994912485](http://img.janhen.com/202103072222251553994912485.png)
 
 
 
 语句执行流程： 
 
-```sql
+```SQL
 # Query_time: 0.900376 Lock_time: 0.000347 Rows_sent: 3 Rows_examined: 20003
 SET timestamp=1541402277;
 select word from words order by rand() limit 3;
@@ -2325,7 +2287,7 @@ tmp_table_size这个配置限制了内存临时表的⼤⼩，默认值是16M。
 
 这个SQL语句的排序确实没有⽤到临时⽂件，采⽤是MySQL 5.6版本引⼊的⼀个新的排序算法，即：优先队列排序算法。接下来，我们就看看为什么没有使⽤临时⽂件的算法，也就是归并排序算法，⽽是采⽤了优先队列排序算法。
 
-```sql
+```SQL
 select city,name,age from t where city='杭州' order by name limit 1000 ;
 ```
 
@@ -2345,7 +2307,7 @@ select city,name,age from t where city='杭州' order by name limit 1000 ;
 2. ⽤随机函数⽣成⼀个最⼤值到最⼩值之间的数 X = (M-N)*rand() + N;
 3. 取不⼩于X的第⼀个ID的⾏。
 
-```sql
+```SQL
 SELECT MAX(id), MIN(id) INTO @M, @N 
 FROM comment;
 SET @X=floor((@M-@X+1)*rand() + @N);
@@ -2369,7 +2331,7 @@ LIMIT 1;                   -- error??
 
 3、再⽤limit Y,1 取得⼀⾏。
 
-```sql
+```SQL
 select count(*) into @C from t;
 set @Y = floor(@C * rand());
 set @sql = concat("select * from t limit ", @Y, ",1");
@@ -2393,7 +2355,7 @@ DEALLOCATE prepare stmt;
 2. 根据相同的随机⽅法得到Y1、Y2、Y3；
 3. 再执⾏三个limit Y, 1语句得到三⾏数据。
 
-```sql
+```SQL
 select count(*) into @C from t;
 set @Y1 = floor(@C * rand());
 set @Y2 = floor(@C * rand());
@@ -2419,7 +2381,7 @@ select * from t limit @Y3，1；
 
 取Y1、Y2和Y3⾥⾯最⼤的⼀个数，记为M，最⼩的⼀个数记为N，然后执⾏下⾯这条SQL语句：
 
-```sql
+```SQL
 SELECT * 
 FROM t
 LIMIT N, M-N+1;
@@ -2470,7 +2432,7 @@ select * from information_schema.processlist where id=1;
 
 这个状态表示的是，现在有⼀个线程正要对表t做flush操作。MySQL⾥⾯对表做flush操作的⽤法，⼀般有以下两个：
 
-```sql
+```SQL
 flush tables t with read lock;
 flush tables with read lock;
 ```
@@ -2491,19 +2453,15 @@ select * from t where id=1 lock in share mode;
 
 **查询慢**
 
-```sql
+```SQL
 select * from t where c=50000 limit 1;
 SET long_query_time=0;    -- slow log 
 ```
 
-```sql
+```SQL
 select * from t where id=1；   -- 800ms
 select * from t where id=1 lock in share mode     -- 0.2ms
 ```
-
-![1553999449922](assets/1553999449922.png)
-
-![1553999516442](assets/1553999516442.png)
 
 session B更新完100万次，⽣成了100万个回滚⽇志(undo log)。
 带lock in share mode的SQL语句，是当前读，因此会直接读到1000001这个结果，所以速度很快；⽽select * from t where

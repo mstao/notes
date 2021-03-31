@@ -358,7 +358,7 @@ a1.sources.r1.selector.type = replicating
 ```properties
 a1.sources = r1 
 a1.channels = c1 
-a1.sources.r1.selector.type = com.janhen.bigdata.flume.MyChannelSelector
+a1.sources.r1.selector.type = com.janhen.bigdata.flume.selector.MyChannelSelector
 ```
 
 

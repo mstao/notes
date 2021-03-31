@@ -1134,14 +1134,16 @@ ParameterizedType :
  
 
 ```JAVA
-public class IntPair extends Pair<Integer> {  }
-    Class<IntPair> clazz = IntPair.class;
-    Type t = clazz.getGenericSuperclass();
-    if (t instanceof ParameterizedType) {
-    Parameterized pt = (ParameterizedType) t;
-    Type[] types = pt.getActualTypeArguments();
-    Type firstType = types[0];
-    Class<?> typeClass = (Class<T>) firstType;
+public class IntPair extends Pair<Integer> {
+}
+Class<IntPair> clazz = IntPair.class;
+Type t = clazz.getGenericSuperclass();
+if(t instanceof ParameterizedType){
+  Parameterized pt=(ParameterizedType)t;
+  Type[]types=pt.getActualTypeArguments();
+  Type firstType=types[0];
+  Class<?> typeClass=(Class<T>)firstType;
+}
 ```
 
 ·Java的泛型采用擦拭法实现 
