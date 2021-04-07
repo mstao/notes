@@ -68,4 +68,8 @@
 
 ## 其他
 [Linux 常用命令](https://www.notion.so/janhen/Linux-7993a60a6636411484c0832795383d2e)  
+[Docker 学习笔记](https://www.notion.so/janhen/Docker-22568256c6894b879f587ca34358af39)
+> Docker 镜像、容器、仓库，单机网络、多机网络、overlay 网络、etcd 存储，数据持久化，Dockerfile 语法，Docker compose...  
 
+[Docker 镜像构建](https://www.notion.so/janhen/Docker-b6d1d65453934331933244d8c9504d2e)  
+> 构建前端项目、maven 项目，使用容器作为编译环境，镜像打包，将参数在运行时传入，编写 Dockerfile 的一些约定(规范)
