@@ -1,6 +1,6 @@
 个人学习笔记，主要为数据结构与算法、后端、大数据相关。
 
-
+笔记整理说明 [link](https://www.notion.so/janhen/a7cba23355f648a89ebd455f4f985cd9)
 
 ## 数据结构与算法
 见 [这里](https://github.com/Janhen/dsal)
