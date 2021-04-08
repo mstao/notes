@@ -5,6 +5,9 @@
 见 [这里](https://github.com/Janhen/dsal)
 
 ## Java
+[Java-语言基础](https://www.notion.so/janhen/Java-126dbb015f1b4b12a4dbf59e53da96f1)
+> 基础的语法细节，装箱拆箱，内部类，访问权限，面向对象，泛型，JDBC，反射，注解，序列化，克隆，枚举等。
+
 [Java-集合类源码](https://www.notion.so/janhen/Java-13de9f29afb34f34bab5ae9e604eae77)  
 > JDK 中 ArrayList,LinkedList,Vector,CopyOnWriteArrayList,PriorityQueue,ArrayDeque,Collections,Arrays 源码分析比较，关注于
 > 集合类型的底层结构、扩容机制、线程安全、复杂度震荡、迭代方式等方面。
