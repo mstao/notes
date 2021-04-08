@@ -1,13 +1,18 @@
-个人学习笔记，主要为数据结构与算法、后端、大数据相关。
-
-笔记整理说明 [link](https://www.notion.so/janhen/a7cba23355f648a89ebd455f4f985cd9)
+个人学习笔记，主要为数据结构与算法、后端、大数据相关。  
+汇总散落在为知笔记(Windows 时使用)、有道云笔记(Mac 时使用)、Typora + 坚果云同步(系统性整理)中的内容，统一使用 Notion 进行管理，博客辅助知识的整理， 笔记整理说明见 [link](https://www.notion.so/janhen/a7cba23355f648a89ebd455f4f985cd9)。
 
 ## 数据结构与算法
 见 [这里](https://github.com/Janhen/dsal)
 
 ## Java
 [Java-集合类源码](https://www.notion.so/janhen/Java-13de9f29afb34f34bab5ae9e604eae77)  
+> JDK 中 ArrayList,LinkedList,Vector,CopyOnWriteArrayList,PriorityQueue,ArrayDeque,Collections,Arrays 源码分析比较，关注于
+> 集合类型的底层结构、扩容机制、线程安全、复杂度震荡、迭代方式等方面。
+
 [Java-Map 类源码](https://www.notion.so/janhen/Java-Map-fe72eca8c00c49a39111d38dddefd92c)  
+> JDK 中 HashMap,LinkedHashMap,ConcurrentHashMap,HashTable,ThreadLocalMap,WeakHashMap 源码分析比较，JDK7 和 JDK8 版本下的不同，
+> 关注 Map 的 Hash 函数与元素定位、Hash 冲突的处理、NULL 值的处理、扩容与 rehash 机制、结构的变更、线程安全的保证(全局锁,分段锁,CAS)
+
 [JVM-内存和GC](https://www.notion.so/janhen/JVM-GC-a5644802b46b4d34bdf95af864a16059)  
 > 内存、GC 配置参数，内存划分，内存问题，内存回收...
 
@@ -25,7 +30,17 @@
 > 常见的索引失效问题，索引选择异常问题，索引重建。
 > 索引实现，自适应 hash 索引， b 树、b+ 树。
 
-[Mysql 日志](https://www.notion.so/janhen/Mysql-1f6ef9a1d4ad451db0066ed7af74cb01)  
+[MySQL 事务](https://www.notion.so/janhen/MySQL-1cc42fe5d18549d1a72a2dab6226342c)
+> 事务的四大特性，并发问题，隔离级别，事务实现方式，事务分类，两阶段提交，Innodb 在 RR 下解决幻读，MVCC 机制。
+
+[MySQL 锁](https://www.notion.so/janhen/MySQL-41e378ebba7349c5b3d9c18c1f505b62)
+> 锁的分类、粒度、实现算法，乐观锁、悲观锁、死锁等
+
+[MySQL 结构|索引|SQL的优化](https://www.notion.so/janhen/MySQL-SQL-678d9fce85cf4528b3e79b64e1ae8b6b)
+> decimal,varchar,char,date,datetime,time 等字段的占用，避免索引失效、确定索引顺序、索引列的选取、清理重复索引等，SQL 执行过程，慢查询分析，
+> 特定条件的 SQL 优化等。
+
+[Mysql 日志](https://www.notionhttps://www.notion.so/janhen/MySQL-SQL-678d9fce85cf4528b3e79b64e1ae8b6b.so/janhen/Mysql-1f6ef9a1d4ad451db0066ed7af74cb01)  
 > 慢查询日志，慢查询日志的分析，explain 各个字段的含义，慢查询分析工具 mysqldumpslow,pt-query-digest，配置...
 > binlog，两阶段提交，与 redo 日志的比较，实时获取 binlog 内容，binlog 的清理...
 > redo log，wal, 脏页的刷新，配置...
@@ -33,6 +48,9 @@
 
 [MySQL 备份与恢复](https://www.notion.so/janhen/MySQL-7fae8af4ddf149f1bfaa558f430c28d7)  
 > 备份的内容，恢复的策略，基于 binlog 的恢复，导入导出方式，mysqldump 进行 全量、条件、表结构、压缩等备份恢复，xtrabackup 进行全量、条件、压缩、增量备份和恢复...
+
+[MySQL 管理](https://www.notion.so/janhen/MySQL-d8fe7b26db344cb6b60a5d34ac8b2f91)
+> 常用的 MySQL 运维管理操作整理，mysql 制作报表，用户与权限管理，运行情况查看与监控，碎片整理，在线表结构变更；服务器配置参数、连接参数、归档数据库配置说明；大表数据的删除；
 
 [Percona-Toolkit](https://www.notion.so/janhen/Percona-Toolkit-e9ea157626d24777babdaacf2babd301)  
 > Percona 公司开发用于管理 MySQL 的工具使用整理，在线更改表结构工具 pt-online-schema-change, 慢查询分析工具 pt-query-digest，主从表同步工具 
